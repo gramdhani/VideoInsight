@@ -12,6 +12,12 @@ export const videos = pgTable("videos", {
   views: text("views").notNull(),
   thumbnail: text("thumbnail").notNull(),
   transcript: text("transcript"),
+  transcriptData: jsonb("transcript_data").$type<Array<{
+    text: string;
+    startMs: string;
+    endMs: string;
+    startTimeText: string;
+  }>>(),
   summary: jsonb("summary").$type<{
     keyPoints: string[];
     ahaMonents: Array<{ timestamp: string; content: string }>;

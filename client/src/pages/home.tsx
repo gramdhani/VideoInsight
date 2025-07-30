@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Play } from "lucide-react";
 import UrlInput from "../components/url-input";
 import VideoPlayer from "../components/video-player";
-import SummaryCard from "../components/summary-card";
+import TabbedContent from "../components/tabbed-content";
 import ChatInterface from "../components/chat-interface";
 import NotesExport from "../components/notes-export";
 import QuickActions from "../components/quick-actions";
@@ -45,7 +45,7 @@ export default function Home() {
             {/* Left Column */}
             <div className="space-y-6">
               <VideoPlayer video={currentVideo} />
-              <SummaryCard video={currentVideo} />
+              <TabbedContent video={currentVideo} />
             </div>
 
             {/* Right Column */}

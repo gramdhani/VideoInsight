@@ -5,6 +5,7 @@ interface YouTubeVideoInfo {
   views: string;
   thumbnail: string;
   transcript?: string;
+  transcriptData?: TranscriptItem[];
 }
 
 interface TranscriptItem {
@@ -62,7 +63,7 @@ export async function getVideoInfo(videoId: string): Promise<YouTubeVideoInfo> {
     
     // Get transcript from ScrapeCreators API
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    const transcript = await getVideoTranscript(videoUrl);
+    const transcriptResult = await getVideoTranscript(videoUrl);
     
     return {
       title: video.snippet.title,
@@ -70,7 +71,8 @@ export async function getVideoInfo(videoId: string): Promise<YouTubeVideoInfo> {
       duration,
       views,
       thumbnail: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-      transcript,
+      transcript: transcriptResult.text,
+      transcriptData: transcriptResult.segments,
     };
   } catch (error) {
     throw new Error("Failed to fetch video information: " + (error instanceof Error ? error.message : String(error)));
@@ -101,7 +103,7 @@ function formatViewCount(count: string): string {
   return num + ' views';
 }
 
-async function getVideoTranscript(videoUrl: string): Promise<string> {
+async function getVideoTranscript(videoUrl: string): Promise<{ text: string; segments: TranscriptItem[] }> {
   const scrapeCreatorsApiKey = process.env.SCRAPE_CREATORS_API_KEY;
   
   if (!scrapeCreatorsApiKey) {
@@ -127,8 +129,11 @@ async function getVideoTranscript(videoUrl: string): Promise<string> {
     
     const data: ScrapeCreatorsResponse = await response.json();
     
-    // Return the full transcript text
-    return data.transcript_only_text || 'No transcript available for this video';
+    // Return both text and structured segments
+    return {
+      text: data.transcript_only_text || 'No transcript available for this video',
+      segments: data.transcript || [],
+    };
   } catch (error) {
     console.error('Error fetching transcript:', error);
     throw new Error("Failed to fetch video transcript: " + (error instanceof Error ? error.message : String(error)));

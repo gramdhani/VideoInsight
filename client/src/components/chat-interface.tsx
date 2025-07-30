@@ -22,17 +22,17 @@ export default function ChatInterface({ video }: ChatInterfaceProps) {
   const queryClient = useQueryClient();
 
   const { data: messages = [] } = useQuery({
-    queryKey: ["/api/videos", video.youtubeId, "chat"],
-    enabled: !!video.youtubeId,
+    queryKey: ["/api/videos", video.id, "chat"],
+    enabled: !!video.id,
   });
 
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
-      const response = await apiRequest("POST", `/api/videos/${video.youtubeId}/chat`, { message });
+      const response = await apiRequest("POST", `/api/videos/${video.id}/chat`, { message });
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/videos", video.youtubeId, "chat"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/videos", video.id, "chat"] });
       setMessage("");
     },
     onError: (error: Error) => {

@@ -33,7 +33,8 @@ export class MemStorage implements IStorage {
       duration: insertVideo.duration,
       views: insertVideo.views,
       thumbnail: insertVideo.thumbnail,
-      transcript: insertVideo.transcript,
+      transcript: insertVideo.transcript || null,
+      transcriptData: Array.isArray(insertVideo.transcriptData) ? insertVideo.transcriptData : null,
       summary: insertVideo.summary || null,
       createdAt: new Date(),
     };
@@ -54,7 +55,7 @@ export class MemStorage implements IStorage {
       videoId: insertMessage.videoId,
       message: insertMessage.message,
       response: insertMessage.response,
-      timestamps: Array.isArray(insertMessage.timestamps) ? insertMessage.timestamps : [],
+      timestamps: Array.isArray(insertMessage.timestamps) ? insertMessage.timestamps : null,
       createdAt: new Date(),
     };
     this.chatMessages.set(id, message);

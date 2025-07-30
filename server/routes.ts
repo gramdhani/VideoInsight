@@ -42,6 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         views: videoInfo.views,
         thumbnail: videoInfo.thumbnail,
         transcript: videoInfo.transcript,
+        transcriptData: videoInfo.transcriptData,
         summary,
       });
       
@@ -79,8 +80,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Message is required" });
       }
       
-      // Get video for context
-      const video = await storage.getVideo(videoId);
+      // Get video for context - videoId could be youtubeId or internal ID
+      let video = await storage.getVideo(videoId);
+      if (!video) {
+        // Try to find by internal ID
+        const allVideos = Array.from((storage as any).videos.values());
+        video = allVideos.find((v: any) => v.id === videoId);
+      }
       if (!video) {
         return res.status(404).json({ message: "Video not found" });
       }
@@ -119,7 +125,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/videos/:videoId/chat", async (req, res) => {
     try {
       const { videoId } = req.params;
-      const messages = await storage.getChatMessages(videoId);
+      
+      // Get video for context - videoId could be youtubeId or internal ID
+      let video = await storage.getVideo(videoId);
+      if (!video) {
+        // Try to find by internal ID
+        const allVideos = Array.from((storage as any).videos.values());
+        video = allVideos.find((v: any) => v.id === videoId);
+      }
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      const messages = await storage.getChatMessages(video.id);
       res.json(messages);
     } catch (error) {
       console.error("Error fetching chat messages:", error);
