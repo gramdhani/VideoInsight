@@ -22,7 +22,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Analyze YouTube video
+  // Analyze YouTube video (accessible to all users)
   app.post("/api/videos/analyze", async (req, res) => {
     try {
       const { url } = req.body;
@@ -68,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get video by YouTube ID
+  // Get video by YouTube ID (accessible to all users)
   app.get("/api/videos/:youtubeId", async (req, res) => {
     try {
       const { youtubeId } = req.params;
@@ -85,8 +85,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Chat about video
-  app.post("/api/videos/:videoId/chat", async (req, res) => {
+  // Chat about video (requires authentication)
+  app.post("/api/videos/:videoId/chat", isAuthenticated, async (req, res) => {
     try {
       const { videoId } = req.params;
       const { message } = req.body;
@@ -135,8 +135,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get chat messages for video
-  app.get("/api/videos/:videoId/chat", async (req, res) => {
+  // Get chat messages for video (requires authentication)
+  app.get("/api/videos/:videoId/chat", isAuthenticated, async (req, res) => {
     try {
       const { videoId } = req.params;
       

@@ -5,23 +5,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Home from "./pages/home";
-import Landing from "./pages/landing";
+
 import Changelog from "./pages/changelog";
 import NotFound from "./pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/changelog" component={Changelog} />
-        </>
-      )}
+      <Route path="/" component={Home} />
+      <Route path="/changelog" component={Changelog} />
       <Route component={NotFound} />
     </Switch>
   );
