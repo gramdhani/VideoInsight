@@ -26,8 +26,14 @@ export class MemStorage implements IStorage {
   async createVideo(insertVideo: InsertVideo): Promise<Video> {
     const id = randomUUID();
     const video: Video = { 
-      ...insertVideo, 
       id,
+      youtubeId: insertVideo.youtubeId,
+      title: insertVideo.title,
+      channel: insertVideo.channel,
+      duration: insertVideo.duration,
+      views: insertVideo.views,
+      thumbnail: insertVideo.thumbnail,
+      transcript: insertVideo.transcript,
       summary: insertVideo.summary || null,
       createdAt: new Date(),
     };
@@ -44,8 +50,10 @@ export class MemStorage implements IStorage {
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
     const id = randomUUID();
     const message: ChatMessage = { 
-      ...insertMessage, 
       id,
+      videoId: insertMessage.videoId,
+      message: insertMessage.message,
+      response: insertMessage.response,
       timestamps: Array.isArray(insertMessage.timestamps) ? insertMessage.timestamps : [],
       createdAt: new Date(),
     };

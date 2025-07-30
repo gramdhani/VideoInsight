@@ -7,6 +7,21 @@ interface YouTubeVideoInfo {
   transcript?: string;
 }
 
+interface TranscriptItem {
+  text: string;
+  startMs: string;
+  endMs: string;
+  startTimeText: string;
+}
+
+interface ScrapeCreatorsResponse {
+  videoId: string;
+  type: string;
+  url: string;
+  transcript: TranscriptItem[];
+  transcript_only_text: string;
+}
+
 export function extractYouTubeId(url: string): string | null {
   const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
   const match = url.match(regex);
@@ -14,16 +29,21 @@ export function extractYouTubeId(url: string): string | null {
 }
 
 export async function getVideoInfo(videoId: string): Promise<YouTubeVideoInfo> {
-  const apiKey = process.env.YOUTUBE_API_KEY || process.env.YOUTUBE_API_KEY_ENV_VAR || "default_key";
+  const youtubeApiKey = process.env.YOUTUBE_API_KEY;
+  
+  if (!youtubeApiKey) {
+    throw new Error('YouTube API key is not configured');
+  }
   
   try {
-    // Get video details
+    // Get video details from YouTube API
     const videoResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet,statistics,contentDetails`
+      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${youtubeApiKey}&part=snippet,statistics,contentDetails`
     );
     
     if (!videoResponse.ok) {
-      throw new Error('Failed to fetch video information');
+      const errorData = await videoResponse.json().catch(() => ({}));
+      throw new Error(`YouTube API error: ${videoResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
     }
     
     const videoData = await videoResponse.json();
@@ -40,13 +60,17 @@ export async function getVideoInfo(videoId: string): Promise<YouTubeVideoInfo> {
     // Format view count
     const views = formatViewCount(video.statistics.viewCount);
     
+    // Get transcript from ScrapeCreators API
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const transcript = await getVideoTranscript(videoUrl);
+    
     return {
       title: video.snippet.title,
       channel: video.snippet.channelTitle,
       duration,
       views,
       thumbnail: video.snippet.thumbnails.maxres?.url || video.snippet.thumbnails.high.url,
-      transcript: await getVideoTranscript(videoId), // This would need a transcript service
+      transcript,
     };
   } catch (error) {
     throw new Error("Failed to fetch video information: " + (error instanceof Error ? error.message : String(error)));
@@ -77,8 +101,36 @@ function formatViewCount(count: string): string {
   return num + ' views';
 }
 
-async function getVideoTranscript(videoId: string): Promise<string> {
-  // For now, return a placeholder since transcript extraction requires additional setup
-  // In production, you'd use a service like youtube-transcript-api or similar
-  return `This is a placeholder transcript for video ${videoId}. In production, this would contain the actual video transcript extracted from YouTube's captions or a transcript service.`;
+async function getVideoTranscript(videoUrl: string): Promise<string> {
+  const scrapeCreatorsApiKey = process.env.SCRAPE_CREATORS_API_KEY;
+  
+  if (!scrapeCreatorsApiKey) {
+    throw new Error('ScrapeCreators API key is not configured');
+  }
+  
+  try {
+    const response = await fetch(
+      `https://api.scrapecreators.com/v1/youtube/video/transcript?url=${encodeURIComponent(videoUrl)}`,
+      {
+        method: 'GET',
+        headers: {
+          'x-api-key': scrapeCreatorsApiKey,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`ScrapeCreators API error: ${response.status} - ${errorData.message || 'Failed to fetch transcript'}`);
+    }
+    
+    const data: ScrapeCreatorsResponse = await response.json();
+    
+    // Return the full transcript text
+    return data.transcript_only_text || 'No transcript available for this video';
+  } catch (error) {
+    console.error('Error fetching transcript:', error);
+    throw new Error("Failed to fetch video transcript: " + (error instanceof Error ? error.message : String(error)));
+  }
 }
