@@ -4,8 +4,23 @@ import { storage } from "./storage";
 import { insertVideoSchema, insertChatMessageSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo } from "./services/openai";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
   
   // Analyze YouTube video
   app.post("/api/videos/analyze", async (req, res) => {
@@ -84,8 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let video = await storage.getVideo(videoId);
       if (!video) {
         // Try to find by internal ID
-        const allVideos = Array.from((storage as any).videos.values());
-        video = allVideos.find((v: any) => v.id === videoId);
+        video = await storage.getVideoById(videoId);
       }
       if (!video) {
         return res.status(404).json({ message: "Video not found" });
@@ -130,8 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let video = await storage.getVideo(videoId);
       if (!video) {
         // Try to find by internal ID
-        const allVideos = Array.from((storage as any).videos.values());
-        video = allVideos.find((v: any) => v.id === videoId);
+        video = await storage.getVideoById(videoId);
       }
       
       if (!video) {

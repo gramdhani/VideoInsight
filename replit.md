@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 30, 2025 - v0.2.0 Authentication Integration:**
+- Integrated Replit OpenID Connect authentication system
+- Added user session management with PostgreSQL session storage
+- Implemented authentication-aware routing (Landing page for unauthenticated users)
+- Created user authentication hooks and utilities for frontend
+- Added protected API routes requiring user authentication
+- Enhanced header component with user profile dropdown and logout functionality
+- Updated database schema with users and sessions tables
+- Switched from in-memory storage to DatabaseStorage for production readiness
+
 **January 30, 2025 - v0.1.0 Initial Release:**
 - Added YouTube URL analysis with real-time transcript extraction using ScrapeCreators API
 - Implemented AI-powered video summaries with key insights and "aha moments"
