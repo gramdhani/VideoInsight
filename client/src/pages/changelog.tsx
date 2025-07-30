@@ -1,31 +1,15 @@
-import { Calendar, GitBranch, Zap, MessageCircle, FileText, Link, Play, Home } from "lucide-react";
+import { Calendar, GitBranch, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Header from "../components/header";
 
 export default function Changelog() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          {/* Navigation */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
-                <Play className="w-3 h-3 text-white" />
-              </div>
-              <span className="font-medium text-gray-700">VideoInsight AI</span>
-            </div>
-            <nav className="flex items-center space-x-6">
-              <a href="/" className="text-gray-600 hover:text-primary transition-colors flex items-center space-x-1">
-                <Home className="w-4 h-4" />
-                <span>Home</span>
-              </a>
-              <span className="text-primary font-medium">Changelog</span>
-            </nav>
-          </div>
-          
-          {/* Page Title */}
+      <Header currentPage="changelog" />
+
+      {/* Page Title Section */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
               <GitBranch className="w-4 h-4 text-white" />
@@ -36,7 +20,7 @@ export default function Changelog() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Content */}
       <main className="max-w-4xl mx-auto px-6 py-8">
