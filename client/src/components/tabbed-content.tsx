@@ -4,6 +4,7 @@ import { RotateCcw, Download, Lightbulb, Key, Star, FileText, Clock, Play } from
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { parseMarkdownLinks, parseMarkdownText } from "../utils/markdown";
 
 interface TabbedContentProps {
   video: {
@@ -84,7 +85,7 @@ export default function TabbedContent({ video }: TabbedContentProps) {
                   {summary.keyPoints.map((point, index) => (
                     <li key={index} className="flex items-start space-x-3">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <p className="text-gray-700">{point}</p>
+                      <div className="text-gray-700">{parseMarkdownLinks(point)}</div>
                     </li>
                   ))}
                 </ul>
@@ -119,7 +120,7 @@ export default function TabbedContent({ video }: TabbedContentProps) {
                           {moment.timestamp}
                         </button>
                       </div>
-                      <p className="text-gray-700 text-sm">{moment.content}</p>
+                      <div className="text-gray-700 text-sm">{parseMarkdownLinks(moment.content)}</div>
                     </div>
                   ))}
                 </div>

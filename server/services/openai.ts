@@ -17,7 +17,7 @@ export async function summarizeVideo(transcript: string, title: string): Promise
       messages: [
         {
           role: "system",
-          content: "You are an expert video analyst. Create a comprehensive summary with key points and aha moments from the transcript. Respond with JSON in this format: { 'keyPoints': string[], 'ahaMonents': Array<{ 'timestamp': string, 'content': string }>, 'readingTime': string, 'insights': number }",
+          content: "You are an expert video analyst. Create a comprehensive, well-structured summary with key points and aha moments from the transcript. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url). Focus on clear, readable formatting with proper paragraphs and bullet points. Respond with JSON in this format: { 'keyPoints': string[], 'ahaMonents': Array<{ 'timestamp': string, 'content': string }>, 'readingTime': string, 'insights': number }",
         },
         {
           role: "user",
@@ -56,7 +56,7 @@ export async function chatAboutVideo(
       messages: [
         {
           role: "system",
-          content: `You are an AI assistant helping users understand a video titled "${title}". Use the transcript to answer questions accurately. When relevant, include timestamps from the video. Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }`,
+          content: `You are an AI assistant helping users understand a video titled "${title}". Structure your responses clearly with proper formatting, bullet points, and paragraphs for readability. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url). When relevant, include timestamps from the video. Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }`,
         },
         {
           role: "user",

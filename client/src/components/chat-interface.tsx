@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { parseMarkdownText } from "../utils/markdown";
 
 interface ChatInterfaceProps {
   video: {
@@ -111,7 +112,7 @@ export default function ChatInterface({ video }: ChatInterfaceProps) {
                   <Bot className="w-4 h-4 text-white" />
                 </div>
                 <div className="bg-gray-50 rounded-lg rounded-tl-none p-3 max-w-sm">
-                  <p className="text-sm text-gray-700 mb-2">{msg.response}</p>
+                  <div className="text-sm text-gray-700 mb-2">{parseMarkdownText(msg.response)}</div>
                   {msg.timestamps && msg.timestamps.length > 0 && (
                     <div className="flex items-center space-x-2 mb-2">
                       {msg.timestamps.map((timestamp: string, i: number) => (
