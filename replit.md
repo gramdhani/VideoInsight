@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 30, 2025 - v0.2.1 Freemium Model Implementation:**
+- Implemented freemium homepage experience allowing all users to analyze videos
+- Unlocked AI summary and transcript access for unauthenticated users
+- Added authentication paywall specifically for interactive chat features only
+- Made chat interface sticky on top of right column for better UX
+- Updated API routes to support both authenticated and unauthenticated access patterns
+- Created blurred preview paywall component for premium features
+
 **January 30, 2025 - v0.2.0 Authentication Integration:**
 - Integrated Replit OpenID Connect authentication system
 - Added user session management with PostgreSQL session storage

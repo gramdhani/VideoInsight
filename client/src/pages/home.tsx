@@ -29,31 +29,23 @@ export default function Home() {
             {/* Left Column */}
             <div className="space-y-6">
               <VideoPlayer video={currentVideo} />
-              
-              {isAuthenticated ? (
-                <TabbedContent video={currentVideo} />
-              ) : (
-                <AuthPaywall title="Sign in to view full transcript & summary">
-                  <TabbedContent video={currentVideo} />
-                </AuthPaywall>
-              )}
+              <TabbedContent video={currentVideo} />
             </div>
 
-            {/* Right Column */}
+            {/* Right Column - Sticky Chat */}
             <div className="space-y-6">
-              {isAuthenticated ? (
-                <>
+              <div className="sticky top-6">
+                {isAuthenticated ? (
                   <ChatInterface video={currentVideo} />
-                  <NotesExport video={currentVideo} />
-                  <QuickActions video={currentVideo} />
-                </>
-              ) : (
-                <AuthPaywall title="Sign in to chat with AI about this video">
-                  <ChatInterface video={currentVideo} />
-                  <NotesExport video={currentVideo} />
-                  <QuickActions video={currentVideo} />
-                </AuthPaywall>
-              )}
+                ) : (
+                  <AuthPaywall title="Sign in to chat with AI about this video">
+                    <ChatInterface video={currentVideo} />
+                  </AuthPaywall>
+                )}
+              </div>
+              
+              <NotesExport video={currentVideo} />
+              <QuickActions video={currentVideo} />
             </div>
           </div>
         )}
