@@ -1,0 +1,78 @@
+import OpenAI from "openai";
+
+// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
+});
+
+export async function summarizeVideo(transcript: string, title: string): Promise<{
+  keyPoints: string[];
+  ahaMonents: Array<{ timestamp: string; content: string }>;
+  readingTime: string;
+  insights: number;
+}> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert video analyst. Create a comprehensive summary with key points and aha moments from the transcript. Respond with JSON in this format: { 'keyPoints': string[], 'ahaMonents': Array<{ 'timestamp': string, 'content': string }>, 'readingTime': string, 'insights': number }",
+        },
+        {
+          role: "user",
+          content: `Analyze this video transcript for "${title}":\n\n${transcript}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{}');
+    
+    return {
+      keyPoints: result.keyPoints || [],
+      ahaMonents: result.ahaMonents || [],
+      readingTime: result.readingTime || "3 min",
+      insights: result.insights || 0,
+    };
+  } catch (error) {
+    throw new Error("Failed to summarize video: " + (error instanceof Error ? error.message : String(error)));
+  }
+}
+
+export async function chatAboutVideo(
+  question: string, 
+  transcript: string, 
+  title: string,
+  previousMessages: Array<{ question: string; answer: string }>
+): Promise<{ answer: string; timestamps: string[] }> {
+  try {
+    const context = previousMessages.map(msg => 
+      `Q: ${msg.question}\nA: ${msg.answer}`
+    ).join('\n\n');
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an AI assistant helping users understand a video titled "${title}". Use the transcript to answer questions accurately. When relevant, include timestamps from the video. Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }`,
+        },
+        {
+          role: "user",
+          content: `Previous conversation:\n${context}\n\nTranscript:\n${transcript}\n\nQuestion: ${question}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || '{}');
+    
+    return {
+      answer: result.answer || "I couldn't generate a response for that question.",
+      timestamps: result.timestamps || [],
+    };
+  } catch (error) {
+    throw new Error("Failed to generate chat response: " + (error instanceof Error ? error.message : String(error)));
+  }
+}

@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 98%);
+  --foreground: hsl(215, 25%, 17%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(215, 25%, 17%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(215, 25%, 17%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(243, 75%, 59%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(262, 83%, 65%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(158, 64%, 52%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(243, 75%, 59%);
+  --radius: 0.75rem;
+  
+  /* Custom colors matching design */
+  --bg-main: hsl(0, 0%, 98%);
+  --text-main: hsl(215, 25%, 17%);
+  --card-bg: hsl(0, 0%, 100%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(243, 75%, 59%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(262, 83%, 65%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(158, 64%, 52%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Custom spacing */
+.spacing-24 {
+  gap: 1.5rem;
+}
+
+/* Animation for typing indicator */
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.animate-bounce:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.animate-bounce:nth-child(2) {
+  animation-delay: -0.16s;
+}
