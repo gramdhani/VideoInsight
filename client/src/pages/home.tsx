@@ -24,7 +24,7 @@ export default function Home() {
             </div>
             <nav className="hidden md:flex items-center space-x-6">
               <a href="#" className="text-gray-600 hover:text-primary transition-colors">Features</a>
-              <a href="#" className="text-gray-600 hover:text-primary transition-colors">Pricing</a>
+              <a href="/changelog" className="text-gray-600 hover:text-primary transition-colors">Changelog</a>
               <a href="#" className="text-gray-600 hover:text-primary transition-colors">Help</a>
               <button className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
                 Sign In

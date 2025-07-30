@@ -8,6 +8,18 @@ VideoInsight AI is a full-stack web application that analyzes YouTube videos usi
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**January 30, 2025 - v0.1.0 Initial Release:**
+- Added YouTube URL analysis with real-time transcript extraction using ScrapeCreators API
+- Implemented AI-powered video summaries with key insights and "aha moments"
+- Created tabbed interface with "AI Summary" and "Transcript" tabs
+- Built interactive chat interface for video Q&A with clickable timestamps
+- Added functional Quick Actions for instant analysis (Shorter Summary, Detailed Analysis, Action Items, Key Quotes)
+- Enhanced AI responses with proper markdown formatting and clickable links
+- Implemented two-column layout with professional Indigo/Purple design theme
+- Added changelog page to track features and improvements
+
 ## System Architecture
 
 ### Monorepo Structure
