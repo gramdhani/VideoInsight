@@ -115,7 +115,7 @@ export default function Sidebar({ className }: SidebarProps) {
             <div className="mt-4">
               {isAuthenticated && user ? (
                 <div className="p-3 rounded-lg bg-white/50 border border-gray-200">
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex items-center space-x-3">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={user.profileImageUrl || ""} />
                       <AvatarFallback className="bg-gray-100">
@@ -124,22 +124,21 @@ export default function Sidebar({ className }: SidebarProps) {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-gray-900 truncate">
-                        {user.firstName ? `${user.firstName} | Webflow Developer` : user.email?.split('@')[0] || 'User'}
+                        {user.firstName || 'User'}
                       </div>
                       <div className="text-xs text-gray-500 truncate">
                         {user.email}
                       </div>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-1 h-8 w-8 text-gray-500 hover:text-red-600"
+                      onClick={() => window.location.href = '/api/logout'}
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => window.location.href = '/api/logout'}
-                  >
-                    <LogOut className="w-3 h-3 mr-2" />
-                    Sign Out
-                  </Button>
                 </div>
               ) : (
                 <div 
