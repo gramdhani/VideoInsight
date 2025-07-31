@@ -12,6 +12,7 @@ import {
   Clock,
   Hash,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AutoTextarea } from "@/components/ui/auto-textarea";
@@ -260,7 +261,7 @@ export default function ChatInterface({
                 className="flex-shrink-0"
               >
                 <Zap className="w-4 h-4" />
-                {!isMobile && <span className="ml-2">Quick</span>}
+                <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
