@@ -104,6 +104,18 @@ function ChangelogContent() {
                       </li>
                       <li className="flex items-start space-x-2">
                         <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Redesigned navigation with collapsible sidebar layout for desktop users</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added comprehensive Help page with getting started guide and support information</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Maintained mobile-optimized header navigation while adding desktop sidebar</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
                         <span>Relocated Quick Actions to chat interface for easier access</span>
                       </li>
                       <li className="flex items-start space-x-2">
