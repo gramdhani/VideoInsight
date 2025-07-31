@@ -162,25 +162,23 @@ export default function Sidebar({ className }: SidebarProps) {
                   </Button>
                 </div>
               ) : (
-                <div className="p-3 rounded-lg bg-white/50 border border-gray-200">
-                  <div className="flex items-center space-x-3 mb-3">
+                <div 
+                  className="p-3 rounded-lg bg-white/50 border border-gray-200 cursor-pointer hover:bg-white/70 transition-colors"
+                  onClick={() => window.location.href = '/api/login'}
+                >
+                  <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                       <User className="w-5 h-5 text-gray-500" />
                     </div>
                     <div className="flex-1">
                       <div className="text-sm font-medium text-gray-900">
-                        Not signed in
+                        Sign in
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Sign in to save your progress
                       </div>
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
-                    onClick={() => window.location.href = '/api/login'}
-                  >
-                    <User className="w-3 h-3 mr-2" />
-                    Sign In
-                  </Button>
                 </div>
               )}
             </div>
