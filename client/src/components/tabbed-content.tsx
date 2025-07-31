@@ -25,9 +25,10 @@ interface TabbedContentProps {
       startTimeText: string;
     }>;
   };
+  onTimestampClick?: (timestamp: string) => void;
 }
 
-export default function TabbedContent({ video }: TabbedContentProps) {
+export default function TabbedContent({ video, onTimestampClick }: TabbedContentProps) {
   const { summary } = video;
   const isMobile = useIsMobile();
 
@@ -40,8 +41,12 @@ export default function TabbedContent({ video }: TabbedContentProps) {
   })) || [];
 
   const jumpToTimestamp = (timestamp: string) => {
-    // This would integrate with the YouTube player to jump to specific times
-    console.log(`Jumping to ${timestamp}`);
+    // Use the callback if provided, otherwise fallback to console log
+    if (onTimestampClick) {
+      onTimestampClick(timestamp);
+    } else {
+      console.log(`Jumping to ${timestamp}`);
+    }
   };
 
   return (

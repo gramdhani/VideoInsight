@@ -93,6 +93,23 @@
     min-width: 44px;
   }
   
+  /* Fix mobile viewport issues */
+  @media (max-width: 768px) {
+    .sticky {
+      position: relative !important;
+    }
+    
+    /* Ensure proper spacing for mobile cards */
+    .mobile-card-spacing {
+      margin-bottom: 16px;
+    }
+    
+    /* Prevent cards from being cut off */
+    .mobile-safe-area {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+  }
+  
   /* Mobile typography improvements */
   @media (max-width: 768px) {
     body {

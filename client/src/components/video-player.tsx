@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { PlayCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useRef, useImperativeHandle, forwardRef } from "react";
 
 interface VideoPlayerProps {
   video: {
@@ -13,14 +14,32 @@ interface VideoPlayerProps {
   };
 }
 
-export default function VideoPlayer({ video }: VideoPlayerProps) {
+export interface VideoPlayerRef {
+  jumpToTime: (timeInSeconds: number) => void;
+}
+
+const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref) => {
   const isMobile = useIsMobile();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  useImperativeHandle(ref, () => ({
+    jumpToTime: (timeInSeconds: number) => {
+      if (iframeRef.current) {
+        // Send postMessage to YouTube iframe to jump to specific time
+        iframeRef.current.contentWindow?.postMessage(
+          `{"event":"command","func":"seekTo","args":[${timeInSeconds}, true]}`,
+          "*"
+        );
+      }
+    }
+  }));
   
   return (
     <Card className="bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="aspect-video bg-gray-900 relative">
         <iframe
-          src={`https://www.youtube.com/embed/${video.youtubeId}`}
+          ref={iframeRef}
+          src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&origin=${window.location.origin}`}
           title={video.title}
           className="absolute inset-0 w-full h-full"
           allowFullScreen
@@ -49,4 +68,8 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       </CardContent>
     </Card>
   );
-}
+});
+
+VideoPlayer.displayName = "VideoPlayer";
+
+export default VideoPlayer;

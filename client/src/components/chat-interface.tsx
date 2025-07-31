@@ -16,9 +16,10 @@ interface ChatInterfaceProps {
     youtubeId: string;
     title: string;
   };
+  onTimestampClick?: (timestamp: string) => void;
 }
 
-export default function ChatInterface({ video }: ChatInterfaceProps) {
+export default function ChatInterface({ video, onTimestampClick }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const { toast } = useToast();
@@ -67,7 +68,7 @@ export default function ChatInterface({ video }: ChatInterfaceProps) {
 
   return (
     <Card className={`bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 flex flex-col ${
-      isMobile ? 'h-[500px]' : 'h-[600px]'
+      isMobile ? 'h-[500px] mobile-card-spacing' : 'h-[600px]'
     }`}>
       {/* Chat Header */}
       <div className="border-b border-gray-200 p-3 sm:p-4">
@@ -130,7 +131,8 @@ export default function ChatInterface({ video }: ChatInterfaceProps) {
                       {msg.timestamps.map((timestamp: string, i: number) => (
                         <button
                           key={i}
-                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                          onClick={() => onTimestampClick?.(timestamp)}
+                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors flex items-center space-x-1 cursor-pointer"
                         >
                           <Play className="w-2 h-2" />
                           <span>{timestamp}</span>

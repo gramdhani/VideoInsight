@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Play } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Header from "../components/header";
 import UrlInput from "../components/url-input";
-import VideoPlayer from "../components/video-player";
+import VideoPlayer, { VideoPlayerRef } from "../components/video-player";
 import TabbedContent from "../components/tabbed-content";
 import ChatInterface from "../components/chat-interface";
 import NotesExport from "../components/notes-export";
@@ -15,6 +15,23 @@ export default function Home() {
   const [currentVideo, setCurrentVideo] = useState(null);
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
+  const videoPlayerRef = useRef<VideoPlayerRef>(null);
+
+  const handleTimestampClick = (timestamp: string) => {
+    // Parse timestamp (e.g., "2:35" or "1:23:45") to seconds
+    const timeToSeconds = (timeStr: string): number => {
+      const parts = timeStr.split(':').map(Number);
+      if (parts.length === 2) {
+        return parts[0] * 60 + parts[1]; // MM:SS
+      } else if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS
+      }
+      return 0;
+    };
+
+    const seconds = timeToSeconds(timestamp);
+    videoPlayerRef.current?.jumpToTime(seconds);
+  };
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)]">
@@ -30,18 +47,18 @@ export default function Home() {
           <div className={`${isMobile ? 'space-y-4' : 'grid lg:grid-cols-2 gap-8'}`}>
             {/* Left Column / Mobile Stack */}
             <div className="space-y-4 sm:space-y-6">
-              <VideoPlayer video={currentVideo} />
-              <TabbedContent video={currentVideo} />
+              <VideoPlayer ref={videoPlayerRef} video={currentVideo} />
+              <TabbedContent video={currentVideo} onTimestampClick={handleTimestampClick} />
             </div>
 
             {/* Right Column - Sticky Chat on Desktop, Inline on Mobile */}
             <div className="space-y-4 sm:space-y-6">
-              <div className={isMobile ? '' : 'sticky top-6'}>
+              <div className={isMobile ? 'mobile-safe-area' : 'sticky top-6 max-h-[calc(100vh-4rem)] overflow-hidden'}>
                 {isAuthenticated ? (
-                  <ChatInterface video={currentVideo} />
+                  <ChatInterface video={currentVideo} onTimestampClick={handleTimestampClick} />
                 ) : (
                   <AuthPaywall title="Sign in to chat with AI about this video">
-                    <ChatInterface video={currentVideo} />
+                    <ChatInterface video={currentVideo} onTimestampClick={handleTimestampClick} />
                   </AuthPaywall>
                 )}
               </div>
