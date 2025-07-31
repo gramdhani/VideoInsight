@@ -16,11 +16,19 @@ const AutoTextarea = React.forwardRef<HTMLTextAreaElement, AutoTextareaProps>(
       const textarea = textareaRef.current;
       if (!textarea) return;
 
-      // Reset height to get accurate scrollHeight measurement
-      textarea.style.height = 'auto';
+      // Reset height to minimum first
+      textarea.style.height = '44px';
       
-      // Calculate new height based on content, but never less than 44px
       const minHeight = 44;
+      // If there's no content, keep it at minimum height
+      if (!textarea.value || textarea.value.trim() === '') {
+        textarea.style.height = `${minHeight}px`;
+        textarea.style.overflowY = 'hidden';
+        return;
+      }
+      
+      // For content, measure the actual needed height
+      textarea.style.height = 'auto';
       const contentHeight = textarea.scrollHeight;
       const newHeight = Math.max(Math.min(contentHeight, maxHeight), minHeight);
       
