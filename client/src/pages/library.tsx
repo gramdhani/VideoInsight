@@ -2,15 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Library, Play, Clock, Eye, User } from "lucide-react";
+import { Library, Play, Clock, Eye, User, Lock } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import type { Video } from "@shared/schema";
 
 export default function LibraryPage() {
   const [, setLocation] = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const { data: videos, isLoading } = useQuery<Video[]>({
     queryKey: ["/api/videos"],
+    enabled: isAuthenticated, // Only fetch when authenticated
   });
 
   const handleVideoClick = (video: Video) => {
@@ -18,7 +21,25 @@ export default function LibraryPage() {
     setLocation(`/?video=${video.youtubeId}`);
   };
 
-  if (isLoading) {
+  // Show authentication required message if not authenticated
+  if (!authLoading && !isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center max-w-md">
+          <Lock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold mb-2">Sign in required</h2>
+          <p className="text-muted-foreground mb-6">
+            You need to sign in to access your personal video library and AI-powered insights.
+          </p>
+          <Button onClick={() => window.location.href = '/api/login'} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            Sign In
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (authLoading || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">

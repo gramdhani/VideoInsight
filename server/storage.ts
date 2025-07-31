@@ -20,8 +20,10 @@ export interface IStorage {
   
   // Video operations
   getVideo(youtubeId: string): Promise<Video | undefined>;
+  getUserVideo(userId: string, youtubeId: string): Promise<Video | undefined>;
   getVideoById(id: string): Promise<Video | undefined>;
   getAllVideos(): Promise<Video[]>;
+  getUserVideos(userId: string): Promise<Video[]>;
   createVideo(video: InsertVideo): Promise<Video>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -55,6 +57,13 @@ export class DatabaseStorage implements IStorage {
     return video;
   }
 
+  async getUserVideo(userId: string, youtubeId: string): Promise<Video | undefined> {
+    const [video] = await db.select().from(videos).where(
+      sql`${videos.userId} = ${userId} AND ${videos.youtubeId} = ${youtubeId}`
+    );
+    return video;
+  }
+
   async getVideoById(id: string): Promise<Video | undefined> {
     const [video] = await db.select().from(videos).where(eq(videos.id, id));
     return video;
@@ -63,6 +72,13 @@ export class DatabaseStorage implements IStorage {
   async getAllVideos(): Promise<Video[]> {
     const allVideos = await db.select().from(videos).orderBy(sql`${videos.createdAt} DESC`);
     return allVideos;
+  }
+
+  async getUserVideos(userId: string): Promise<Video[]> {
+    const userVideos = await db.select().from(videos)
+      .where(eq(videos.userId, userId))
+      .orderBy(sql`${videos.createdAt} DESC`);
+    return userVideos;
   }
 
   async createVideo(insertVideo: InsertVideo): Promise<Video> {
@@ -113,6 +129,12 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserVideo(userId: string, youtubeId: string): Promise<Video | undefined> {
+    return Array.from(this.videos.values()).find(
+      (video) => video.youtubeId === youtubeId && video.userId === userId,
+    );
+  }
+
   async getVideoById(id: string): Promise<Video | undefined> {
     return this.videos.get(id);
   }
@@ -123,6 +145,16 @@ export class MemStorage implements IStorage {
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA;
     });
+  }
+
+  async getUserVideos(userId: string): Promise<Video[]> {
+    return Array.from(this.videos.values())
+      .filter(video => video.userId === userId)
+      .sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
   }
 
   async createVideo(insertVideo: InsertVideo): Promise<Video> {

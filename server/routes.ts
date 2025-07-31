@@ -22,10 +22,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Analyze YouTube video (accessible to all users)
-  app.post("/api/videos/analyze", async (req, res) => {
+  // Analyze YouTube video (requires authentication)
+  app.post("/api/videos/analyze", isAuthenticated, async (req: any, res) => {
     try {
       const { url } = req.body;
+      const userId = req.user.claims.sub;
       
       if (!url) {
         return res.status(400).json({ message: "YouTube URL is required" });
@@ -36,8 +37,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid YouTube URL" });
       }
       
-      // Check if video already exists
-      const existingVideo = await storage.getVideo(youtubeId);
+      // Check if user already has this video
+      const existingVideo = await storage.getUserVideo(userId, youtubeId);
       if (existingVideo) {
         return res.json(existingVideo);
       }
@@ -48,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate AI summary
       const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title);
       
-      // Create video record
+      // Create video record for this user
       const video = await storage.createVideo({
         youtubeId,
         title: videoInfo.title,
@@ -59,6 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         transcript: videoInfo.transcript,
         transcriptData: videoInfo.transcriptData,
         summary,
+        userId, // Associate video with user
       });
       
       res.json(video);
@@ -68,10 +70,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get all videos (accessible to all users)
-  app.get("/api/videos", async (req, res) => {
+  // Get all videos (requires authentication)
+  app.get("/api/videos", isAuthenticated, async (req: any, res) => {
     try {
-      const videos = await storage.getAllVideos();
+      const userId = req.user.claims.sub;
+      const videos = await storage.getUserVideos(userId);
       res.json(videos);
     } catch (error) {
       console.error("Error fetching videos:", error);
