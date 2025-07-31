@@ -16,11 +16,12 @@ const AutoTextarea = React.forwardRef<HTMLTextAreaElement, AutoTextareaProps>(
       const textarea = textareaRef.current;
       if (!textarea) return;
 
-      // Reset height to auto to get the correct scrollHeight
-      textarea.style.height = 'auto';
+      // Reset height to minimum to get the correct scrollHeight
+      textarea.style.height = '44px';
       
-      // Calculate new height based on content
-      const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+      // Calculate new height based on content, but never less than 44px
+      const minHeight = 44;
+      const newHeight = Math.max(Math.min(textarea.scrollHeight, maxHeight), minHeight);
       textarea.style.height = `${newHeight}px`;
       
       // Add scrollbar if content exceeds max height
