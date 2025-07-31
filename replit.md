@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - v0.1.1 User Experience Improvements:**
+- Fixed markdown rendering to properly display HTML tags like &lt;strong&gt;
+- Added working PDF export functionality for video summaries using jsPDF
+- Enhanced timestamp display with inline clickable elements in chat responses
+- Moved Export Notes inside AI Summary card for better organization
+- Relocated Quick Actions to chat interface for easier access
+- Made chat interface sticky on top for better navigation
+- Enhanced chat flow to show user messages immediately
+
 **January 30, 2025 - v0.2.1 Freemium Model Implementation:**
 - Implemented freemium homepage experience allowing all users to analyze videos
 - Unlocked AI summary and transcript access for unauthenticated users
