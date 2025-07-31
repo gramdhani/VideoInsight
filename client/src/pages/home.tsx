@@ -37,11 +37,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header currentPage="home" />
-
+    <div className="space-y-6">
+      {/* Desktop layout with sidebar, mobile keeps header */}
+      {isMobile && <Header currentPage="home" />}
+      
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className={isMobile ? "max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8" : ""}>
         {/* URL Input - Always visible */}
         <UrlInput onVideoAnalyzed={setCurrentVideo} />
 
@@ -87,9 +88,7 @@ export default function Home() {
             </div>
           </div>
         )}
-      </main>
-
-      
+      </div>
     </div>
   );
 }

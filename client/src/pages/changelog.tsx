@@ -1,30 +1,59 @@
 import { Calendar, GitBranch, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "../components/header";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Changelog() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
-      <Header currentPage="changelog" />
+  const isMobile = useIsMobile();
 
-      {/* Page Title Section */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+  return (
+    <div className="space-y-6">
+      {/* Mobile header */}
+      {isMobile && (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+          <Header currentPage="changelog" />
+          <div className="bg-white border-b border-gray-200">
+            <div className="max-w-4xl mx-auto px-6 py-8">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                  <GitBranch className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Changelog</h1>
+                  <p className="text-gray-600">Track new features and improvements</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="max-w-4xl mx-auto px-6 py-8">
+            <ChangelogContent />
+          </div>
+        </div>
+      )}
+
+      {/* Desktop with sidebar */}
+      {!isMobile && (
+        <>
+          {/* Page Title */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <GitBranch className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Changelog</h1>
-              <p className="text-gray-600">Track new features and improvements</p>
+              <h1 className="text-2xl font-bold text-[var(--text-main)]">Changelog</h1>
+              <p className="text-[var(--text-secondary)]">Track new features and improvements</p>
             </div>
           </div>
-        </div>
-      </div>
+          <ChangelogContent />
+        </>
+      )}
+    </div>
+  );
+}
 
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="space-y-8">
+function ChangelogContent() {
+  return (
+    <div className="space-y-8">
           {/* Version 0.1.1 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
@@ -164,8 +193,6 @@ export default function Changelog() {
               </div>
             </CardContent>
           </Card>
-        </div>
-      </main>
     </div>
   );
 }
