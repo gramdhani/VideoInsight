@@ -18,11 +18,11 @@ export default function Home() {
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
 
   const handleTimestampClick = (timestamp: string) => {
-    console.log('Timestamp clicked:', timestamp);
-    
+    console.log("Timestamp clicked:", timestamp);
+
     // Parse timestamp (e.g., "2:35" or "1:23:45") to seconds
     const timeToSeconds = (timeStr: string): number => {
-      const parts = timeStr.split(':').map(Number);
+      const parts = timeStr.split(":").map(Number);
       if (parts.length === 2) {
         return parts[0] * 60 + parts[1]; // MM:SS
       } else if (parts.length === 3) {
@@ -32,7 +32,7 @@ export default function Home() {
     };
 
     const seconds = timeToSeconds(timestamp);
-    console.log('Jumping to seconds:', seconds);
+    console.log("Jumping to seconds:", seconds);
     videoPlayerRef.current?.jumpToTime(seconds);
   };
 
@@ -47,21 +47,40 @@ export default function Home() {
 
         {/* Responsive Layout */}
         {currentVideo && (
-          <div className={`${isMobile ? 'space-y-4' : 'grid lg:grid-cols-2 gap-8'}`}>
+          <div
+            className={`${isMobile ? "space-y-4" : "grid lg:grid-cols-2 gap-8"}`}
+          >
             {/* Left Column / Mobile Stack */}
             <div className="space-y-4 sm:space-y-6">
               <VideoPlayer ref={videoPlayerRef} video={currentVideo} />
-              <TabbedContent video={currentVideo} onTimestampClick={handleTimestampClick} />
+              <TabbedContent
+                video={currentVideo}
+                onTimestampClick={handleTimestampClick}
+              />
             </div>
 
             {/* Right Column - Sticky Chat on Desktop, Inline on Mobile */}
-            <div className={`space-y-4 sm:space-y-6 ${isMobile ? 'pb-16' : ''}`}>
-              <div className={isMobile ? 'mobile-safe-area mobile-chat-fix' : 'sticky top-8 max-h-[calc(100vh-6rem)]'}>
+            <div
+              className={`space-y-4 sm:space-y-6 ${isMobile ? "pb-16" : ""}`}
+            >
+              <div
+                className={
+                  isMobile
+                    ? "mobile-safe-area mobile-chat-fix"
+                    : "sticky top-32 max-h-[calc(100vh-6rem)]"
+                }
+              >
                 {isAuthenticated ? (
-                  <ChatInterface video={currentVideo} onTimestampClick={handleTimestampClick} />
+                  <ChatInterface
+                    video={currentVideo}
+                    onTimestampClick={handleTimestampClick}
+                  />
                 ) : (
                   <AuthPaywall title="Sign in to chat with AI about this video">
-                    <ChatInterface video={currentVideo} onTimestampClick={handleTimestampClick} />
+                    <ChatInterface
+                      video={currentVideo}
+                      onTimestampClick={handleTimestampClick}
+                    />
                   </AuthPaywall>
                 )}
               </div>
@@ -78,12 +97,22 @@ export default function Home() {
               <div className="w-6 h-6 bg-primary rounded flex items-center justify-center">
                 <Play className="w-3 h-3 text-white" />
               </div>
-              <span className="font-medium text-gray-700">{isMobile ? "VideoInsight" : "VideoInsight AI"}</span>
+              <span className="font-medium text-gray-700">
+                {isMobile ? "VideoInsight" : "VideoInsight AI"}
+              </span>
             </div>
-            <div className={`flex items-center ${isMobile ? 'space-x-4 text-xs' : 'space-x-6 text-sm'} text-gray-600`}>
-              <a href="#" className="hover:text-primary transition-colors">{isMobile ? "Privacy" : "Privacy Policy"}</a>
-              <a href="#" className="hover:text-primary transition-colors">{isMobile ? "Terms" : "Terms of Service"}</a>
-              <a href="#" className="hover:text-primary transition-colors">Support</a>
+            <div
+              className={`flex items-center ${isMobile ? "space-x-4 text-xs" : "space-x-6 text-sm"} text-gray-600`}
+            >
+              <a href="#" className="hover:text-primary transition-colors">
+                {isMobile ? "Privacy" : "Privacy Policy"}
+              </a>
+              <a href="#" className="hover:text-primary transition-colors">
+                {isMobile ? "Terms" : "Terms of Service"}
+              </a>
+              <a href="#" className="hover:text-primary transition-colors">
+                Support
+              </a>
             </div>
           </div>
         </div>
