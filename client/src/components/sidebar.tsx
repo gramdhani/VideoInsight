@@ -27,6 +27,15 @@ export default function Sidebar({ className }: SidebarProps) {
       label: "Changelog",
       icon: GitBranch,
       isActive: location === "/changelog"
+    }
+  ];
+
+  const supportItems = [
+    {
+      href: "#",
+      label: "Share Feedback",
+      icon: HelpCircle,
+      isActive: false
     },
     {
       href: "/help",
@@ -86,6 +95,37 @@ export default function Sidebar({ className }: SidebarProps) {
         
         <nav className="space-y-2">
           {navigationItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.href} href={item.href}>
+                <div className={cn(
+                  "flex items-center space-x-3 px-3 py-2 rounded-lg transition-all cursor-pointer",
+                  item.isActive 
+                    ? "bg-[hsl(263,70%,95%)] text-primary" 
+                    : "text-[var(--text-secondary)] hover:bg-[var(--muted)] hover:text-[var(--text-main)]",
+                  isCollapsed && "justify-center px-2"
+                )}>
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {!isCollapsed && (
+                    <span className="font-medium">{item.label}</span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Support Section */}
+        {!isCollapsed && (
+          <div className="mt-6 mb-4">
+            <h2 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+              Support
+            </h2>
+          </div>
+        )}
+        
+        <nav className="space-y-2">
+          {supportItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link key={item.href} href={item.href}>
