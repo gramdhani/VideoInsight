@@ -1,61 +1,303 @@
-import { useState } from 'react';
-import { Lightbulb, FileText } from 'lucide-react';
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RotateCcw, Download, Lightbulb, Key, Star, FileText, Clock, Play, FileDown } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { parseMarkdownLinks, parseMarkdownText } from "../utils/markdown";
 
 interface TabbedContentProps {
-  summary: string;
-  transcript: string;
+  video: {
+    title: string;
+    youtubeId: string;
+    summary: {
+      keyPoints: string[];
+      ahaMonents: Array<{ timestamp: string; content: string }>;
+      readingTime: string;
+      insights: number;
+    };
+    transcript?: string;
+    transcriptData?: Array<{
+      text: string;
+      startMs: string;
+      endMs: string;
+      startTimeText: string;
+    }>;
+  };
+  onTimestampClick?: (timestamp: string) => void;
 }
 
-export default function TabbedContent({ summary, transcript }: TabbedContentProps) {
-  const [activeTab, setActiveTab] = useState<'summary' | 'transcript'>('summary');
+export default function TabbedContent({ video, onTimestampClick }: TabbedContentProps) {
+  const { summary } = video;
+  const isMobile = useIsMobile();
+
+  // Use actual transcript data if available, otherwise parse text
+  const transcriptSegments = video.transcriptData?.map(segment => ({
+    timestamp: segment.startTimeText,
+    text: segment.text,
+    startMs: segment.startMs,
+    endMs: segment.endMs,
+  })) || [];
+
+  const jumpToTimestamp = (timestamp: string) => {
+    // Use the callback if provided, otherwise fallback to console log
+    if (onTimestampClick) {
+      onTimestampClick(timestamp);
+    } else {
+      console.log(`Jumping to ${timestamp}`);
+    }
+  };
 
   return (
-    <div className="w-full">
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 bg-gray-50 rounded-t-lg">
-        <nav className="flex" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab('summary')}
-            className={`${
-              activeTab === 'summary'
-                ? 'bg-white border-gray-200 border-b-white text-primary shadow-sm'
-                : 'bg-transparent border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-            } flex-1 py-3 px-4 border-l border-t border-r font-medium text-sm flex items-center justify-center space-x-2 rounded-tl-lg transition-all duration-150`}
-          >
-            <Lightbulb className="w-4 h-4" />
-            <span>AI Summary</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('transcript')}
-            className={`${
-              activeTab === 'transcript'
-                ? 'bg-white border-gray-200 border-b-white text-primary shadow-sm'
-                : 'bg-transparent border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-            } flex-1 py-3 px-4 border-t border-r font-medium text-sm flex items-center justify-center space-x-2 rounded-tr-lg transition-all duration-150`}
-          >
-            <FileText className="w-4 h-4" />
-            <span>Transcript</span>
-          </button>
-        </nav>
-      </div>
+    <Card className="modern-card shadow-modern">
+      <CardContent className="p-3 sm:p-6">
+        <Tabs defaultValue="summary" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="summary" className={`flex items-center ${isMobile ? 'space-x-1' : 'space-x-2'}`}>
+              <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className={isMobile ? 'text-xs' : 'text-sm'}>AI Summary</span>
+            </TabsTrigger>
+            <TabsTrigger value="transcript" className={`flex items-center ${isMobile ? 'space-x-1' : 'space-x-2'}`}>
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className={isMobile ? 'text-xs' : 'text-sm'}>Transcript</span>
+            </TabsTrigger>
+          </TabsList>
 
-      {/* Tab Content */}
-      <div className="bg-white border-l border-r border-b border-gray-200 rounded-b-lg p-6">
-        {activeTab === 'summary' && (
-          <div className="prose prose-sm max-w-none">
-            <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-              {summary || 'No summary available yet.'}
+          {/* AI Summary Tab */}
+          <TabsContent value="summary" className="mt-4 sm:mt-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold flex items-center space-x-2 text-foreground`}>
+                <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span>{isMobile ? "Summary" : "AI Summary"}</span>
+              </h2>
+              <div className="flex space-x-2">
+                <Button variant="ghost" size="sm" title="Regenerate Summary" className="hover:bg-muted">
+                  <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" title="Export Summary" className="hover:bg-muted">
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-        {activeTab === 'transcript' && (
-          <div className="prose prose-sm max-w-none">
-            <div className="whitespace-pre-wrap text-gray-700 leading-relaxed font-mono text-sm">
-              {transcript || 'No transcript available yet.'}
+
+            <div className="space-y-3 sm:space-y-4">
+              {/* Key Points Section */}
+              <div>
+                <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? 'text-sm' : 'text-base'}`}>
+                  <Key className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                  <span>Key Points</span>
+                </h3>
+                <ul className="space-y-2">
+                  {summary.keyPoints.map((point, index) => (
+                    <li key={index} className="flex items-start space-x-2 sm:space-x-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                      <div className={`text-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+                        {parseMarkdownLinks(point)}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Aha Moments Section */}
+              <div>
+                <h3 className={`font-medium text-gray-900 mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? 'text-sm' : 'text-base'}`}>
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
+                  <span>Aha Moments</span>
+                </h3>
+                <div className="space-y-2 sm:space-y-3">
+                  {summary.ahaMonents.map((moment, index) => (
+                    <div
+                      key={index}
+                      className={`border-l-4 p-2 sm:p-3 rounded-r-lg ${
+                        index % 2 === 0
+                          ? "bg-yellow-50 border-yellow-400"
+                          : "bg-green-50 border-green-400"
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2 mb-1">
+                        <button
+                          onClick={() => jumpToTimestamp(moment.timestamp)}
+                          className={`text-xs font-medium px-2 py-1 rounded hover:opacity-80 transition-opacity cursor-pointer ${
+                            index % 2 === 0
+                              ? "text-yellow-700 bg-yellow-200 hover:bg-yellow-300"
+                              : "text-green-700 bg-green-200 hover:bg-green-300"
+                          }`}
+                        >
+                          <Play className="w-2 h-2 inline mr-1" />
+                          {moment.timestamp}
+                        </button>
+                      </div>
+                      <div className={`text-gray-700 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                        {parseMarkdownLinks(moment.content)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                  <div>
+                    <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-primary`}>
+                      {summary.readingTime}
+                    </div>
+                    <div className="text-xs text-gray-600">{isMobile ? "Read Time" : "Reading Time"}</div>
+                  </div>
+                  <div>
+                    <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-secondary`}>
+                      {summary.keyPoints.length}
+                    </div>
+                    <div className="text-xs text-gray-600">Key Points</div>
+                  </div>
+                  <div>
+                    <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-accent`}>
+                      {summary.insights}
+                    </div>
+                    <div className="text-xs text-gray-600">Insights</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Export Notes */}
+              <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <h4 className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-gray-900 flex items-center space-x-2`}>
+                    <Download className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
+                    <span>Export Notes</span>
+                  </h4>
+                </div>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className={`flex-1 ${isMobile ? 'text-xs h-7' : 'text-xs h-8'}`}
+                    onClick={() => {
+                      let content = `# ${video.title}\n\n## AI Summary\n\n### Key Points\n`;
+                      summary.keyPoints.forEach((point: string, index: number) => {
+                        content += `${index + 1}. ${point}\n`;
+                      });
+                      content += `\n### Aha Moments\n`;
+                      summary.ahaMonents.forEach((moment: any) => {
+                        content += `**${moment.timestamp}**: ${moment.content}\n`;
+                      });
+                      const blob = new Blob([content], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${video.title}-summary.txt`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    <FileText className="w-3 h-3 mr-1" />
+                    Text
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className={`flex-1 ${isMobile ? 'text-xs h-7' : 'text-xs h-8'}`}
+                    onClick={async () => {
+                      // Dynamic import to avoid bundling issues
+                      const { default: jsPDF } = await import('jspdf');
+                      
+                      const pdf = new jsPDF();
+                      
+                      // Title
+                      pdf.setFontSize(20);
+                      pdf.text(video.title, 20, 30);
+                      
+                      // AI Summary section
+                      pdf.setFontSize(16);
+                      pdf.text('AI Summary', 20, 50);
+                      
+                      // Key Points
+                      pdf.setFontSize(14);
+                      pdf.text('Key Points:', 20, 70);
+                      pdf.setFontSize(12);
+                      
+                      let yPosition = 85;
+                      summary.keyPoints.forEach((point: string, index: number) => {
+                        const lines = pdf.splitTextToSize(`${index + 1}. ${point}`, 170);
+                        pdf.text(lines, 20, yPosition);
+                        yPosition += lines.length * 7;
+                      });
+                      
+                      // Aha Moments
+                      yPosition += 10;
+                      pdf.setFontSize(14);
+                      pdf.text('Aha Moments:', 20, yPosition);
+                      yPosition += 15;
+                      pdf.setFontSize(12);
+                      
+                      summary.ahaMonents.forEach((moment: any) => {
+                        const lines = pdf.splitTextToSize(`${moment.timestamp}: ${moment.content}`, 170);
+                        pdf.text(lines, 20, yPosition);
+                        yPosition += lines.length * 7 + 5;
+                      });
+                      
+                      // Save the PDF
+                      pdf.save(`${video.title}-summary.pdf`);
+                    }}
+                  >
+                    <FileDown className="w-3 h-3 mr-1" />
+                    PDF
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+          </TabsContent>
+
+          {/* Transcript Tab */}
+          <TabsContent value="transcript" className="mt-4 sm:mt-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold flex items-center space-x-2`}>
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
+                <span>{isMobile ? "Transcript" : "Full Transcript"}</span>
+              </h2>
+              <div className="flex space-x-2">
+                <Button variant="ghost" size="sm" title="Search Transcript">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" title="Export Transcript">
+                  <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {transcriptSegments.length > 0 ? (
+              <ScrollArea className={`${isMobile ? 'h-[400px]' : 'h-[500px]'} w-full rounded-lg border p-3 sm:p-4`}>
+                <div className="space-y-3 sm:space-y-4">
+                  {transcriptSegments.map((segment, index) => (
+                    <div key={index} className="group hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition-colors">
+                      <div className="flex items-start space-x-2 sm:space-x-3">
+                        <button
+                          onClick={() => jumpToTimestamp(segment.timestamp)}
+                          className="flex-shrink-0 bg-primary text-white text-xs px-2 py-1 rounded hover:bg-indigo-700 transition-colors cursor-pointer flex items-center space-x-1"
+                        >
+                          <Play className="w-2 h-2" />
+                          <span>{segment.timestamp}</span>
+                        </button>
+                        <p className={`text-gray-700 ${isMobile ? 'text-xs' : 'text-sm'} leading-relaxed flex-1`}>
+                          {segment.text}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="text-center py-6 sm:py-8 text-gray-500">
+                <FileText className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} mx-auto mb-3 text-gray-300`} />
+                <p className={isMobile ? 'text-sm' : 'text-base'}>No transcript available for this video</p>
+                <p className="text-xs sm:text-sm">Try analyzing a different video with captions</p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }
