@@ -67,22 +67,22 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
   };
 
   return (
-    <Card className={`bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 flex flex-col ${
+    <Card className={`modern-card shadow-modern flex flex-col ${
       isMobile ? 'h-[500px] mobile-card-spacing mobile-chat-container mobile-chat-fix' : 'h-[calc(100vh-8rem)]'
     }`}>
       {/* Chat Header */}
-      <div className="border-b border-gray-200 p-3 sm:p-4">
+      <div className="border-b border-border p-3 sm:p-4">
         <div className="flex items-center justify-between">
-          <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold flex items-center space-x-2`}>
-            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
+          <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold flex items-center space-x-2 text-foreground`}>
+            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             <span>{isMobile ? "Ask AI" : "Ask About This Video"}</span>
           </h2>
-          <Button variant="ghost" size="sm" title="Clear Chat">
+          <Button variant="ghost" size="sm" title="Clear Chat" className="hover:bg-muted">
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
         {!isMobile && (
-          <p className="text-sm text-gray-600 mt-1">Ask specific questions about the video content</p>
+          <p className="text-sm text-muted-foreground mt-1">Ask specific questions about the video content</p>
         )}
       </div>
 
@@ -94,11 +94,11 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
               <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </div>
-            <div className={`bg-gray-50 rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? 'max-w-[85%]' : 'max-w-xs'}`}>
-              <p className="text-xs sm:text-sm text-gray-700">
+            <div className={`bg-muted rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? 'max-w-[85%]' : 'max-w-xs'}`}>
+              <p className="text-xs sm:text-sm text-foreground">
                 {isMobile ? "Hi! Ask me anything about this video." : "Hi! I've analyzed the video. Ask me anything about the content, key concepts, or specific moments."}
               </p>
-              <span className="text-xs text-gray-500 mt-1 block">Just now</span>
+              <span className="text-xs text-muted-foreground mt-1 block">Just now</span>
             </div>
           </div>
 
@@ -113,8 +113,8 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
                 </div>
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
                 </div>
               </div>
 
@@ -123,11 +123,11 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
                 <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
                   <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
-                <div className={`bg-gray-50 rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? 'max-w-[85%]' : 'max-w-sm'}`}>
-                  <div className="text-xs sm:text-sm text-gray-700 mb-2">{parseMarkdownText(msg.response, onTimestampClick)}</div>
+                <div className={`bg-muted rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? 'max-w-[85%]' : 'max-w-sm'}`}>
+                  <div className="text-xs sm:text-sm text-foreground mb-2">{parseMarkdownText(msg.response, onTimestampClick)}</div>
                   {msg.timestamps && msg.timestamps.length > 0 && !msg.response.includes('[') && (
                     <div className="flex flex-wrap gap-1 mt-2 mb-2">
-                      {!isMobile && <span className="text-xs text-gray-500 mr-2">Referenced timestamps:</span>}
+                      {!isMobile && <span className="text-xs text-muted-foreground mr-2">Referenced timestamps:</span>}
                       {msg.timestamps.map((timestamp: string, i: number) => (
                         <button
                           key={i}
@@ -135,7 +135,7 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
                             console.log('Chat timestamp clicked:', timestamp);
                             onTimestampClick?.(timestamp);
                           }}
-                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors flex items-center space-x-1 cursor-pointer"
+                          className="text-xs bg-primary/10 text-primary px-2 py-1 rounded hover:bg-primary/20 transition-colors flex items-center space-x-1 cursor-pointer"
                         >
                           <Play className="w-2 h-2" />
                           <span>{timestamp}</span>
@@ -143,7 +143,7 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
                       ))}
                     </div>
                   )}
-                  <span className="text-xs text-gray-500 mt-2 block">
+                  <span className="text-xs text-muted-foreground mt-2 block">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
                 </div>

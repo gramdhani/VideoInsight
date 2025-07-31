@@ -3,54 +3,63 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 98%);
-  --foreground: hsl(215, 25%, 17%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --background: hsl(251, 100%, 99%);
+  --foreground: hsl(225, 25%, 25%);
+  --muted: hsl(251, 50%, 97%);
+  --muted-foreground: hsl(225, 12%, 55%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(215, 25%, 17%);
+  --popover-foreground: hsl(225, 25%, 25%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(215, 25%, 17%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(243, 75%, 59%);
+  --card-foreground: hsl(225, 25%, 25%);
+  --border: hsl(251, 30%, 90%);
+  --input: hsl(251, 30%, 95%);
+  --primary: hsl(263, 70%, 65%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(262, 83%, 65%);
+  --secondary: hsl(270, 80%, 70%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(158, 64%, 52%);
+  --accent: hsl(263, 70%, 65%);
   --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(243, 75%, 59%);
-  --radius: 0.75rem;
+  --ring: hsl(263, 70%, 65%);
+  --radius: 1rem;
   
-  /* Custom colors matching design */
-  --bg-main: hsl(0, 0%, 98%);
-  --text-main: hsl(215, 25%, 17%);
+  /* Custom colors matching clean design */
+  --bg-main: hsl(251, 100%, 99%);
+  --text-main: hsl(225, 25%, 25%);
   --card-bg: hsl(0, 0%, 100%);
+  --text-secondary: hsl(225, 12%, 55%);
+  --border-light: hsl(251, 30%, 92%);
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
+  --background: hsl(251, 15%, 8%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
+  --muted: hsl(251, 10%, 15%);
+  --muted-foreground: hsl(225, 12%, 65%);
+  --popover: hsl(251, 15%, 8%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
+  --card: hsl(251, 15%, 10%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(243, 75%, 59%);
+  --border: hsl(251, 15%, 20%);
+  --input: hsl(251, 15%, 18%);
+  --primary: hsl(263, 70%, 65%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(262, 83%, 65%);
+  --secondary: hsl(270, 80%, 70%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(158, 64%, 52%);
+  --accent: hsl(263, 70%, 65%);
   --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
-  --radius: 0.75rem;
+  --ring: hsl(263, 70%, 65%);
+  --radius: 1rem;
+  
+  /* Dark mode custom colors */
+  --bg-main: hsl(251, 15%, 8%);
+  --text-main: hsl(0, 0%, 98%);
+  --card-bg: hsl(251, 15%, 10%);
+  --text-secondary: hsl(225, 12%, 65%);
+  --border-light: hsl(251, 15%, 20%);
 }
 
 @layer base {
@@ -66,9 +75,62 @@
   }
 }
 
-/* Custom spacing */
+/* Custom spacing and modern design utilities */
 .spacing-24 {
   gap: 1.5rem;
+}
+
+/* Modern card styling inspired by the design */
+.modern-card {
+  @apply bg-white dark:bg-card border border-border shadow-sm;
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+  border-color: var(--border-light);
+}
+
+.modern-card:hover {
+  @apply shadow-md;
+  transform: translateY(-1px);
+}
+
+/* Modern button styling */
+.modern-button {
+  @apply bg-primary text-primary-foreground;
+  border-radius: calc(var(--radius) - 2px);
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+}
+
+.modern-button:hover {
+  background-color: hsl(263, 70%, 60%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsl(263, 70%, 65%, 0.25);
+}
+
+/* Modern input styling */
+.modern-input {
+  @apply bg-input border border-border;
+  border-radius: calc(var(--radius) - 2px);
+  transition: all 0.2s ease-in-out;
+}
+
+.modern-input:focus {
+  @apply ring-2 ring-ring border-transparent;
+  box-shadow: 0 0 0 2px hsl(263, 70%, 65%, 0.2);
+}
+
+/* Subtle text styling */
+.text-modern-secondary {
+  color: var(--text-secondary);
+}
+
+/* Enhanced shadows for depth */
+.shadow-modern {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-modern-lg {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Mobile-optimized scrolling */

@@ -32,7 +32,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
   }));
   
   return (
-    <Card className="bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <Card className="modern-card shadow-modern overflow-hidden">
       <div className="aspect-video bg-gray-900 relative">
         <iframe
           ref={iframeRef}
@@ -45,10 +45,10 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
         />
       </div>
       <CardContent className="p-3 sm:p-4">
-        <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'} mb-2 text-[var(--text-main)] leading-tight`}>
+        <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'} mb-2 text-foreground leading-tight`}>
           {video.title}
         </h3>
-        <div className={`flex items-center ${isMobile ? 'flex-col items-start space-y-1' : 'space-x-4'} ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>
+        <div className={`flex items-center ${isMobile ? 'flex-col items-start space-y-1' : 'space-x-4'} ${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
           <span className="font-medium">{video.channel}</span>
           {!isMobile && (
             <>

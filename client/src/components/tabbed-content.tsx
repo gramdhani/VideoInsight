@@ -50,7 +50,7 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
   };
 
   return (
-    <Card className="bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200">
+    <Card className="modern-card shadow-modern">
       <CardContent className="p-3 sm:p-6">
         <Tabs defaultValue="summary" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
@@ -67,15 +67,15 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
           {/* AI Summary Tab */}
           <TabsContent value="summary" className="mt-4 sm:mt-6">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold flex items-center space-x-2`}>
-                <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+              <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold flex items-center space-x-2 text-foreground`}>
+                <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 <span>{isMobile ? "Summary" : "AI Summary"}</span>
               </h2>
               <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" title="Regenerate Summary">
+                <Button variant="ghost" size="sm" title="Regenerate Summary" className="hover:bg-muted">
                   <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" title="Export Summary">
+                <Button variant="ghost" size="sm" title="Export Summary" className="hover:bg-muted">
                   <Download className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
@@ -84,7 +84,7 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
             <div className="space-y-3 sm:space-y-4">
               {/* Key Points Section */}
               <div>
-                <h3 className={`font-medium text-gray-900 mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? 'text-sm' : 'text-base'}`}>
+                <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? 'text-sm' : 'text-base'}`}>
                   <Key className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                   <span>Key Points</span>
                 </h3>
@@ -92,7 +92,7 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
                   {summary.keyPoints.map((point, index) => (
                     <li key={index} className="flex items-start space-x-2 sm:space-x-3">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <div className={`text-gray-700 ${isMobile ? 'text-sm' : 'text-base'}`}>
+                      <div className={`text-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
                         {parseMarkdownLinks(point)}
                       </div>
                     </li>
