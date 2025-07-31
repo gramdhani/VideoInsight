@@ -11,11 +11,18 @@ import {
   FileText,
   Clock,
   Hash,
+  Zap,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -243,63 +250,53 @@ export default function ChatInterface({
         </div>
       </ScrollArea>
 
-      {/* Quick Actions */}
+      {/* Chat Input */}
       <div className="border-t border-gray-200 p-3 sm:p-4">
-        <div
-          className={`grid ${isMobile ? "grid-cols-2" : "grid-cols-2"} gap-2 mb-3 sm:mb-4`}
-        >
-          <Button
-            variant="outline"
-            size="sm"
-            className={`${isMobile ? "text-xs h-7" : "text-xs h-8"}`}
-            onClick={() =>
-              setMessage("Give me a shorter summary of this video")
-            }
-            disabled={chatMutation.isPending}
-          >
-            <Lightbulb className="w-3 h-3 mr-1" />
-            {isMobile ? "Summary" : "Shorter Summary"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className={`${isMobile ? "text-xs h-7" : "text-xs h-8"}`}
-            onClick={() =>
-              setMessage("What are the main action items from this video?")
-            }
-            disabled={chatMutation.isPending}
-          >
-            <FileText className="w-3 h-3 mr-1" />
-            {isMobile ? "Actions" : "Action Items"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className={`${isMobile ? "text-xs h-7" : "text-xs h-8"}`}
-            onClick={() =>
-              setMessage("What are the most important quotes from this video?")
-            }
-            disabled={chatMutation.isPending}
-          >
-            <Hash className="w-3 h-3 mr-1" />
-            {isMobile ? "Quotes" : "Key Quotes"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className={`${isMobile ? "text-xs h-7" : "text-xs h-8"}`}
-            onClick={() =>
-              setMessage("Give me a detailed analysis of this video")
-            }
-            disabled={chatMutation.isPending}
-          >
-            <Clock className="w-3 h-3 mr-1" />
-            {isMobile ? "Analysis" : "Deep Analysis"}
-          </Button>
-        </div>
-
-        {/* Chat Input */}
         <form onSubmit={handleSubmit} className="flex space-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size={isMobile ? "sm" : "default"}
+                disabled={chatMutation.isPending}
+                className="flex-shrink-0"
+              >
+                <Zap className="w-4 h-4" />
+                {!isMobile && <span className="ml-2">Quick</span>}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuItem
+                onClick={() => setMessage("Give me a shorter summary of this video")}
+                disabled={chatMutation.isPending}
+              >
+                <Lightbulb className="w-4 h-4 mr-2" />
+                Shorter Summary
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setMessage("What are the main action items from this video?")}
+                disabled={chatMutation.isPending}
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Action Items
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setMessage("What are the most important quotes from this video?")}
+                disabled={chatMutation.isPending}
+              >
+                <Hash className="w-4 h-4 mr-2" />
+                Key Quotes
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setMessage("Give me a detailed analysis of this video")}
+                disabled={chatMutation.isPending}
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Deep Analysis
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
