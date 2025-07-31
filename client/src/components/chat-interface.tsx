@@ -253,7 +253,7 @@ export default function ChatInterface({
 
       {/* Chat Input */}
       <div className="border-t border-gray-200 p-3 sm:p-4">
-        <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+        <form onSubmit={handleSubmit} className="flex items-end space-x-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
