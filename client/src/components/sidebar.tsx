@@ -107,19 +107,20 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Footer */}
       {!isCollapsed && (
         <div className="p-4 border-t border-[var(--border-light)]">
-          <div className="bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-4 h-4 bg-primary rounded flex items-center justify-center">
-                <Play className="w-2 h-2 text-white" />
+          <div className="bg-[hsl(263,70%,95%)] rounded-2xl p-4 border border-[hsl(263,70%,85%)]">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-6 h-6 text-primary">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
               </div>
-              <span className="text-xs font-medium text-[var(--text-main)]">FREE PLAN</span>
+              <h3 className="text-lg font-semibold text-primary">Upgrade to Pro</h3>
             </div>
-            <h3 className="font-semibold text-[var(--text-main)] mb-1">Upgrade To Pro</h3>
-            <p className="text-xs text-[var(--text-secondary)] mb-3">
-              Upgrade your plan and have unlimited generations
+            <p className="text-sm text-gray-700 mb-4 leading-relaxed">
+              You're on the free plan. Upgrade to get 100 Generations every month.
             </p>
             <Button 
-              className="w-full bg-white text-[var(--text-main)] hover:bg-gray-50 font-medium"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-medium rounded-xl py-3"
               size="sm"
             >
               Upgrade
