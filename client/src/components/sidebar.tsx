@@ -106,7 +106,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
       {/* Footer */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-[var(--border-light)]">
+        <div className="p-4">
           <div className="bg-[hsl(263,70%,95%)] rounded-2xl p-4 border border-[hsl(263,70%,85%)]">
             <div className="flex items-center space-x-2 mb-3">
               <div className="w-6 h-6 text-primary">
