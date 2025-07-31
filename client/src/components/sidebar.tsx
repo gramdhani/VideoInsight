@@ -133,7 +133,7 @@ export default function Sidebar({ className }: SidebarProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="p-1 h-8 w-8 text-gray-500 hover:text-red-600"
+                      className="p-0 h-11 w-11 text-gray-500 hover:text-white hover:bg-red-600 hover:rounded-full transition-all duration-200"
                       onClick={() => window.location.href = '/api/logout'}
                     >
                       <LogOut className="w-4 h-4" />
