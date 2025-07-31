@@ -57,7 +57,7 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
             Navigate through the application
           </SheetDescription>
         </SheetHeader>
-        
+
         <div className="mt-6 space-y-4">
           {navigationItems.map((item) => (
             <a
@@ -73,7 +73,7 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
               {item.label}
             </a>
           ))}
-          
+
           <div className="border-t pt-4 mt-4">
             {isAuthenticated && user ? (
               <>
@@ -132,7 +132,7 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
               {isMobile ? "VideoInsight" : "VideoInsight AI"}
             </h1>
           </div>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navigationItems.map((item) => (
@@ -148,7 +148,7 @@ export default function Header({ currentPage = "home" }: HeaderProps) {
                 {item.label}
               </a>
             ))}
-            
+
             {isAuthenticated && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
