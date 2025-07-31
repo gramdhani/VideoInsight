@@ -171,9 +171,6 @@ export default function Sidebar({ className }: SidebarProps) {
                       <div className="text-sm font-medium text-gray-900">
                         Not signed in
                       </div>
-                      <div className="text-xs text-gray-500">
-                        Sign in to save your progress
-                      </div>
                     </div>
                   </div>
                   <Button
