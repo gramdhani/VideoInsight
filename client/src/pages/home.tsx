@@ -85,8 +85,6 @@ export default function Home() {
                   title: currentVideo.title,
                   youtubeId: currentVideo.youtubeId,
                   summary: currentVideo.summary,
-                  transcript: currentVideo.transcript || undefined,
-                  transcriptData: currentVideo.transcriptData || undefined,
                 }}
                 onTimestampClick={handleTimestampClick}
               />

@@ -162,6 +162,7 @@ export class MemStorage implements IStorage {
     const video: Video = { 
       id,
       youtubeId: insertVideo.youtubeId,
+      userId: insertVideo.userId,
       title: insertVideo.title,
       channel: insertVideo.channel,
       duration: insertVideo.duration,

@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RotateCcw, Download, Lightbulb, Key, Star, FileText, Clock, Play, FileDown } from "lucide-react";
+import { RotateCcw, Download, Lightbulb, Key, Star, Play, FileDown, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,13 +15,6 @@ interface TabbedContentProps {
       readingTime: string;
       insights: number;
     };
-    transcript?: string;
-    transcriptData?: Array<{
-      text: string;
-      startMs: string;
-      endMs: string;
-      startTimeText: string;
-    }>;
   };
   onTimestampClick?: (timestamp: string) => void;
 }
@@ -31,14 +22,6 @@ interface TabbedContentProps {
 export default function TabbedContent({ video, onTimestampClick }: TabbedContentProps) {
   const { summary } = video;
   const isMobile = useIsMobile();
-
-  // Use actual transcript data if available, otherwise parse text
-  const transcriptSegments = video.transcriptData?.map(segment => ({
-    timestamp: segment.startTimeText,
-    text: segment.text,
-    startMs: segment.startMs,
-    endMs: segment.endMs,
-  })) || [];
 
   const jumpToTimestamp = (timestamp: string) => {
     // Use the callback if provided, otherwise fallback to console log
@@ -52,20 +35,6 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
   return (
     <Card className="modern-card shadow-modern">
       <CardContent className="p-3 sm:p-6">
-        <Tabs defaultValue="summary" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-12">
-            <TabsTrigger value="summary" className="flex items-center justify-center space-x-2 h-full">
-              <Lightbulb className="w-4 h-4" />
-              <span className="text-sm font-medium">AI Summary</span>
-            </TabsTrigger>
-            <TabsTrigger value="transcript" className="flex items-center justify-center space-x-2 h-full">
-              <FileText className="w-4 h-4" />
-              <span className="text-sm font-medium">Transcript</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* AI Summary Tab */}
-          <TabsContent value="summary" className="mt-4 sm:mt-6">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold flex items-center space-x-2 text-foreground`}>
                 <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
@@ -248,55 +217,6 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
                 </div>
               </div>
             </div>
-          </TabsContent>
-
-          {/* Transcript Tab */}
-          <TabsContent value="transcript" className="mt-4 sm:mt-6">
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold flex items-center space-x-2`}>
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
-                <span>{isMobile ? "Transcript" : "Full Transcript"}</span>
-              </h2>
-              <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" title="Search Transcript">
-                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-                </Button>
-                <Button variant="ghost" size="sm" title="Export Transcript">
-                  <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {transcriptSegments.length > 0 ? (
-              <ScrollArea className={`${isMobile ? 'h-[400px]' : 'h-[500px]'} w-full rounded-lg border p-3 sm:p-4`}>
-                <div className="space-y-3 sm:space-y-4">
-                  {transcriptSegments.map((segment, index) => (
-                    <div key={index} className="group hover:bg-gray-50 p-2 sm:p-3 rounded-lg transition-colors">
-                      <div className="flex items-start space-x-2 sm:space-x-3">
-                        <button
-                          onClick={() => jumpToTimestamp(segment.timestamp)}
-                          className="flex-shrink-0 bg-primary text-white text-xs px-2 py-1 rounded hover:bg-indigo-700 transition-colors cursor-pointer flex items-center space-x-1"
-                        >
-                          <Play className="w-2 h-2" />
-                          <span>{segment.timestamp}</span>
-                        </button>
-                        <p className={`text-gray-700 ${isMobile ? 'text-xs' : 'text-sm'} leading-relaxed flex-1`}>
-                          {segment.text}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            ) : (
-              <div className="text-center py-6 sm:py-8 text-gray-500">
-                <FileText className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} mx-auto mb-3 text-gray-300`} />
-                <p className={isMobile ? 'text-sm' : 'text-base'}>No transcript available for this video</p>
-                <p className="text-xs sm:text-sm">Try analyzing a different video with captions</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
       </CardContent>
     </Card>
   );
