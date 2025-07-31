@@ -28,7 +28,7 @@ export default function Layout({ children, className }: LayoutProps) {
       
       {/* Main content area */}
       <div className="flex-1 overflow-hidden">
-        <main className={cn("h-screen overflow-y-auto", className)}>
+        <main className={cn("h-screen overflow-y-auto bg-white", className)}>
           <div className="max-w-7xl mx-auto px-6 py-8">
             {children}
           </div>
