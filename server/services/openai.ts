@@ -13,7 +13,7 @@ export async function summarizeVideo(transcript: string, title: string): Promise
 }> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -52,7 +52,7 @@ export async function chatAboutVideo(
     ).join('\n\n');
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",

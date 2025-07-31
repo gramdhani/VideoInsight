@@ -97,6 +97,7 @@
   @media (max-width: 768px) {
     .sticky {
       position: relative !important;
+      top: auto !important;
     }
     
     /* Ensure proper spacing for mobile cards */
@@ -106,19 +107,28 @@
     
     /* Prevent cards from being cut off */
     .mobile-safe-area {
-      padding-bottom: env(safe-area-inset-bottom, 24px);
-      margin-bottom: 24px;
+      padding-bottom: env(safe-area-inset-bottom, 32px);
+      margin-bottom: 32px;
     }
     
     /* Fix mobile chat card overflow */
     .mobile-chat-container {
-      max-height: 70vh;
+      max-height: none !important;
+      height: auto !important;
       overflow: visible;
     }
     
     /* Ensure mobile cards don't get cut by viewport */
     main {
-      padding-bottom: 40px;
+      padding-bottom: 60px;
+      min-height: 100vh;
+    }
+    
+    /* Force mobile chat cards to be visible */
+    .mobile-chat-fix {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 40px;
     }
   }
   

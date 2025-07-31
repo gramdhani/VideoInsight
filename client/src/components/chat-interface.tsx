@@ -68,7 +68,7 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
 
   return (
     <Card className={`bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 flex flex-col ${
-      isMobile ? 'h-[500px] mobile-card-spacing mobile-chat-container' : 'h-[600px]'
+      isMobile ? 'h-[500px] mobile-card-spacing mobile-chat-container mobile-chat-fix' : 'h-[600px]'
     }`}>
       {/* Chat Header */}
       <div className="border-b border-gray-200 p-3 sm:p-4">
