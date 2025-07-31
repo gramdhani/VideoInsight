@@ -45,8 +45,8 @@ export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: s
     const parts: (string | JSX.Element)[] = [];
     let lastIndex = 0;
     
-    // Combined regex for bold, italic, links, and timestamps
-    const formatRegex = /(\*\*(.*?)\*\*|\*(.*?)\*|\[([^\]]+)\]\(([^)]+)\)|<strong>(.*?)<\/strong>|<em>(.*?)<\/em>|\[(\d{1,2}:\d{2})\])/g;
+    // Combined regex for bold, italic, links, and timestamps (including ranges)
+    const formatRegex = /(\*\*(.*?)\*\*|\*(.*?)\*|\[([^\]]+)\]\(([^)]+)\)|<strong>(.*?)<\/strong>|<em>(.*?)<\/em>|\[([\d:,-\s]+)\])/g;
     let match;
     
     while ((match = formatRegex.exec(content)) !== null) {
@@ -84,9 +84,11 @@ export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: s
       } else if (fullMatch.startsWith('<em>')) {
         // HTML em tag
         parts.push(<em key={match.index} className="italic">{match[7]}</em>);
-      } else if (fullMatch.startsWith('[') && fullMatch.endsWith(']') && /^\[\d{1,2}:\d{2}\]$/.test(fullMatch)) {
-        // Timestamp [MM:SS]
+      } else if (fullMatch.startsWith('[') && fullMatch.endsWith(']') && /^\[[\d:,-\s]+\]$/.test(fullMatch)) {
+        // Timestamp [MM:SS] or range [MM:SS - MM:SS]
         const timestamp = match[8];
+        // For ranges like "5:01 - 6:35", extract the first timestamp
+        const firstTimestamp = timestamp.includes(' - ') ? timestamp.split(' - ')[0].trim() : timestamp;
         parts.push(
           <button
             key={match.index}
@@ -94,7 +96,7 @@ export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: s
             onClick={() => {
               console.log(`Jump to ${timestamp}`);
               if (onTimestampClick) {
-                onTimestampClick(timestamp);
+                onTimestampClick(firstTimestamp);
               }
             }}
           >

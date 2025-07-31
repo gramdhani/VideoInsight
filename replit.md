@@ -10,9 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - v0.2.4 Desktop Layout & AI Model Optimization:**
+- Switched AI model from GPT-4o to GPT-4o-mini to reduce operational costs
+- Fixed desktop chat header cutoff on large monitors with adjusted sticky positioning
+- Enhanced timestamp parsing to support range formats like "5:01 - 6:35"
+- Improved chat container height calculations for better large screen compatibility
+- Fixed mobile sticky positioning issues with proper CSS media queries
+
 **January 31, 2025 - v0.2.3 Timestamp Navigation:**
 - Implemented timestamp clicking functionality with YouTube iframe re-rendering
-- Fixed mobile sticky positioning issues with proper CSS media queries
 - Enhanced markdown parser to support clickable timestamps with callback handlers
 - Added proper timestamp parsing for MM:SS and HH:MM:SS formats
 - Fixed mobile chat card cut-off with improved spacing and safe areas
