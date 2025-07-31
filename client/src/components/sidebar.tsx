@@ -110,7 +110,7 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Footer */}
       {!isCollapsed && (
         <div className="p-4">
-          <div className="bg-[hsl(263,70%,95%)] rounded-2xl p-4 border border-[hsl(263,70%,85%)]">
+          <div className="bg-[hsl(263,70%,95%)] rounded-lg p-4 border border-[hsl(263,70%,85%)]">
             <div className="flex items-center space-x-2 mb-3">
               <div className="w-6 h-6 text-primary">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -123,7 +123,7 @@ export default function Sidebar({ className }: SidebarProps) {
               You're on the free plan. Upgrade to get 100 Generations every month.
             </p>
             <Button 
-              className="w-full bg-primary hover:bg-primary/90 text-white font-medium rounded-xl py-3"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-medium rounded-lg py-3"
               size="sm"
             >
               Upgrade
@@ -132,7 +132,7 @@ export default function Sidebar({ className }: SidebarProps) {
           
           {/* User Info Section */}
           {user && (
-            <div className="mt-4 p-3 rounded-xl bg-white/50 border border-gray-200">
+            <div className="mt-4 p-3 rounded-lg bg-white/50 border border-gray-200">
               <div className="flex items-center space-x-3">
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={user.profileImageUrl || ""} />
