@@ -39,7 +39,7 @@ export function parseMarkdownLinks(text: string): JSX.Element {
 }
 
 // Utility to convert markdown text formatting
-export function parseMarkdownText(text: string): JSX.Element {
+export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: string) => void): JSX.Element {
   // Function to recursively parse text with formatting
   const parseFormattedText = (content: string): (string | JSX.Element)[] => {
     const parts: (string | JSX.Element)[] = [];
@@ -91,7 +91,12 @@ export function parseMarkdownText(text: string): JSX.Element {
           <button
             key={match.index}
             className="inline-flex items-center text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors ml-1 mr-1"
-            onClick={() => console.log(`Jump to ${timestamp}`)}
+            onClick={() => {
+              console.log(`Jump to ${timestamp}`);
+              if (onTimestampClick) {
+                onTimestampClick(timestamp);
+              }
+            }}
           >
             <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />

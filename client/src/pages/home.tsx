@@ -18,6 +18,8 @@ export default function Home() {
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
 
   const handleTimestampClick = (timestamp: string) => {
+    console.log('Timestamp clicked:', timestamp);
+    
     // Parse timestamp (e.g., "2:35" or "1:23:45") to seconds
     const timeToSeconds = (timeStr: string): number => {
       const parts = timeStr.split(':').map(Number);
@@ -30,6 +32,7 @@ export default function Home() {
     };
 
     const seconds = timeToSeconds(timestamp);
+    console.log('Jumping to seconds:', seconds);
     videoPlayerRef.current?.jumpToTime(seconds);
   };
 

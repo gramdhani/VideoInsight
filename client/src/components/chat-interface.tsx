@@ -124,14 +124,17 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
                   <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
                 <div className={`bg-gray-50 rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? 'max-w-[85%]' : 'max-w-sm'}`}>
-                  <div className="text-xs sm:text-sm text-gray-700 mb-2">{parseMarkdownText(msg.response)}</div>
+                  <div className="text-xs sm:text-sm text-gray-700 mb-2">{parseMarkdownText(msg.response, onTimestampClick)}</div>
                   {msg.timestamps && msg.timestamps.length > 0 && !msg.response.includes('[') && (
                     <div className="flex flex-wrap gap-1 mt-2 mb-2">
                       {!isMobile && <span className="text-xs text-gray-500 mr-2">Referenced timestamps:</span>}
                       {msg.timestamps.map((timestamp: string, i: number) => (
                         <button
                           key={i}
-                          onClick={() => onTimestampClick?.(timestamp)}
+                          onClick={() => {
+                            console.log('Chat timestamp clicked:', timestamp);
+                            onTimestampClick?.(timestamp);
+                          }}
                           className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors flex items-center space-x-1 cursor-pointer"
                         >
                           <Play className="w-2 h-2" />

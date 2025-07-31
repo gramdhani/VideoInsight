@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - v0.2.3 Timestamp Navigation:**
+- Implemented timestamp clicking functionality with YouTube iframe re-rendering
+- Fixed mobile sticky positioning issues with proper CSS media queries
+- Enhanced markdown parser to support clickable timestamps with callback handlers
+- Added proper timestamp parsing for MM:SS and HH:MM:SS formats
+- Fixed mobile chat card cut-off with improved spacing and safe areas
+- Updated video player to reload iframe with start time parameter for reliable seeking
+
 **January 31, 2025 - v0.2.2 Mobile Optimization:**
 - Implemented comprehensive mobile responsiveness across all components
 - Added mobile-first navigation with collapsible sidebar menu
