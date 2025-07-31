@@ -39,13 +39,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if video already exists
       const existingVideo = await storage.getVideo(youtubeId);
       if (existingVideo) {
-        // If user is authenticated and video has no user, associate it
-        if (req.isAuthenticated && req.isAuthenticated() && !existingVideo.userId) {
-          const userId = (req as any).user.claims.sub;
-          // Update the existing video with user association
-          await storage.updateVideoUser(existingVideo.id, userId);
-          existingVideo.userId = userId;
-        }
         return res.json(existingVideo);
       }
       
@@ -55,15 +48,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate AI summary
       const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title);
       
-      // Create video record with user association if authenticated
-      let userId = null;
-      if (req.isAuthenticated && req.isAuthenticated()) {
-        userId = (req as any).user.claims.sub;
-      }
-      
+      // Create video record
       const video = await storage.createVideo({
         youtubeId,
-        userId,
         title: videoInfo.title,
         channel: videoInfo.channel,
         duration: videoInfo.duration,
@@ -80,66 +67,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to analyze video" });
     }
   });
-
-  // Get user's videos (requires authentication)
-  app.get("/api/videos/user", isAuthenticated, async (req, res) => {
-    try {
-      const userId = (req as any).user.claims.sub;
-      const videos = await storage.getUserVideos(userId);
-      res.json(videos);
-    } catch (error) {
-      console.error("Error fetching user videos:", error);
-      res.status(500).json({ message: "Failed to fetch user videos" });
-    }
-  });
-
-  // Get video by internal ID (accessible to all users)
-  app.get("/api/videos/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      let video = await storage.getVideoById(id);
-      
-      // If not found by ID, try YouTube ID for backwards compatibility
-      if (!video) {
-        video = await storage.getVideo(id);
-      }
-      
-      if (!video) {
-        return res.status(404).json({ message: "Video not found" });
-      }
-      
-      res.json(video);
-    } catch (error) {
-      console.error("Error fetching video:", error);
-      res.status(500).json({ message: "Failed to fetch video" });
-    }
-  });
-
-  // Get chat messages for a video (accessible to all users for now)
-  app.get("/api/chat/:videoId", async (req, res) => {
-    try {
-      const { videoId } = req.params;
-      
-      // Get video for context - videoId could be youtubeId or internal ID
-      let video = await storage.getVideoById(videoId);
-      if (!video) {
-        video = await storage.getVideo(videoId);
-      }
-      
-      if (!video) {
-        return res.status(404).json({ message: "Video not found" });
-      }
-      
-      const messages = await storage.getChatMessages(video.id);
-      res.json(messages);
-    } catch (error) {
-      console.error("Error fetching chat messages:", error);
-      res.status(500).json({ message: "Failed to fetch chat messages" });
-    }
-  });
   
-  // Get video by YouTube ID (accessible to all users) - deprecated, use /api/videos/:id
-  app.get("/api/videos/youtube/:youtubeId", async (req, res) => {
+  // Get video by YouTube ID (accessible to all users)
+  app.get("/api/videos/:youtubeId", async (req, res) => {
     try {
       const { youtubeId } = req.params;
       const video = await storage.getVideo(youtubeId);
