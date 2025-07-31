@@ -89,7 +89,7 @@ export default function Sidebar({ className }: SidebarProps) {
                 <div className={cn(
                   "flex items-center space-x-3 px-3 py-2 rounded-lg transition-all cursor-pointer",
                   item.isActive 
-                    ? "bg-[hsl(263,70%,95%)] text-primary border border-primary/10" 
+                    ? "bg-[hsl(263,70%,95%)] text-primary" 
                     : "text-[var(--text-secondary)] hover:bg-[var(--muted)] hover:text-[var(--text-main)]",
                   isCollapsed && "justify-center px-2"
                 )}>
