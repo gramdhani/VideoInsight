@@ -6,9 +6,9 @@ export default {
   theme: {
     extend: {
       borderRadius: {
-        lg: "12px",
-        md: "10px",
-        sm: "8px",
+        lg: "8px",
+        md: "6px",
+        sm: "4px",
       },
       colors: {
         background: "var(--background)",

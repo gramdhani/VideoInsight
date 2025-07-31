@@ -22,7 +22,7 @@
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(263, 70%, 65%);
-  --radius: 12px;
+  --radius: 8px;
 
   /* Custom colors matching clean design */
   --bg-main: hsl(251, 100%, 99%);
@@ -52,7 +52,7 @@
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(263, 70%, 65%);
-  --radius: 12px;
+  --radius: 8px;
 
   /* Dark mode custom colors */
   --bg-main: hsl(251, 15%, 8%);
@@ -255,6 +255,6 @@
   /* Mobile-optimized cards */
   .mobile-card {
     margin: 8px 0 !important;
-    border-radius: 12px !important;
+    border-radius: 8px !important;
   }
 }
