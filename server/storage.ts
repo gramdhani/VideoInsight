@@ -21,6 +21,7 @@ export interface IStorage {
   // Video operations
   getVideo(youtubeId: string): Promise<Video | undefined>;
   getVideoById(id: string): Promise<Video | undefined>;
+  getUserVideos(userId: string): Promise<Video[]>;
   createVideo(video: InsertVideo): Promise<Video>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -57,6 +58,11 @@ export class DatabaseStorage implements IStorage {
   async getVideoById(id: string): Promise<Video | undefined> {
     const [video] = await db.select().from(videos).where(eq(videos.id, id));
     return video;
+  }
+
+  async getUserVideos(userId: string): Promise<Video[]> {
+    const userVideos = await db.select().from(videos).where(eq(videos.userId, userId));
+    return userVideos;
   }
 
   async createVideo(insertVideo: InsertVideo): Promise<Video> {
@@ -111,11 +117,18 @@ export class MemStorage implements IStorage {
     return this.videos.get(id);
   }
 
+  async getUserVideos(userId: string): Promise<Video[]> {
+    return Array.from(this.videos.values()).filter(
+      (video) => video.userId === userId,
+    );
+  }
+
   async createVideo(insertVideo: InsertVideo): Promise<Video> {
     const id = randomUUID();
     const video: Video = { 
       id,
       youtubeId: insertVideo.youtubeId,
+      userId: insertVideo.userId || null,
       title: insertVideo.title,
       channel: insertVideo.channel,
       duration: insertVideo.duration,
