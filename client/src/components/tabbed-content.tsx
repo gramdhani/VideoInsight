@@ -182,6 +182,48 @@ export default function TabbedContent({ video }: TabbedContentProps) {
                     variant="outline" 
                     size="sm"
                     className="flex-1 text-xs"
+                    onClick={async () => {
+                      // Dynamic import to avoid bundling issues
+                      const { default: jsPDF } = await import('jspdf');
+                      
+                      const pdf = new jsPDF();
+                      
+                      // Title
+                      pdf.setFontSize(20);
+                      pdf.text(video.title, 20, 30);
+                      
+                      // AI Summary section
+                      pdf.setFontSize(16);
+                      pdf.text('AI Summary', 20, 50);
+                      
+                      // Key Points
+                      pdf.setFontSize(14);
+                      pdf.text('Key Points:', 20, 70);
+                      pdf.setFontSize(12);
+                      
+                      let yPosition = 85;
+                      summary.keyPoints.forEach((point: string, index: number) => {
+                        const lines = pdf.splitTextToSize(`${index + 1}. ${point}`, 170);
+                        pdf.text(lines, 20, yPosition);
+                        yPosition += lines.length * 7;
+                      });
+                      
+                      // Aha Moments
+                      yPosition += 10;
+                      pdf.setFontSize(14);
+                      pdf.text('Aha Moments:', 20, yPosition);
+                      yPosition += 15;
+                      pdf.setFontSize(12);
+                      
+                      summary.ahaMonents.forEach((moment: any) => {
+                        const lines = pdf.splitTextToSize(`${moment.timestamp}: ${moment.content}`, 170);
+                        pdf.text(lines, 20, yPosition);
+                        yPosition += lines.length * 7 + 5;
+                      });
+                      
+                      // Save the PDF
+                      pdf.save(`${video.title}-summary.pdf`);
+                    }}
                   >
                     <FileDown className="w-3 h-3 mr-1" />
                     PDF

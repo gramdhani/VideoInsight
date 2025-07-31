@@ -56,7 +56,11 @@ export async function chatAboutVideo(
       messages: [
         {
           role: "system",
-          content: `You are an AI assistant helping users understand a video titled "${title}". Structure your responses clearly with proper formatting, bullet points, and paragraphs for readability. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url). When relevant, include timestamps from the video. Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }`,
+          content: `You are an AI assistant helping users understand a video titled "${title}". Structure your responses clearly with proper formatting, bullet points, and paragraphs for readability. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url). 
+
+IMPORTANT: When referencing specific content from the video, include timestamps inline within the text where they are most relevant. Format timestamps as clickable elements within your answer text like this: "The speaker mentions this important point at [5:32] in the discussion."
+
+Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }. The timestamps array should contain all timestamps mentioned in your answer.`,
         },
         {
           role: "user",
