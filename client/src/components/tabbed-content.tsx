@@ -53,14 +53,14 @@ export default function TabbedContent({ video, onTimestampClick }: TabbedContent
     <Card className="modern-card shadow-modern">
       <CardContent className="p-3 sm:p-6">
         <Tabs defaultValue="summary" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="summary" className={`flex items-center ${isMobile ? 'space-x-1' : 'space-x-2'}`}>
-              <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className={isMobile ? 'text-xs' : 'text-sm'}>AI Summary</span>
+          <TabsList className="grid w-full grid-cols-2 h-12">
+            <TabsTrigger value="summary" className="flex items-center justify-center space-x-2 h-full">
+              <Lightbulb className="w-4 h-4" />
+              <span className="text-sm font-medium">AI Summary</span>
             </TabsTrigger>
-            <TabsTrigger value="transcript" className={`flex items-center ${isMobile ? 'space-x-1' : 'space-x-2'}`}>
-              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className={isMobile ? 'text-xs' : 'text-sm'}>Transcript</span>
+            <TabsTrigger value="transcript" className="flex items-center justify-center space-x-2 h-full">
+              <FileText className="w-4 h-4" />
+              <span className="text-sm font-medium">Transcript</span>
             </TabsTrigger>
           </TabsList>
 
