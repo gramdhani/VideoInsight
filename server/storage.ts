@@ -23,6 +23,7 @@ export interface IStorage {
   getVideoById(id: string): Promise<Video | undefined>;
   getUserVideos(userId: string): Promise<Video[]>;
   createVideo(video: InsertVideo): Promise<Video>;
+  updateVideoUser(videoId: string, userId: string): Promise<Video>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
 }
@@ -69,6 +70,15 @@ export class DatabaseStorage implements IStorage {
     const [video] = await db
       .insert(videos)
       .values(insertVideo as any)
+      .returning();
+    return video;
+  }
+
+  async updateVideoUser(videoId: string, userId: string): Promise<Video> {
+    const [video] = await db
+      .update(videos)
+      .set({ userId })
+      .where(eq(videos.id, videoId))
       .returning();
     return video;
   }
@@ -141,6 +151,16 @@ export class MemStorage implements IStorage {
     };
     this.videos.set(id, video);
     return video;
+  }
+
+  async updateVideoUser(videoId: string, userId: string): Promise<Video> {
+    const video = this.videos.get(videoId);
+    if (video) {
+      video.userId = userId;
+      this.videos.set(videoId, video);
+      return video;
+    }
+    throw new Error("Video not found");
   }
 
   async getChatMessages(videoId: string): Promise<ChatMessage[]> {

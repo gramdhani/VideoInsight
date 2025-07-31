@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - v0.3.0 Library Feature Implementation:**
+- Added comprehensive Library page displaying user's analyzed video collection
+- Implemented user-video association in database schema with userId foreign key
+- Enhanced video analysis endpoint to properly link videos to authenticated users
+- Created video detail page showing full analysis, chat history, and insights
+- Added Library navigation link in sidebar for easy access to video collection
+- Fixed authentication flow to ensure videos are properly associated with users
+- Added database methods for retrieving user-specific video collections
+- Enhanced video display with thumbnail previews, metadata, and interaction indicators
+
 **January 31, 2025 - v0.2.4 Desktop Layout & AI Model Optimization:**
 - Switched AI model from GPT-4o to GPT-4o-mini to reduce operational costs
 - Fixed desktop chat header cutoff on large monitors with adjusted sticky positioning

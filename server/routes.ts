@@ -39,6 +39,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if video already exists
       const existingVideo = await storage.getVideo(youtubeId);
       if (existingVideo) {
+        // If user is authenticated and video has no user, associate it
+        if (req.isAuthenticated && req.isAuthenticated() && !existingVideo.userId) {
+          const userId = (req as any).user.claims.sub;
+          // Update the existing video with user association
+          await storage.updateVideoUser(existingVideo.id, userId);
+          existingVideo.userId = userId;
+        }
         return res.json(existingVideo);
       }
       
@@ -49,7 +56,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title);
       
       // Create video record with user association if authenticated
-      const userId = (req as any).user?.claims?.sub || null;
+      let userId = null;
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        userId = (req as any).user.claims.sub;
+      }
+      
       const video = await storage.createVideo({
         youtubeId,
         userId,
