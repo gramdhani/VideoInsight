@@ -22,8 +22,8 @@
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(263, 70%, 65%);
-  --radius: 1rem;
-  
+  --radius: 12px;
+
   /* Custom colors matching clean design */
   --bg-main: hsl(251, 100%, 99%);
   --text-main: hsl(225, 25%, 25%);
@@ -52,8 +52,8 @@
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(263, 70%, 65%);
-  --radius: 1rem;
-  
+  --radius: 12px;
+
   /* Dark mode custom colors */
   --bg-main: hsl(251, 15%, 8%);
   --text-main: hsl(0, 0%, 98%);
@@ -126,54 +126,54 @@
   html {
     scroll-behavior: smooth;
   }
-  
+
   /* Improve mobile scrolling performance */
   * {
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Prevent horizontal scroll on mobile */
   body {
     overflow-x: hidden;
   }
-  
+
   /* Better mobile touch targets */
   button, a, [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Fix mobile viewport issues */
   @media (max-width: 768px) {
     .sticky {
       position: relative !important;
       top: auto !important;
     }
-    
+
     /* Ensure proper spacing for mobile cards */
     .mobile-card-spacing {
       margin-bottom: 24px;
     }
-    
+
     /* Prevent cards from being cut off */
     .mobile-safe-area {
       padding-bottom: env(safe-area-inset-bottom, 32px);
       margin-bottom: 32px;
     }
-    
+
     /* Fix mobile chat card overflow */
     .mobile-chat-container {
       max-height: none !important;
       height: auto !important;
       overflow: visible;
     }
-    
+
     /* Ensure mobile cards don't get cut by viewport */
     main {
       padding-bottom: 60px;
       min-height: 100vh;
     }
-    
+
     /* Force mobile chat cards to be visible */
     .mobile-chat-fix {
       position: relative;
@@ -181,20 +181,20 @@
       margin-bottom: 40px;
     }
   }
-  
+
   /* Mobile typography improvements */
   @media (max-width: 768px) {
     body {
       font-size: 14px;
       line-height: 1.5;
     }
-    
+
     /* Improve readability on small screens */
     p, li, span {
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
-    
+
     /* Ensure proper spacing between interactive elements */
     button + button, 
     a + a,
@@ -231,27 +231,27 @@
   .mobile-stack {
     flex-direction: column !important;
   }
-  
+
   .mobile-center {
     text-align: center !important;
   }
-  
+
   .mobile-full-width {
     width: 100% !important;
   }
-  
+
   /* Improve mobile tap targets */
   .mobile-tap-target {
     min-height: 44px;
     min-width: 44px;
     padding: 12px !important;
   }
-  
+
   /* Better mobile spacing */
   .mobile-spacing {
     margin: 8px 0 !important;
   }
-  
+
   /* Mobile-optimized cards */
   .mobile-card {
     margin: 8px 0 !important;
