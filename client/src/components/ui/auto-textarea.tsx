@@ -54,7 +54,7 @@ const AutoTextarea = React.forwardRef<HTMLTextAreaElement, AutoTextareaProps>(
           className
         )}
         style={{
-          height: '40px', // Match button height (h-10)
+          height: '44px', // Default height as requested
           overflowY: 'hidden',
           ...props.style,
         }}
