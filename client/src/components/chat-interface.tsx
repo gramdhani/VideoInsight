@@ -14,7 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { AutoTextarea } from "@/components/ui/auto-textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -91,6 +91,7 @@ export default function ChatInterface({
       e.preventDefault();
       handleSubmit(e);
     }
+    // Allow Shift+Enter for new lines
   };
 
   return (
@@ -297,10 +298,10 @@ export default function ChatInterface({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Input
+          <AutoTextarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder={
               isMobile
                 ? "Ask about the video..."
@@ -308,6 +309,7 @@ export default function ChatInterface({
             }
             disabled={chatMutation.isPending}
             className="flex-1 text-sm"
+            maxHeight={120}
           />
           <Button
             type="submit"
@@ -322,7 +324,7 @@ export default function ChatInterface({
           className={`flex items-center ${isMobile ? "justify-center" : "justify-between"} mt-2`}
         >
           {!isMobile && (
-            <p className="text-xs text-gray-500">Press Enter to send</p>
+            <p className="text-xs text-gray-500">Press Enter to send • Shift+Enter for new line</p>
           )}
           <div className="flex items-center space-x-2 text-xs text-gray-500">
             <span>
