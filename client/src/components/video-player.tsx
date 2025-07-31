@@ -25,11 +25,29 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
   useImperativeHandle(ref, () => ({
     jumpToTime: (timeInSeconds: number) => {
       if (iframeRef.current) {
-        // Send postMessage to YouTube iframe to jump to specific time
-        iframeRef.current.contentWindow?.postMessage(
-          `{"event":"command","func":"seekTo","args":[${timeInSeconds}, true]}`,
-          "*"
-        );
+        // Method 1: Try YouTube iframe API postMessage
+        try {
+          const message = {
+            event: 'command',
+            func: 'seekTo',
+            args: [timeInSeconds, true]
+          };
+          iframeRef.current.contentWindow?.postMessage(JSON.stringify(message), '*');
+        } catch (e) {
+          console.log('PostMessage failed:', e);
+        }
+        
+        // Method 2: Reload iframe with timestamp (more reliable)
+        setTimeout(() => {
+          if (iframeRef.current) {
+            const currentSrc = iframeRef.current.src;
+            const videoId = currentSrc.match(/embed\/([^?&]+)/)?.[1];
+            if (videoId) {
+              const newSrc = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}&start=${timeInSeconds}&autoplay=1&rel=0`;
+              iframeRef.current.src = newSrc;
+            }
+          }
+        }, 100);
       }
     }
   }));
@@ -39,7 +57,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
       <div className="aspect-video bg-gray-900 relative">
         <iframe
           ref={iframeRef}
-          src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&origin=${window.location.origin}`}
+          src={`https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}&rel=0`}
           title={video.title}
           className="absolute inset-0 w-full h-full"
           allowFullScreen

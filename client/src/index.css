@@ -101,12 +101,24 @@
     
     /* Ensure proper spacing for mobile cards */
     .mobile-card-spacing {
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
     
     /* Prevent cards from being cut off */
     .mobile-safe-area {
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      padding-bottom: env(safe-area-inset-bottom, 24px);
+      margin-bottom: 24px;
+    }
+    
+    /* Fix mobile chat card overflow */
+    .mobile-chat-container {
+      max-height: 70vh;
+      overflow: visible;
+    }
+    
+    /* Ensure mobile cards don't get cut by viewport */
+    main {
+      padding-bottom: 40px;
     }
   }
   
