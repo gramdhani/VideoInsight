@@ -11,7 +11,7 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -21,6 +21,7 @@ export interface IStorage {
   // Video operations
   getVideo(youtubeId: string): Promise<Video | undefined>;
   getVideoById(id: string): Promise<Video | undefined>;
+  getAllVideos(): Promise<Video[]>;
   createVideo(video: InsertVideo): Promise<Video>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -57,6 +58,11 @@ export class DatabaseStorage implements IStorage {
   async getVideoById(id: string): Promise<Video | undefined> {
     const [video] = await db.select().from(videos).where(eq(videos.id, id));
     return video;
+  }
+
+  async getAllVideos(): Promise<Video[]> {
+    const allVideos = await db.select().from(videos).orderBy(sql`${videos.createdAt} DESC`);
+    return allVideos;
   }
 
   async createVideo(insertVideo: InsertVideo): Promise<Video> {
@@ -109,6 +115,14 @@ export class MemStorage implements IStorage {
 
   async getVideoById(id: string): Promise<Video | undefined> {
     return this.videos.get(id);
+  }
+
+  async getAllVideos(): Promise<Video[]> {
+    return Array.from(this.videos.values()).sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
   }
 
   async createVideo(insertVideo: InsertVideo): Promise<Video> {

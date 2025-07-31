@@ -68,6 +68,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get all videos (accessible to all users)
+  app.get("/api/videos", async (req, res) => {
+    try {
+      const videos = await storage.getAllVideos();
+      res.json(videos);
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      res.status(500).json({ message: "Failed to fetch videos" });
+    }
+  });
+
   // Get video by YouTube ID (accessible to all users)
   app.get("/api/videos/:youtubeId", async (req, res) => {
     try {
