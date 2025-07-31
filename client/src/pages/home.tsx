@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Play } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useVideo } from "@/contexts/VideoContext";
 import Header from "../components/header";
 import UrlInput from "../components/url-input";
 import VideoPlayer, { VideoPlayerRef } from "../components/video-player";
@@ -14,7 +15,7 @@ import AuthPaywall from "../components/auth-paywall";
 import type { Video } from "@shared/schema";
 
 export default function Home() {
-  const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
+  const { currentVideo, setCurrentVideo } = useVideo();
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
@@ -32,16 +33,11 @@ export default function Home() {
   // Auto-load video from Library when available
   useEffect(() => {
     if (libraryVideo && !currentVideo && libraryVideo.summary) {
-      // Transform the Library Video to match component expectations
-      const transformedVideo = {
-        ...libraryVideo,
-        summary: libraryVideo.summary, // This is already the right structure
-      };
-      setCurrentVideo(transformedVideo as any); // Use 'any' to match existing pattern
+      setCurrentVideo(libraryVideo);
       // Clear the URL parameter to clean up the URL
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [libraryVideo, currentVideo]);
+  }, [libraryVideo, currentVideo, setCurrentVideo]);
 
   const handleTimestampClick = (timestamp: string) => {
     console.log("Timestamp clicked:", timestamp);
@@ -73,11 +69,11 @@ export default function Home() {
           isMobile ? "max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8" : ""
         }
       >
-        {/* URL Input - Always visible */}
-        <UrlInput onVideoAnalyzed={setCurrentVideo} />
+        {/* URL Input - Only visible when no video is loaded */}
+        <UrlInput onVideoAnalyzed={setCurrentVideo} show={!currentVideo} />
 
         {/* Responsive Layout */}
-        {currentVideo && (
+        {currentVideo && currentVideo.summary && (
           <div
             className={`${isMobile ? "space-y-4" : "grid lg:grid-cols-2 gap-8"}`}
           >
@@ -85,7 +81,13 @@ export default function Home() {
             <div className="space-y-4 sm:space-y-6">
               <VideoPlayer ref={videoPlayerRef} video={currentVideo} />
               <TabbedContent
-                video={currentVideo}
+                video={{
+                  title: currentVideo.title,
+                  youtubeId: currentVideo.youtubeId,
+                  summary: currentVideo.summary,
+                  transcript: currentVideo.transcript || undefined,
+                  transcriptData: currentVideo.transcriptData || undefined,
+                }}
                 onTimestampClick={handleTimestampClick}
               />
             </div>

@@ -11,9 +11,10 @@ import { apiRequest } from "@/lib/queryClient";
 
 interface UrlInputProps {
   onVideoAnalyzed: (video: any) => void;
+  show?: boolean;
 }
 
-export default function UrlInput({ onVideoAnalyzed }: UrlInputProps) {
+export default function UrlInput({ onVideoAnalyzed, show = true }: UrlInputProps) {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -51,6 +52,8 @@ export default function UrlInput({ onVideoAnalyzed }: UrlInputProps) {
     }
     analyzeMutation.mutate(url);
   };
+
+  if (!show) return null;
 
   return (
     <Card className="modern-card shadow-modern mb-6 sm:mb-8">

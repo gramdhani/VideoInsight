@@ -1,10 +1,11 @@
-import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library } from "lucide-react";
+import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useVideo } from "@/contexts/VideoContext";
 
 interface SidebarProps {
   className?: string;
@@ -14,6 +15,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { currentVideo, resetVideo } = useVideo();
 
   const navigationItems = [
     {
@@ -156,6 +158,20 @@ export default function Sidebar({ className }: SidebarProps) {
       {/* Footer */}
       {!isCollapsed && (
         <div className="p-4">
+          {/* New Summarize Button - Show when there's a current video */}
+          {currentVideo && (
+            <div className="mb-4">
+              <Button
+                onClick={resetVideo}
+                className="w-full bg-primary hover:bg-primary/90 text-white flex items-center space-x-2"
+                size="sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>New Summarize</span>
+              </Button>
+            </div>
+          )}
+          
           {/* User Info Section */}
           {!isLoading && (
             <div className="mt-4">
