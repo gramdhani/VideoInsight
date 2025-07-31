@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -15,6 +16,7 @@ interface UrlInputProps {
 export default function UrlInput({ onVideoAnalyzed }: UrlInputProps) {
   const [url, setUrl] = useState("");
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const analyzeMutation = useMutation({
     mutationFn: async (url: string) => {
@@ -51,31 +53,34 @@ export default function UrlInput({ onVideoAnalyzed }: UrlInputProps) {
   };
 
   return (
-    <Card className="bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 mb-8">
-      <CardContent className="p-6">
-        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4">
+    <Card className="bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 mb-6 sm:mb-8">
+      <CardContent className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className={`${isMobile ? 'space-y-4' : 'flex flex-col md:flex-row gap-4'}`}>
           <div className="flex-1">
-            <Label htmlFor="youtube-url" className="block text-sm font-medium text-gray-700 mb-2">
+            <Label htmlFor="youtube-url" className={`block ${isMobile ? 'text-sm' : 'text-sm'} font-medium text-gray-700 mb-2`}>
               YouTube Video URL
             </Label>
             <div className="relative">
               <Input
                 id="youtube-url"
                 type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder={isMobile ? "Paste YouTube URL..." : "https://www.youtube.com/watch?v=..."}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
                 disabled={analyzeMutation.isPending}
               />
               <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
           </div>
-          <div className="flex items-end">
+          <div className={`${isMobile ? '' : 'flex items-end'}`}>
             <Button
               type="submit"
               disabled={analyzeMutation.isPending}
-              className="bg-primary text-white hover:bg-indigo-700 transition-colors flex items-center space-x-2 font-medium"
+              className={`bg-primary text-white hover:bg-indigo-700 transition-colors flex items-center space-x-2 font-medium ${
+                isMobile ? 'w-full justify-center' : ''
+              }`}
+              size={isMobile ? "default" : "default"}
             >
               {analyzeMutation.isPending ? (
                 <>
@@ -85,7 +90,7 @@ export default function UrlInput({ onVideoAnalyzed }: UrlInputProps) {
               ) : (
                 <>
                   <Wand2 className="w-4 h-4" />
-                  <span>Analyze Video</span>
+                  <span>{isMobile ? "Analyze Video" : "Analyze Video"}</span>
                 </>
               )}
             </Button>

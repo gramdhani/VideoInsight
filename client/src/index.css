@@ -71,6 +71,50 @@
   gap: 1.5rem;
 }
 
+/* Mobile-optimized scrolling */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Improve mobile scrolling performance */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent horizontal scroll on mobile */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Better mobile touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Mobile typography improvements */
+  @media (max-width: 768px) {
+    body {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    /* Improve readability on small screens */
+    p, li, span {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Ensure proper spacing between interactive elements */
+    button + button, 
+    a + a,
+    .mobile-touch-target {
+      margin-left: 8px;
+    }
+  }
+}
+
 /* Animation for typing indicator */
 @keyframes bounce {
   0%, 80%, 100% {
@@ -91,4 +135,37 @@
 
 .animate-bounce:nth-child(2) {
   animation-delay: -0.16s;
+}
+
+/* Mobile-specific utility classes */
+@media (max-width: 768px) {
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-center {
+    text-align: center !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  /* Improve mobile tap targets */
+  .mobile-tap-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px !important;
+  }
+  
+  /* Better mobile spacing */
+  .mobile-spacing {
+    margin: 8px 0 !important;
+  }
+  
+  /* Mobile-optimized cards */
+  .mobile-card {
+    margin: 8px 0 !important;
+    border-radius: 12px !important;
+  }
 }

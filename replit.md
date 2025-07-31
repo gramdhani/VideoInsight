@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**January 31, 2025 - v0.2.2 Mobile Optimization:**
+- Implemented comprehensive mobile responsiveness across all components
+- Added mobile-first navigation with collapsible sidebar menu
+- Optimized chat interface with mobile-friendly sizing and spacing
+- Enhanced tabbed content with responsive text and button sizing
+- Updated URL input form with mobile-optimized layout
+- Added mobile-specific CSS utilities for touch targets and scrolling
+- Improved header with shortened branding and mobile navigation
+- Enhanced video player and footer with mobile-responsive layouts
+- Added mobile-specific breakpoints using existing useIsMobile hook
+
 **January 31, 2025 - v0.1.1 User Experience Improvements:**
 - Fixed markdown rendering to properly display HTML tags like &lt;strong&gt;
 - Added working PDF export functionality for video summaries using jsPDF
