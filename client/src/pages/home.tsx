@@ -1,6 +1,6 @@
 
 import { useState, useRef } from "react";
-import { Play, Home, Calendar, HelpCircle } from "lucide-react";
+import { Play, Home as HomeIcon, Calendar, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -54,7 +54,7 @@ export default function Home() {
   const menuItems = [
     {
       title: "Summarize",
-      icon: Home,
+      icon: HomeIcon,
       url: "/",
       isActive: true,
     },
@@ -117,7 +117,7 @@ export default function Home() {
           <div className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <div className="flex-1">
-              <Header currentPage="home" hideLogo={true} />
+              <Header currentPage="home" />
             </div>
           </div>
 
