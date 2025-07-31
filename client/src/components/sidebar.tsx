@@ -112,12 +112,7 @@ export default function Sidebar({ className }: SidebarProps) {
         <div className="p-4">
           <div className="bg-[hsl(263,70%,95%)] rounded-lg p-4 border border-[hsl(263,70%,85%)]">
             <div className="flex items-center space-x-2 mb-3">
-              <div className="w-6 h-6 text-primary">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-primary">Upgrade to Pro</h3>
+              <h3 className="text-base font-semibold text-primary">Upgrade to Pro</h3>
             </div>
             <p className="text-sm text-gray-700 mb-4 leading-relaxed">
               You're on the free plan. Upgrade to get 100 Generations every month.
