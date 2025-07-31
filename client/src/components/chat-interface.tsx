@@ -118,6 +118,20 @@ export default function ChatInterface({ video }: ChatInterfaceProps) {
                 </div>
                 <div className="bg-gray-50 rounded-lg rounded-tl-none p-3 max-w-sm">
                   <div className="text-sm text-gray-700 mb-2">{parseMarkdownText(msg.response)}</div>
+                  {msg.timestamps && msg.timestamps.length > 0 && !msg.response.includes('[') && (
+                    <div className="flex flex-wrap gap-1 mt-2 mb-2">
+                      <span className="text-xs text-gray-500 mr-2">Referenced timestamps:</span>
+                      {msg.timestamps.map((timestamp: string, i: number) => (
+                        <button
+                          key={i}
+                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                        >
+                          <Play className="w-2 h-2" />
+                          <span>{timestamp}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <span className="text-xs text-gray-500 mt-2 block">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>

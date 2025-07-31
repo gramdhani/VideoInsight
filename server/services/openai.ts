@@ -58,9 +58,9 @@ export async function chatAboutVideo(
           role: "system",
           content: `You are an AI assistant helping users understand a video titled "${title}". Structure your responses clearly with proper formatting, bullet points, and paragraphs for readability. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url). 
 
-IMPORTANT: When referencing specific content from the video, include timestamps inline within the text where they are most relevant. Format timestamps as clickable elements within your answer text like this: "The speaker mentions this important point at [5:32] in the discussion."
+IMPORTANT: When referencing specific content from the video, include timestamps inline within the text where they are most relevant. Format timestamps as [MM:SS] within your answer text like this: "The speaker explains the main concept at [5:32] and provides examples at [8:15]."
 
-Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }. The timestamps array should contain all timestamps mentioned in your answer.`,
+Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }. Include all timestamps mentioned in your answer in the timestamps array, but focus on embedding them naturally within the answer text.`,
         },
         {
           role: "user",
