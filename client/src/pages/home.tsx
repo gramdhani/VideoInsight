@@ -56,7 +56,7 @@ export default function Home() {
 
             {/* Right Column - Sticky Chat on Desktop, Inline on Mobile */}
             <div className={`space-y-4 sm:space-y-6 ${isMobile ? 'pb-16' : ''}`}>
-              <div className={isMobile ? 'mobile-safe-area mobile-chat-fix' : 'sticky top-6 max-h-[calc(100vh-4rem)] overflow-hidden'}>
+              <div className={isMobile ? 'mobile-safe-area mobile-chat-fix' : 'sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden'}>
                 {isAuthenticated ? (
                   <ChatInterface video={currentVideo} onTimestampClick={handleTimestampClick} />
                 ) : (

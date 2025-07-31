@@ -68,7 +68,7 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
 
   return (
     <Card className={`bg-[var(--card-bg)] rounded-xl shadow-sm border border-gray-200 flex flex-col ${
-      isMobile ? 'h-[500px] mobile-card-spacing mobile-chat-container mobile-chat-fix' : 'h-[600px]'
+      isMobile ? 'h-[500px] mobile-card-spacing mobile-chat-container mobile-chat-fix' : 'max-h-[calc(100vh-3rem)]'
     }`}>
       {/* Chat Header */}
       <div className="border-b border-gray-200 p-3 sm:p-4">
@@ -87,7 +87,7 @@ export default function ChatInterface({ video, onTimestampClick }: ChatInterface
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-3 sm:p-4">
+      <ScrollArea className={`flex-1 p-3 sm:p-4 ${!isMobile ? 'max-h-[calc(100vh-12rem)]' : ''}`}>
         <div className="space-y-3 sm:space-y-4">
           {/* Welcome Message */}
           <div className="flex items-start space-x-2 sm:space-x-3">
