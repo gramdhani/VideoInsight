@@ -44,8 +44,7 @@ export default function Home() {
                 )}
               </div>
               
-              <NotesExport video={currentVideo} />
-              <QuickActions video={currentVideo} />
+
             </div>
           </div>
         )}

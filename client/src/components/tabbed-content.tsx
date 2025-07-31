@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RotateCcw, Download, Lightbulb, Key, Star, FileText, Clock, Play } from "lucide-react";
+import { RotateCcw, Download, Lightbulb, Key, Star, FileText, Clock, Play, FileDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -141,6 +141,51 @@ export default function TabbedContent({ video }: TabbedContentProps) {
                     <div className="text-lg font-semibold text-accent">{summary.insights}</div>
                     <div className="text-xs text-gray-600">Insights</div>
                   </div>
+                </div>
+              </div>
+
+              {/* Export Notes */}
+              <div className="border-t border-gray-200 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-900 flex items-center space-x-2">
+                    <Download className="w-4 h-4 text-accent" />
+                    <span>Export Notes</span>
+                  </h4>
+                </div>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1 text-xs"
+                    onClick={() => {
+                      let content = `# ${video.title}\n\n## AI Summary\n\n### Key Points\n`;
+                      summary.keyPoints.forEach((point: string, index: number) => {
+                        content += `${index + 1}. ${point}\n`;
+                      });
+                      content += `\n### Aha Moments\n`;
+                      summary.ahaMonents.forEach((moment: any) => {
+                        content += `**${moment.timestamp}**: ${moment.content}\n`;
+                      });
+                      const blob = new Blob([content], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `${video.title}-summary.txt`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    <FileText className="w-3 h-3 mr-1" />
+                    Text
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1 text-xs"
+                  >
+                    <FileDown className="w-3 h-3 mr-1" />
+                    PDF
+                  </Button>
                 </div>
               </div>
             </div>
