@@ -120,11 +120,7 @@ export default function ChatInterface({
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
-        {!isMobile && (
-          <p className="text-sm text-muted-foreground mt-1">
-            Ask specific questions about the video content
-          </p>
-        )}
+        
       </div>
 
       {/* Chat Messages */}
