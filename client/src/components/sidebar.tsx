@@ -1,8 +1,10 @@
-import { Play, Home, GitBranch, HelpCircle, ChevronLeft } from "lucide-react";
+import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
   className?: string;
@@ -11,6 +13,7 @@ interface SidebarProps {
 export default function Sidebar({ className }: SidebarProps) {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { user } = useAuth();
 
   const navigationItems = [
     {
@@ -126,6 +129,28 @@ export default function Sidebar({ className }: SidebarProps) {
               Upgrade
             </Button>
           </div>
+          
+          {/* User Info Section */}
+          {user && (
+            <div className="mt-4 p-3 rounded-xl bg-white/50 border border-gray-200">
+              <div className="flex items-center space-x-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src={user.profileImageUrl || ""} />
+                  <AvatarFallback className="bg-gray-100">
+                    {user.firstName?.[0] || user.email?.[0] || <User className="w-5 h-5" />}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-900 truncate">
+                    {user.firstName ? `${user.firstName} | Webflow Developer` : user.email?.split('@')[0] || 'User'}
+                  </div>
+                  <div className="text-xs text-gray-500 truncate">
+                    {user.email}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
