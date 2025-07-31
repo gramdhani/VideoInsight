@@ -82,14 +82,13 @@
 
 /* Modern card styling inspired by the design */
 .modern-card {
-  @apply bg-white dark:bg-card border border-border shadow-sm;
+  @apply bg-white dark:bg-card border border-border;
   border-radius: var(--radius);
   transition: all 0.2s ease-in-out;
   border-color: var(--border-light);
 }
 
 .modern-card:hover {
-  @apply shadow-md;
   transform: translateY(-1px);
 }
 
@@ -104,7 +103,6 @@
 .modern-button:hover {
   background-color: hsl(263, 70%, 60%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px hsl(263, 70%, 65%, 0.25);
 }
 
 /* Modern input styling */
@@ -116,21 +114,11 @@
 
 .modern-input:focus {
   @apply ring-2 ring-ring border-transparent;
-  box-shadow: 0 0 0 2px hsl(263, 70%, 65%, 0.2);
 }
 
 /* Subtle text styling */
 .text-modern-secondary {
   color: var(--text-secondary);
-}
-
-/* Enhanced shadows for depth */
-.shadow-modern {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.shadow-modern-lg {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Mobile-optimized scrolling */
