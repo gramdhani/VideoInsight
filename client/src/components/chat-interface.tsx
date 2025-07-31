@@ -319,16 +319,6 @@ export default function ChatInterface({
         <div
           className={`flex items-center ${isMobile ? "justify-center" : "justify-between"} mt-2`}
         >
-          {!isMobile && (
-            <p className="text-xs text-gray-500">Press Enter to send • Shift+Enter for new line</p>
-          )}
-          <div className="flex items-center space-x-2 text-xs text-gray-500">
-            <span>
-              {isMobile
-                ? "Includes timestamps"
-                : "Responses include video timestamps"}
-            </span>
-          </div>
         </div>
       </div>
     </Card>
