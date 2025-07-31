@@ -62,11 +62,7 @@ export class DatabaseStorage implements IStorage {
   async createVideo(insertVideo: InsertVideo): Promise<Video> {
     const [video] = await db
       .insert(videos)
-      .values({
-        ...insertVideo,
-        transcriptData: insertVideo.transcriptData as any,
-        summary: insertVideo.summary as any,
-      })
+      .values(insertVideo as any)
       .returning();
     return video;
   }
@@ -79,10 +75,7 @@ export class DatabaseStorage implements IStorage {
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
     const [message] = await db
       .insert(chatMessages)
-      .values({
-        ...insertMessage,
-        timestamps: insertMessage.timestamps as any,
-      })
+      .values(insertMessage as any)
       .returning();
     return message;
   }
@@ -129,8 +122,8 @@ export class MemStorage implements IStorage {
       views: insertVideo.views,
       thumbnail: insertVideo.thumbnail,
       transcript: insertVideo.transcript || null,
-      transcriptData: insertVideo.transcriptData || null,
-      summary: insertVideo.summary || null,
+      transcriptData: insertVideo.transcriptData as any || null,
+      summary: insertVideo.summary as any || null,
       createdAt: new Date(),
     };
     this.videos.set(id, video);
@@ -150,7 +143,7 @@ export class MemStorage implements IStorage {
       videoId: insertMessage.videoId,
       message: insertMessage.message,
       response: insertMessage.response,
-      timestamps: insertMessage.timestamps || null,
+      timestamps: insertMessage.timestamps as any || null,
       createdAt: new Date(),
     };
     this.chatMessages.set(id, message);

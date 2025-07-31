@@ -1,4 +1,4 @@
-import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User } from "lucide-react";
+import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,7 +13,7 @@ interface SidebarProps {
 export default function Sidebar({ className }: SidebarProps) {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   const navigationItems = [
     {
@@ -131,24 +131,61 @@ export default function Sidebar({ className }: SidebarProps) {
           </div>
           
           {/* User Info Section */}
-          {user && (
-            <div className="mt-4 p-3 rounded-lg bg-white/50 border border-gray-200">
-              <div className="flex items-center space-x-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={user.profileImageUrl || ""} />
-                  <AvatarFallback className="bg-gray-100">
-                    {user.firstName?.[0] || user.email?.[0] || <User className="w-5 h-5" />}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">
-                    {user.firstName ? `${user.firstName} | Webflow Developer` : user.email?.split('@')[0] || 'User'}
+          {!isLoading && (
+            <div className="mt-4">
+              {isAuthenticated && user ? (
+                <div className="p-3 rounded-lg bg-white/50 border border-gray-200">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={user.profileImageUrl || ""} />
+                      <AvatarFallback className="bg-gray-100">
+                        {user.firstName?.[0] || user.email?.[0] || <User className="w-5 h-5" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {user.firstName ? `${user.firstName} | Webflow Developer` : user.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 truncate">
-                    {user.email}
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => window.location.href = '/api/logout'}
+                  >
+                    <LogOut className="w-3 h-3 mr-2" />
+                    Sign Out
+                  </Button>
                 </div>
-              </div>
+              ) : (
+                <div className="p-3 rounded-lg bg-white/50 border border-gray-200">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-gray-500" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium text-gray-900">
+                        Not signed in
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Sign in to save your progress
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
+                    onClick={() => window.location.href = '/api/login'}
+                  >
+                    <User className="w-3 h-3 mr-2" />
+                    Sign In
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
