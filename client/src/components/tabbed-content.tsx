@@ -134,7 +134,6 @@ export default function TabbedContent({
                         marginBottom: "8px",
                       }}
                     >
-                      <Play className="w-2 h-2 inline mr-1" />
                       {moment.timestamp}
                     </button>
                   </div>
