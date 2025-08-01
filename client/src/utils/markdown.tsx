@@ -64,7 +64,7 @@ export function parseMarkdownText(
       if (fullMatch.startsWith("**") && fullMatch.endsWith("**")) {
         // Bold markdown **text**
         parts.push(
-          <strong key={match.index} className="font-semibold">
+          <strong key={match.index} className="font-bold text-foreground">
             {match[2]}
           </strong>,
         );
@@ -97,7 +97,7 @@ export function parseMarkdownText(
       } else if (fullMatch.startsWith("<strong>")) {
         // HTML strong tag
         parts.push(
-          <strong key={match.index} className="font-semibold">
+          <strong key={match.index} className="font-bold text-foreground">
             {match[6]}
           </strong>,
         );
@@ -151,38 +151,56 @@ export function parseMarkdownText(
     return parts;
   };
 
-  // Split into paragraphs
-  const paragraphs = text.split("\n\n").filter((p) => p.trim());
+  // Split content into lines and group them properly
+  const lines = text.split('\n').filter(line => line.trim());
+  const elements: JSX.Element[] = [];
+  let currentBulletGroup: string[] = [];
+  
+  const flushBulletGroup = () => {
+    if (currentBulletGroup.length > 0) {
+      elements.push(
+        <ul key={elements.length} className="list-none space-y-2 text-foreground mb-3">
+          {currentBulletGroup.map((item, itemIndex) => (
+            <li key={itemIndex} className="text-sm leading-relaxed flex items-start">
+              <span className="text-primary mr-2 mt-0.5 font-bold">•</span>
+              <div className="flex-1">
+                {parseFormattedText(item.replace(/^[•\-]\s*/, ""))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      );
+      currentBulletGroup = [];
+    }
+  };
 
-  return (
-    <div className="space-y-3">
-      {paragraphs.map((paragraph, index) => {
-        // Check if it's a bullet point
-        if (
-          paragraph.trim().startsWith("•") ||
-          paragraph.trim().startsWith("-")
-        ) {
-          const items = paragraph.split("\n").filter((item) => item.trim());
-          return (
-            <ul
-              key={index}
-              className="list-disc list-inside space-y-1 text-gray-700"
-            >
-              {items.map((item, itemIndex) => (
-                <li key={itemIndex} className="text-sm leading-relaxed">
-                  {parseFormattedText(item.replace(/^[•\-]\s*/, ""))}
-                </li>
-              ))}
-            </ul>
-          );
-        } else {
-          return (
-            <p key={index} className="text-gray-700 text-sm leading-relaxed">
-              {parseFormattedText(paragraph)}
-            </p>
-          );
-        }
-      })}
-    </div>
-  );
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+    
+    if (trimmedLine.startsWith("•") || trimmedLine.startsWith("-")) {
+      // This is a bullet point - add to current group
+      currentBulletGroup.push(trimmedLine);
+    } else if (trimmedLine.startsWith("**") && trimmedLine.includes(":**")) {
+      // This is a section header - flush bullets first, then add header
+      flushBulletGroup();
+      elements.push(
+        <div key={elements.length} className="text-sm leading-relaxed text-foreground mb-2">
+          {parseFormattedText(trimmedLine)}
+        </div>
+      );
+    } else if (trimmedLine) {
+      // This is regular text - flush bullets first, then add paragraph
+      flushBulletGroup();
+      elements.push(
+        <p key={elements.length} className="text-sm leading-relaxed text-foreground mb-2">
+          {parseFormattedText(trimmedLine)}
+        </p>
+      );
+    }
+  });
+  
+  // Flush any remaining bullets
+  flushBulletGroup();
+
+  return <div className="space-y-1">{elements}</div>;
 }

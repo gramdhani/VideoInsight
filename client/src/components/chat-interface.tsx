@@ -170,9 +170,9 @@ export default function ChatInterface({
                   <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                 </div>
                 <div
-                  className={`bg-muted rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-sm"}`}
+                  className={`bg-muted rounded-lg rounded-tl-none p-3 sm:p-4 ${isMobile ? "max-w-[85%]" : "max-w-lg"}`}
                 >
-                  <div className="text-xs sm:text-sm text-foreground mb-2">
+                  <div className="text-sm leading-relaxed">
                     {parseMarkdownText(msg.response, onTimestampClick)}
                   </div>
                   {msg.timestamps &&
