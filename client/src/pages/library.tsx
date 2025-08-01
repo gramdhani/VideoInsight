@@ -41,9 +41,7 @@ export default function LibraryPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (videoId: string) => {
-      return await apiRequest(`/api/videos/${videoId}`, {
-        method: "DELETE",
-      });
+      return await apiRequest("DELETE", `/api/videos/${videoId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
