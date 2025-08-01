@@ -92,7 +92,7 @@ export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: s
         parts.push(
           <button
             key={match.index}
-            className="inline-flex items-center text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors ml-1 mr-1"
+            className="inline-flex items-center text-sm font-medium bg-purple-200 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-300 transition-colors ml-1 mr-1"
             onClick={() => {
               console.log(`Jump to ${timestamp}`);
               if (onTimestampClick) {
@@ -100,9 +100,6 @@ export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: s
               }
             }}
           >
-            <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-            </svg>
             {timestamp}
           </button>
         );
