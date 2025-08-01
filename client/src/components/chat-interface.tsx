@@ -56,6 +56,12 @@ export default function ChatInterface({
   });
 
   console.log("Current messages in chat:", messages);
+  console.log("Messages length:", messages.length);
+  
+  // Debug: Show what's being passed to the map function
+  if (messages.length > 0) {
+    console.log("First message:", messages[0]);
+  }
 
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
