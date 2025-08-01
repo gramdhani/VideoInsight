@@ -38,11 +38,28 @@ export function parseMarkdownLinks(text: string): JSX.Element {
   return <>{parts}</>;
 }
 
+// Utility to clean and sanitize text before parsing
+function cleanText(text: string): string {
+  if (!text || typeof text !== 'string') return '';
+  
+  // Remove any malformed JSON artifacts
+  let cleaned = text.replace(/^\{|\}$/g, ''); // Remove leading/trailing braces
+  cleaned = cleaned.replace(/^"answer":\s*"|"$|\\"/g, ''); // Remove JSON property syntax and escaped quotes
+  cleaned = cleaned.replace(/\\n/g, '\n'); // Convert escaped newlines to actual newlines
+  cleaned = cleaned.replace(/\\t/g, '\t'); // Convert escaped tabs to actual tabs
+  cleaned = cleaned.replace(/\\\\/g, '\\'); // Fix double-escaped backslashes
+  
+  return cleaned.trim();
+}
+
 // Utility to convert markdown text formatting
 export function parseMarkdownText(
   text: string,
   onTimestampClick?: (timestamp: string) => void,
 ): JSX.Element {
+  // Clean the input text first
+  const cleanedText = cleanText(text);
+  
   // Function to recursively parse text with formatting
   const parseFormattedText = (content: string): (string | JSX.Element)[] => {
     const parts: (string | JSX.Element)[] = [];
@@ -152,7 +169,7 @@ export function parseMarkdownText(
   };
 
   // Split content into lines and group them properly
-  const lines = text.split('\n').filter(line => line.trim());
+  const lines = cleanedText.split('\n').filter(line => line.trim());
   const elements: JSX.Element[] = [];
   let currentBulletGroup: string[] = [];
   

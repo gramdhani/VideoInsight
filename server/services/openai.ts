@@ -75,17 +75,29 @@ WORD CHOICES - SIMPLE ALTERNATIVES:
 - Instead of "utilize" → say "use"
 - Instead of "implement" → say "do" or "try"
 
-FORMATTING:
-- Use bullet points for main ideas
-- Include timestamps as [MM:SS] naturally within text
+FORMATTING RULES - CRITICAL FOR PROPER DISPLAY:
+- Use simple bullet points with "-" (dash) at the start of each line
+- Include timestamps as [MM:SS] naturally within sentences
 - Format tools/websites as clickable links [text](url)
-- Bold key terms for emphasis
+- Use **bold** for emphasis, not HTML tags
+- NEVER use double quotes (") inside the answer text - use single quotes (') if needed
+- NEVER use curly braces {} inside the answer text
+- NEVER use backslashes or escaped characters
+- Keep each bullet point on a separate line starting with "-"
 
-EXAMPLE STYLE:
-Instead of: "If traction is only from one channel, assess the sustainability of that approach"
-Write: "If you're only getting customers from one place, check if that will keep working [11:22]"
+EXAMPLE FORMAT:
+- Start by thinking about a problem people have in your target market [02:30]
+- Make a list of problems based on your own experience [03:00]  
+- Choose one good problem and think of a solution [05:00]
+- Use tools like [Make](https://make.com) to build your app without coding [10:00]
 
-Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }. Keep the answer concise and scannable.`,
+JSON RESPONSE FORMAT (copy exactly):
+{
+  "answer": "- Your bullet point here [MM:SS]\n- Second bullet point here [MM:SS]", 
+  "timestamps": ["MM:SS", "MM:SS"]
+}
+
+NEVER include any other text outside the JSON object.`,
         },
         {
           role: "user",
@@ -95,7 +107,24 @@ Respond with JSON in this format: { 'answer': string, 'timestamps': string[] }. 
       response_format: { type: "json_object" },
     });
 
-    const result = JSON.parse(response.choices[0].message.content || '{}');
+    let result;
+    try {
+      const content = response.choices[0].message.content || '{}';
+      result = JSON.parse(content);
+    } catch (parseError) {
+      // If JSON parsing fails, try to extract the answer manually
+      const content = response.choices[0].message.content || '';
+      console.log('JSON parse error, attempting manual extraction:', parseError);
+      
+      // Try to extract answer from malformed JSON
+      const answerMatch = content.match(/"answer":\s*"([^"]+)"/);
+      const timestampsMatch = content.match(/"timestamps":\s*\[(.*?)\]/);
+      
+      result = {
+        answer: answerMatch ? answerMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n') : content,
+        timestamps: timestampsMatch ? timestampsMatch[1].split(',').map(t => t.trim().replace(/"/g, '')) : []
+      };
+    }
     
     return {
       answer: result.answer || "I couldn't generate a response for that question.",

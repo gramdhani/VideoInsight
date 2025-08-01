@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 1, 2025 - v0.2.6 AI Response Formatting Improvements:**
+- Fixed broken AI markdown formatting caused by malformed JSON responses
+- Added text sanitization to remove JSON artifacts from AI responses
+- Enhanced server-side JSON parsing with manual extraction fallback
+- Updated AI system prompts to avoid problematic characters in responses
+- Improved markdown parser to handle escaped characters and HTML tags
+- Added comprehensive error handling for AI response processing
+- Strengthened formatting rules to prevent quote and brace conflicts
+
 **August 1, 2025 - v0.2.5 Feedback System Implementation:**
 - Added comprehensive Share Feedback page with Name, Email, and Message fields
 - Email auto-fills for authenticated users and is required for guest submissions
