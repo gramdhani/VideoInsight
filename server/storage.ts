@@ -3,11 +3,14 @@ import {
   type InsertVideo, 
   type ChatMessage, 
   type InsertChatMessage,
+  type Feedback,
+  type InsertFeedback,
   type User,
   type UpsertUser,
   users,
   videos,
-  chatMessages
+  chatMessages,
+  feedbacks
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -27,6 +30,9 @@ export interface IStorage {
   createVideo(video: InsertVideo): Promise<Video>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  
+  // Feedback operations
+  createFeedback(feedback: InsertFeedback): Promise<Feedback>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -101,15 +107,25 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return message;
   }
+
+  async createFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {
+    const [feedback] = await db
+      .insert(feedbacks)
+      .values(insertFeedback as any)
+      .returning();
+    return feedback;
+  }
 }
 
 export class MemStorage implements IStorage {
   private videos: Map<string, Video>;
   private chatMessages: Map<string, ChatMessage>;
+  private feedbacks: Map<string, Feedback>;
 
   constructor() {
     this.videos = new Map();
     this.chatMessages = new Map();
+    this.feedbacks = new Map();
   }
 
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -195,6 +211,20 @@ export class MemStorage implements IStorage {
     };
     this.chatMessages.set(id, message);
     return message;
+  }
+
+  async createFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {
+    const id = randomUUID();
+    const feedback: Feedback = { 
+      id,
+      name: insertFeedback.name,
+      email: insertFeedback.email,
+      message: insertFeedback.message,
+      userId: insertFeedback.userId || null,
+      createdAt: new Date(),
+    };
+    this.feedbacks.set(id, feedback);
+    return feedback;
   }
 }
 

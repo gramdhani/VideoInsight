@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVideoSchema, insertChatMessageSchema } from "@shared/schema";
+import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo } from "./services/openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -170,6 +170,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching chat messages:", error);
       res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+
+  // Submit feedback (no authentication required)
+  app.post("/api/feedback", async (req: any, res) => {
+    try {
+      const validatedData = insertFeedbackSchema.parse(req.body);
+      
+      // If user is authenticated, add userId to feedback
+      let userId = null;
+      if (req.user && req.user.claims && req.user.claims.sub) {
+        userId = req.user.claims.sub;
+      }
+      
+      const feedbackData = {
+        ...validatedData,
+        userId,
+      };
+      
+      const feedback = await storage.createFeedback(feedbackData);
+      res.json({ success: true, message: "Feedback submitted successfully" });
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to submit feedback" });
     }
   });
   
