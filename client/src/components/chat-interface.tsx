@@ -191,10 +191,9 @@ export default function ChatInterface({
                               console.log("Chat timestamp clicked:", timestamp);
                               onTimestampClick?.(timestamp);
                             }}
-                            className="text-xs bg-primary/10 text-primary px-2 py-1 rounded hover:bg-primary/20 transition-colors flex items-center space-x-1 cursor-pointer"
+                            className="text-sm font-medium bg-purple-200 text-purple-800 px-4 py-2 rounded-full hover:bg-purple-300 transition-colors cursor-pointer border-0 outline-none"
                           >
-                            <Play className="w-2 h-2" />
-                            <span>{timestamp}</span>
+                            {timestamp}
                           </button>
                         ))}
                       </div>
