@@ -62,6 +62,7 @@ export default function LibraryPage() {
   });
 
   const handleVideoClick = (video: Video) => {
+    console.log("Video clicked:", video.id, video.title);
     // Redirect to summarize page with the video data
     setLocation(`/?video=${video.id}`);
   };
