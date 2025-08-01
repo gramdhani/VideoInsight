@@ -161,6 +161,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Delete video (requires authentication)
+  app.delete("/api/videos/:videoId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { videoId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      const deleted = await storage.deleteVideo(videoId, userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Video not found or unauthorized" });
+      }
+      
+      res.json({ success: true, message: "Video deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      res.status(500).json({ message: "Failed to delete video" });
+    }
+  });
+  
   // Get chat messages for video (requires authentication)
   app.get("/api/videos/:videoId/chat", isAuthenticated, async (req, res) => {
     try {

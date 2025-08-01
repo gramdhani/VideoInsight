@@ -28,6 +28,7 @@ export interface IStorage {
   getAllVideos(): Promise<Video[]>;
   getUserVideos(userId: string): Promise<Video[]>;
   createVideo(video: InsertVideo): Promise<Video>;
+  deleteVideo(videoId: string, userId: string): Promise<boolean>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   
@@ -93,6 +94,17 @@ export class DatabaseStorage implements IStorage {
       .values(insertVideo as any)
       .returning();
     return video;
+  }
+
+  async deleteVideo(videoId: string, userId: string): Promise<boolean> {
+    // First delete all chat messages for this video
+    await db.delete(chatMessages).where(eq(chatMessages.videoId, videoId));
+    
+    // Then delete the video (only if it belongs to the user)
+    const result = await db.delete(videos).where(
+      sql`${videos.id} = ${videoId} AND ${videos.userId} = ${userId}`
+    );
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getChatMessages(videoId: string): Promise<ChatMessage[]> {
@@ -191,6 +203,24 @@ export class MemStorage implements IStorage {
     };
     this.videos.set(id, video);
     return video;
+  }
+
+  async deleteVideo(videoId: string, userId: string): Promise<boolean> {
+    const video = this.videos.get(videoId);
+    if (!video || video.userId !== userId) {
+      return false;
+    }
+    
+    // Delete associated chat messages
+    Array.from(this.chatMessages.keys()).forEach(messageId => {
+      const message = this.chatMessages.get(messageId);
+      if (message && message.videoId === videoId) {
+        this.chatMessages.delete(messageId);
+      }
+    });
+    
+    // Delete the video
+    return this.videos.delete(videoId);
   }
 
   async getChatMessages(videoId: string): Promise<ChatMessage[]> {
