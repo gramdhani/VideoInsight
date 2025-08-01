@@ -94,6 +94,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get video by internal ID (requires authentication)
+  app.get("/api/videos/id/:videoId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { videoId } = req.params;
+      const userId = req.user.claims.sub;
+      const video = await storage.getVideoById(videoId);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      // Ensure user can only access their own videos
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      res.json(video);
+    } catch (error) {
+      console.error("Error fetching video:", error);
+      res.status(500).json({ message: "Failed to fetch video" });
+    }
+  });
+
   // Get video by YouTube ID (accessible to all users)
   app.get("/api/videos/:youtubeId", async (req, res) => {
     try {

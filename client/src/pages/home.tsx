@@ -26,7 +26,7 @@ export default function Home() {
 
   // Load video if coming from Library
   const { data: libraryVideo } = useQuery<Video>({
-    queryKey: ["/api/videos", videoId],
+    queryKey: ["/api/videos/id", videoId],
     enabled: !!videoId,
   });
 

@@ -63,7 +63,7 @@ export default function LibraryPage() {
 
   const handleVideoClick = (video: Video) => {
     // Redirect to summarize page with the video data
-    setLocation(`/?video=${video.youtubeId}`);
+    setLocation(`/?video=${video.id}`);
   };
 
   const handleDeleteClick = (e: React.MouseEvent, video: Video) => {
