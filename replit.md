@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 1, 2025 - v0.2.5 Feedback System Implementation:**
+- Added comprehensive Share Feedback page with Name, Email, and Message fields
+- Email auto-fills for authenticated users and is required for guest submissions
+- Created feedback database table with proper schema relations and user associations
+- Implemented feedback API endpoint supporting both authenticated and guest access
+- Added Share Feedback navigation link in sidebar with MessageSquare icon
+- Success confirmation page with option to submit additional feedback
+- Added app version indicator (v0.2.5) at bottom of sidebar with 12px font size
+- Updated changelog with complete version history from v0.2.0 to v0.2.5
+
 **January 31, 2025 - v0.2.4 Desktop Layout & AI Model Optimization:**
 - Switched AI model from GPT-4o to GPT-4o-mini to reduce operational costs
 - Fixed desktop chat header cutoff on large monitors with adjusted sticky positioning

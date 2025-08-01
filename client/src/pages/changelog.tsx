@@ -54,16 +54,388 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.1.1 */}
+          {/* Version 0.2.5 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.1.1</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.5</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 1, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2">📋 Feedback System Implementation</h3>
+                  <p className="text-blue-800 text-sm">
+                    Added comprehensive feedback system for user input and suggestions.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span>New Features</span>
+                    </h4>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added Share Feedback page with comprehensive form (Name, Email, Message)</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Email auto-fills for authenticated users and is required for guests</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Created feedback database table with proper schema relations</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added feedback API endpoint supporting both authenticated and guest submissions</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added navigation link in sidebar with message square icon</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Success confirmation page with option to submit additional feedback</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.4 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.4</h2>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>January 31, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2">🖥️ Desktop Layout & AI Model Optimization</h3>
+                  <p className="text-purple-800 text-sm">
+                    Enhanced desktop experience and optimized AI costs with improved performance.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span>Optimizations</span>
+                    </h4>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Switched AI model from GPT-4o to GPT-4o-mini to reduce operational costs</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Fixed desktop chat header cutoff on large monitors with adjusted sticky positioning</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Enhanced timestamp parsing to support range formats like "5:01 - 6:35"</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Improved chat container height calculations for better large screen compatibility</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Fixed mobile sticky positioning issues with proper CSS media queries</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.3 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.3</h2>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>January 31, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2">⏱️ Timestamp Navigation</h3>
+                  <p className="text-green-800 text-sm">
+                    Enhanced video navigation with clickable timestamps and improved parsing.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span>Improvements</span>
+                    </h4>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Implemented timestamp clicking functionality with YouTube iframe re-rendering</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Enhanced markdown parser to support clickable timestamps with callback handlers</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added proper timestamp parsing for MM:SS and HH:MM:SS formats</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Fixed mobile chat card cut-off with improved spacing and safe areas</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Updated video player to reload iframe with start time parameter for reliable seeking</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.2 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.2</h2>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>January 31, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-orange-900 mb-2">📱 Mobile Optimization</h3>
+                  <p className="text-orange-800 text-sm">
+                    Comprehensive mobile responsiveness with optimized navigation and touch interfaces.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span>Mobile Enhancements</span>
+                    </h4>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Implemented comprehensive mobile responsiveness across all components</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added mobile-first navigation with collapsible sidebar menu</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Optimized chat interface with mobile-friendly sizing and spacing</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Enhanced tabbed content with responsive text and button sizing</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Updated URL input form with mobile-optimized layout</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added mobile-specific CSS utilities for touch targets and scrolling</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Improved header with shortened branding and mobile navigation</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Enhanced video player and footer with mobile-responsive layouts</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added mobile-specific breakpoints using existing useIsMobile hook</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.1 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.1</h2>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>January 30, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-indigo-900 mb-2">💎 Freemium Model Implementation</h3>
+                  <p className="text-indigo-800 text-sm">
+                    Implemented freemium access with smart paywall for premium features.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span>Business Model</span>
+                    </h4>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Implemented freemium homepage experience allowing all users to analyze videos</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Unlocked AI summary and transcript access for unauthenticated users</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added authentication paywall specifically for interactive chat features only</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Made chat interface sticky on top of right column for better UX</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Updated API routes to support both authenticated and unauthenticated access patterns</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Created blurred preview paywall component for premium features</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.0 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.0</h2>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>January 30, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-red-900 mb-2">🔐 Authentication Integration</h3>
+                  <p className="text-red-800 text-sm">
+                    Major platform upgrade with full user authentication and database integration.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      <span>Authentication System</span>
+                    </h4>
+                    <ul className="space-y-3 text-sm text-gray-700">
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Integrated Replit OpenID Connect authentication system</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added user session management with PostgreSQL session storage</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Implemented authentication-aware routing (Landing page for unauthenticated users)</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Created user authentication hooks and utilities for frontend</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Added protected API routes requiring user authentication</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Enhanced header component with user profile dropdown and logout functionality</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Updated database schema with users and sessions tables</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <div className="w-1 h-1 bg-gray-400 rounded-full mt-2"></div>
+                        <span>Switched from in-memory storage to DatabaseStorage for production readiness</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.1.1 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.1.1</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />

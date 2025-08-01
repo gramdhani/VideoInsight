@@ -226,6 +226,15 @@ export default function Sidebar({ className }: SidebarProps) {
           )}
         </div>
       )}
+
+      {/* Version indicator */}
+      {!isCollapsed && (
+        <div className="p-4 border-t border-[var(--border-light)]">
+          <div className="text-xs text-[var(--text-secondary)] text-center">
+            VideoInsight AI v0.2.5
+          </div>
+        </div>
+      )}
     </div>
   );
 }
