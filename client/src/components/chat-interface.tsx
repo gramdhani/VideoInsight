@@ -56,15 +56,19 @@ export default function ChatInterface({
 
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
+      console.log("Starting chat mutation for video:", video.id);
       setPendingMessage(message);
       const response = await apiRequest(
         "POST",
         `/api/videos/${video.id}/chat`,
         { message },
       );
-      return response.json();
+      const result = await response.json();
+      console.log("Chat API response:", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Chat mutation successful:", data);
       queryClient.invalidateQueries({
         queryKey: ["/api/videos", video.id, "chat"],
       });
@@ -72,6 +76,7 @@ export default function ChatInterface({
       setPendingMessage(null);
     },
     onError: (error: Error) => {
+      console.error("Chat mutation error:", error);
       setPendingMessage(null);
       toast({
         title: "Chat failed",
@@ -84,6 +89,7 @@ export default function ChatInterface({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    console.log("Submitting chat message:", message);
     chatMutation.mutate(message);
   };
 
