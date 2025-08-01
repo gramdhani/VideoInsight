@@ -194,7 +194,7 @@ export function parseMarkdownText(
   lines.forEach((line, index) => {
     const trimmedLine = line.trim();
     
-    if (trimmedLine.startsWith("•") || trimmedLine.startsWith("-")) {
+    if (trimmedLine.startsWith("•") || trimmedLine.startsWith("- ")) {
       // This is a bullet point - add to current group
       currentBulletGroup.push(trimmedLine);
     } else if (trimmedLine.startsWith("**") && trimmedLine.includes(":**")) {
@@ -208,8 +208,13 @@ export function parseMarkdownText(
     } else if (trimmedLine) {
       // This is regular text - flush bullets first, then add paragraph
       flushBulletGroup();
+      
+      // Check if this is a continuation of previous content or standalone
+      const isShortLine = trimmedLine.length < 100;
+      const hasFormattingMarks = trimmedLine.includes('**') || trimmedLine.includes('[') || trimmedLine.includes('](');
+      
       elements.push(
-        <p key={elements.length} className="text-sm leading-relaxed text-foreground mb-2">
+        <p key={elements.length} className={`text-sm leading-relaxed text-foreground ${isShortLine && !hasFormattingMarks ? 'mb-1' : 'mb-2'}`}>
           {parseFormattedText(trimmedLine)}
         </p>
       );

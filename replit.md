@@ -10,12 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**August 1, 2025 - v0.2.6 AI Response Formatting Improvements:**
+**August 1, 2025 - v0.2.6 AI Response Formatting & Contextual Intelligence:**
 - Fixed broken AI markdown formatting caused by malformed JSON responses
 - Added text sanitization to remove JSON artifacts from AI responses
 - Enhanced server-side JSON parsing with manual extraction fallback
 - Updated AI system prompts to avoid problematic characters in responses
 - Improved markdown parser to handle escaped characters and HTML tags
+- Made AI responses more contextually intelligent - uses paragraphs vs bullet points appropriately
+- Enhanced AI to only include timestamps when directly relevant to the question
+- Improved creative question handling to generate inspired ideas rather than just video references
 - Added comprehensive error handling for AI response processing
 - Strengthened formatting rules to prevent quote and brace conflicts
 
