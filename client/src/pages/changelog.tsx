@@ -54,16 +54,50 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.2.6 */}
+          {/* Version 0.2.7 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.2.6</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.7</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 1, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Video Navigation & Chat Auto-scroll
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Fixed video library routing - clicking videos now opens correct content</li>
+                    <li>• Updated API endpoints to properly fetch videos by internal ID</li>
+                    <li>• Resolved chat message display issue where messages weren't appearing</li>
+                    <li>• Added automatic scroll-to-bottom functionality for chat interface</li>
+                    <li>• Chat scrolls to latest message when opening videos with existing history</li>
+                    <li>• Chat automatically scrolls to bottom when sending new messages</li>
+                    <li>• Updated sidebar version to automatically match latest changelog version</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.6 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.6</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />

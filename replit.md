@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 1, 2025 - v0.2.7 Video Navigation & Chat Auto-scroll:**
+- Fixed video library routing issue where clicking videos opened incorrect content
+- Updated API endpoints to properly fetch videos by internal ID rather than YouTube ID
+- Resolved chat message display problem where messages weren't appearing in UI
+- Added automatic scroll-to-bottom functionality for chat interface
+- Chat now scrolls to latest message when opening videos with existing history
+- Chat automatically scrolls to bottom when sending new messages
+- Improved user experience with seamless video switching and chat navigation
+- Updated sidebar version display to automatically match latest changelog version
+
 **August 1, 2025 - v0.2.6 AI Response Formatting & Contextual Intelligence:**
 - Fixed broken AI markdown formatting caused by malformed JSON responses
 - Added text sanitization to remove JSON artifacts from AI responses
