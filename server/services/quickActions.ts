@@ -8,57 +8,33 @@ export async function generateQuickAction(
 ): Promise<{ answer: string; timestamps: string[] }> {
   
   const prompts: Record<string, string> = {
-    "Shorter Summary": `Provide a concise 3-bullet point summary of the key takeaways from this video "${title}". Focus on the most important actionable insights. Format your response with clear bullet points and include any relevant tools or websites mentioned as clickable links.`,
+    "Shorter Summary": `Give me 3 key takeaways from "${title}" in bullet points. Keep each point short and actionable. Include timestamps and links where relevant.`,
     
-    "Detailed Analysis": `Provide a comprehensive analysis of "${title}" including:
+    "Detailed Analysis": `Break down "${title}" with these sections:
 
-**Main Themes:**
-- Core concepts and ideas presented
+**Main Ideas:** Core concepts (1-2 sentences each)
+**Key Insights:** Most important points with timestamps
+**How to Apply:** Practical next steps
+**Tools Mentioned:** Links to resources
 
-**Detailed Insights:**
-- Deep dive into the key points
-- Context and implications
+Keep everything concise and scannable.`,
 
-**Practical Applications:**
-- How viewers can apply this information
-- Real-world use cases
+    "Action Items": `Extract clear action steps from "${title}":
 
-**Tools & Resources:**
-- Any software, websites, or resources mentioned (format as clickable links)
-- Additional recommended resources
+**Do Now:** Immediate steps
+**This Week:** Short-term actions  
+**Long-term:** Bigger goals
+**Tools Needed:** Resources and links
 
-Format your response with clear headings and structure for easy reading.`,
+Make each item specific and brief.`,
 
-    "Action Items": `Extract actionable steps and recommendations from "${title}". Structure your response as:
+    "Key Quotes": `Find the best quotes from "${title}":
 
-**Immediate Actions:**
-- Steps viewers can take right away
+For each quote:
+- "Exact quote" [timestamp]
+- Why it matters (1 sentence)
 
-**Short-term Goals:**
-- Actions to complete within the next week
-
-**Long-term Objectives:**
-- Bigger picture goals and aspirations
-
-**Resources Needed:**
-- Tools, websites, or materials required (format as clickable links)
-
-Make each action item specific and measurable when possible.`,
-
-    "Key Quotes": `Identify the most impactful quotes, statements, and memorable phrases from "${title}". For each quote:
-
-- Provide the exact quote in quotation marks
-- Include the approximate timestamp when possible
-- Explain why this quote is significant
-- Add context about how it relates to the main message
-
-Focus on quotes that are:
-- Inspirational or motivational
-- Contain key insights or "aha moments"
-- Summarize important concepts
-- Are highly quotable or shareable
-
-Format with clear sections and make timestamps clickable.`
+Focus on memorable, actionable, or inspiring statements.`
   };
 
   const prompt = prompts[action] || `Generate ${action.toLowerCase()} for this video.`;
