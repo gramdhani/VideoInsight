@@ -54,16 +54,59 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.2.5 */}
+          {/* Version 0.2.6 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.2.5</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.6</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 1, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Video Library Management
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Added complete video deletion functionality with dropdown menu on each video card</li>
+                    <li>• Users can now permanently remove videos from their library along with all associated chat messages</li>
+                    <li>• Implemented confirmation dialog to prevent accidental deletions</li>
+                    <li>• Added proper error handling and success notifications for delete operations</li>
+                    <li>• Only video owners can delete their own videos (authorization built-in)</li>
+                    <li>• Enhanced Library page UI with hover-triggered action menu</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2">AI Response Improvements</h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Optimized AI responses to use simple, everyday language instead of complex business terms</li>
+                    <li>• Enhanced markdown formatting with better bold text rendering and bullet point layout</li>
+                    <li>• Improved chat message containers with better spacing and readability</li>
+                    <li>• Made AI responses more concise and direct, similar to user-preferred style</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.5 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.5</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
