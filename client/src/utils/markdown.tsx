@@ -92,7 +92,7 @@ export function parseMarkdownText(text: string, onTimestampClick?: (timestamp: s
         parts.push(
           <button
             key={match.index}
-            className="inline-flex items-center text-sm font-medium bg-purple-200 text-purple-700 px-4 py-2 rounded-full hover:bg-purple-300 transition-colors ml-1 mr-1"
+            className="inline-flex items-center text-xs font-medium bg-purple-200 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-300 transition-colors ml-1 mr-1"
             onClick={() => {
               console.log(`Jump to ${timestamp}`);
               if (onTimestampClick) {
