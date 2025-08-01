@@ -51,8 +51,11 @@ export default function ChatInterface({
 
   const { data: messages = [] } = useQuery({
     queryKey: ["/api/videos", video.id, "chat"],
+    queryFn: () => fetch(`/api/videos/${video.id}/chat`).then(res => res.json()),
     enabled: !!video.id,
   });
+
+  console.log("Current messages in chat:", messages);
 
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
