@@ -8,33 +8,33 @@ export async function generateQuickAction(
 ): Promise<{ answer: string; timestamps: string[] }> {
   
   const prompts: Record<string, string> = {
-    "Shorter Summary": `Give me 3 key takeaways from "${title}" in bullet points. Keep each point short and actionable. Include timestamps and links where relevant.`,
+    "Shorter Summary": `Give me 3 main points from "${title}" in simple bullet points. Keep each point short and easy to do. Include timestamps and links.`,
     
-    "Detailed Analysis": `Break down "${title}" with these sections:
+    "Detailed Analysis": `Break down "${title}" in simple terms:
 
-**Main Ideas:** Core concepts (1-2 sentences each)
-**Key Insights:** Most important points with timestamps
-**How to Apply:** Practical next steps
-**Tools Mentioned:** Links to resources
+**Main Ideas:** What's this about? (1-2 simple sentences each)
+**Key Points:** Most important stuff with timestamps
+**What You Can Do:** Easy next steps
+**Tools Used:** Links to websites and apps
 
-Keep everything concise and scannable.`,
+Keep everything simple and easy to read.`,
 
-    "Action Items": `Extract clear action steps from "${title}":
+    "Action Items": `What should I do after watching "${title}"?
 
-**Do Now:** Immediate steps
-**This Week:** Short-term actions  
-**Long-term:** Bigger goals
-**Tools Needed:** Resources and links
+**Do Right Now:** Easy first steps
+**Do This Week:** Things to try soon
+**Do Later:** Bigger goals
+**What You Need:** Tools and websites
 
-Make each item specific and brief.`,
+Make each step clear and simple.`,
 
-    "Key Quotes": `Find the best quotes from "${title}":
+    "Key Quotes": `Best quotes from "${title}":
 
 For each quote:
-- "Exact quote" [timestamp]
-- Why it matters (1 sentence)
+- "What they said" [timestamp]
+- Why this matters (simple explanation)
 
-Focus on memorable, actionable, or inspiring statements.`
+Pick quotes that are inspiring or really useful.`
   };
 
   const prompt = prompts[action] || `Generate ${action.toLowerCase()} for this video.`;
