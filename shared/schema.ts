@@ -30,7 +30,7 @@ export const users = pgTable("users", {
 export const videos = pgTable("videos", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   youtubeId: text("youtube_id").notNull(),
-  userId: varchar("user_id").references(() => users.id).notNull(),
+  userId: varchar("user_id").references(() => users.id),
   title: text("title").notNull(),
   channel: text("channel").notNull(),
   duration: text("duration").notNull(),

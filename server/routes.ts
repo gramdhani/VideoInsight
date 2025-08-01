@@ -22,11 +22,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Analyze YouTube video (requires authentication)
-  app.post("/api/videos/analyze", isAuthenticated, async (req: any, res) => {
+  // Analyze YouTube video (accessible to all users)
+  app.post("/api/videos/analyze", async (req: any, res) => {
     try {
       const { url } = req.body;
-      const userId = req.user.claims.sub;
+      
+      // Get userId if user is authenticated, otherwise null
+      let userId = null;
+      if (req.user && req.user.claims && req.user.claims.sub) {
+        userId = req.user.claims.sub;
+      }
       
       if (!url) {
         return res.status(400).json({ message: "YouTube URL is required" });
@@ -37,8 +42,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid YouTube URL" });
       }
       
-      // Check if user already has this video
-      const existingVideo = await storage.getUserVideo(userId, youtubeId);
+      // Check if this video already exists (for authenticated users, check their personal copy)
+      let existingVideo;
+      if (userId) {
+        existingVideo = await storage.getUserVideo(userId, youtubeId);
+      } else {
+        // For unauthenticated users, check if video exists in general
+        existingVideo = await storage.getVideo(youtubeId);
+      }
+      
       if (existingVideo) {
         return res.json(existingVideo);
       }
@@ -49,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate AI summary
       const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title);
       
-      // Create video record for this user
+      // Create video record
       const video = await storage.createVideo({
         youtubeId,
         title: videoInfo.title,
@@ -60,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         transcript: videoInfo.transcript,
         transcriptData: videoInfo.transcriptData,
         summary,
-        userId, // Associate video with user
+        userId, // Associate with user if authenticated, otherwise null
       });
       
       res.json(video);
