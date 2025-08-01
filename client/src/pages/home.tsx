@@ -23,7 +23,6 @@ export default function Home() {
   // Check for video parameter from Library
   const urlParams = new URLSearchParams(window.location.search);
   const videoId = urlParams.get('video');
-  console.log("URL videoId parameter:", videoId);
 
   // Load video if coming from Library
   const { data: libraryVideo } = useQuery<Video>({
@@ -34,7 +33,6 @@ export default function Home() {
   // Auto-load video from Library when available
   useEffect(() => {
     if (libraryVideo && libraryVideo.summary) {
-      console.log("Loading video from library:", libraryVideo.id, libraryVideo.title);
       // Always set the video, even if currentVideo exists (to override any cached video)
       setCurrentVideo(libraryVideo);
       // Clear the URL parameter to clean up the URL

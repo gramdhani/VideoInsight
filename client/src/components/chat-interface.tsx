@@ -55,29 +55,17 @@ export default function ChatInterface({
     enabled: !!video.id,
   });
 
-  console.log("Current messages in chat:", messages);
-  console.log("Messages length:", messages.length);
-  
-  // Debug: Show what's being passed to the map function
-  if (messages.length > 0) {
-    console.log("First message:", messages[0]);
-  }
-
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
-      console.log("Starting chat mutation for video:", video.id);
       setPendingMessage(message);
       const response = await apiRequest(
         "POST",
         `/api/videos/${video.id}/chat`,
         { message },
       );
-      const result = await response.json();
-      console.log("Chat API response:", result);
-      return result;
+      return response.json();
     },
-    onSuccess: (data) => {
-      console.log("Chat mutation successful:", data);
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["/api/videos", video.id, "chat"],
       });
@@ -85,7 +73,6 @@ export default function ChatInterface({
       setPendingMessage(null);
     },
     onError: (error: Error) => {
-      console.error("Chat mutation error:", error);
       setPendingMessage(null);
       toast({
         title: "Chat failed",
@@ -95,10 +82,40 @@ export default function ChatInterface({
     },
   });
 
+  // Scroll to bottom when messages change or component mounts
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollAreaRef.current) {
+        const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollElement) {
+          scrollElement.scrollTop = scrollElement.scrollHeight;
+        }
+      }
+    };
+
+    // Small delay to ensure DOM is updated
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [messages, pendingMessage]);
+
+  // Scroll to bottom when mutation is successful
+  useEffect(() => {
+    if (!chatMutation.isPending && !pendingMessage) {
+      const scrollToBottom = () => {
+        if (scrollAreaRef.current) {
+          const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+          if (scrollElement) {
+            scrollElement.scrollTop = scrollElement.scrollHeight;
+          }
+        }
+      };
+      setTimeout(scrollToBottom, 200);
+    }
+  }, [chatMutation.isPending, pendingMessage]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-    console.log("Submitting chat message:", message);
     chatMutation.mutate(message);
   };
 
@@ -140,7 +157,7 @@ export default function ChatInterface({
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-3 sm:p-4">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 p-3 sm:p-4">
         <div className="space-y-3 sm:space-y-4">
           {/* Welcome Message */}
           <div className="flex items-start space-x-2 sm:space-x-3">
