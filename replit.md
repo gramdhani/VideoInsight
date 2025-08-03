@@ -10,13 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**August 3, 2025 - v0.2.8 OpenRouter Integration with DeepSeek Model:**
+**August 3, 2025 - v0.2.8 OpenRouter Integration with Gemini Model:**
 - Migrated from OpenAI API directly to OpenRouter API for cost efficiency
-- Switched to deepseek/deepseek-r1-0528-qwen3-8b:free model for AI processing
+- Switched to google/gemini-2.5-flash-lite-preview-06-17 model for improved reliability
 - Updated OpenAI service configuration to use OpenRouter's unified API endpoint
 - Added proper OpenRouter headers for app attribution and rankings
 - Maintained all existing functionality while reducing operational costs
 - Updated environment variable requirement from OPENAI_API_KEY to OPENROUTER_API_KEY
+- Added better timeout handling and user-friendly error messages for free model limitations
 
 **August 1, 2025 - v0.2.7 Video Navigation & Chat Auto-scroll:**
 - Fixed video library routing issue where clicking videos opened incorrect content
@@ -149,7 +150,7 @@ The project follows a monorepo architecture with clear separation between client
 - In-memory storage fallback for development
 
 **External Services:**
-- OpenRouter API for AI-powered video analysis and chat (using deepseek model)
+- OpenRouter API for AI-powered video analysis and chat (using Google Gemini model)
 - YouTube Data API v3 for video metadata extraction
 
 ## Key Components
@@ -171,7 +172,7 @@ The summary field uses JSONB to store structured data including key points, aha 
 - Formats duration and view count data
 
 **OpenAI Service (server/services/openai.ts):**
-- Generates structured video summaries using deepseek model via OpenRouter
+- Generates structured video summaries using Google Gemini model via OpenRouter
 - Provides conversational AI for video-related questions
 - Uses JSON response format for consistent data structure
 - Maintains conversation context for improved responses

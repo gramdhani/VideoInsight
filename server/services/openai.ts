@@ -19,7 +19,7 @@ export async function summarizeVideo(transcript: string, title: string): Promise
   try {
     console.log(`Starting video summary for: ${title}`);
     const response = await openai.chat.completions.create({
-      model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+      model: "google/gemini-2.5-flash-lite-preview-06-17",
       messages: [
         {
           role: "system",
@@ -65,7 +65,7 @@ export async function chatAboutVideo(
 
     console.log(`Starting chat response for video: ${title}`);
     const response = await openai.chat.completions.create({
-      model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+      model: "google/gemini-2.5-flash-lite-preview-06-17",
       messages: [
         {
           role: "system",
