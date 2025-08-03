@@ -1,8 +1,13 @@
 import OpenAI from "openai";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
+// Using OpenRouter with deepseek model for cost-effective AI processing
+const openai = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": "https://videoinsight-ai.replit.app", // Your site URL for rankings
+    "X-Title": "VideoInsight AI", // Your site name for rankings
+  },
 });
 
 export async function summarizeVideo(transcript: string, title: string): Promise<{
@@ -13,7 +18,7 @@ export async function summarizeVideo(transcript: string, title: string): Promise
 }> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
       messages: [
         {
           role: "system",
@@ -52,7 +57,7 @@ export async function chatAboutVideo(
     ).join('\n\n');
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
       messages: [
         {
           role: "system",

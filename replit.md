@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 3, 2025 - v0.2.8 OpenRouter Integration with DeepSeek Model:**
+- Migrated from OpenAI API directly to OpenRouter API for cost efficiency
+- Switched to deepseek/deepseek-r1-0528-qwen3-8b:free model for AI processing
+- Updated OpenAI service configuration to use OpenRouter's unified API endpoint
+- Added proper OpenRouter headers for app attribution and rankings
+- Maintained all existing functionality while reducing operational costs
+- Updated environment variable requirement from OPENAI_API_KEY to OPENROUTER_API_KEY
+
 **August 1, 2025 - v0.2.7 Video Navigation & Chat Auto-scroll:**
 - Fixed video library routing issue where clicking videos opened incorrect content
 - Updated API endpoints to properly fetch videos by internal ID rather than YouTube ID
@@ -141,7 +149,7 @@ The project follows a monorepo architecture with clear separation between client
 - In-memory storage fallback for development
 
 **External Services:**
-- OpenAI API for AI-powered video analysis and chat
+- OpenRouter API for AI-powered video analysis and chat (using deepseek model)
 - YouTube Data API v3 for video metadata extraction
 
 ## Key Components
@@ -163,7 +171,7 @@ The summary field uses JSONB to store structured data including key points, aha 
 - Formats duration and view count data
 
 **OpenAI Service (server/services/openai.ts):**
-- Generates structured video summaries using GPT-4o
+- Generates structured video summaries using deepseek model via OpenRouter
 - Provides conversational AI for video-related questions
 - Uses JSON response format for consistent data structure
 - Maintains conversation context for improved responses
@@ -215,7 +223,7 @@ The summary field uses JSONB to store structured data including key points, aha 
 
 ### Required Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string (Neon serverless)
-- `OPENAI_API_KEY`: OpenAI API authentication
+- `OPENROUTER_API_KEY`: OpenRouter API authentication for AI services
 - `YOUTUBE_API_KEY`: YouTube Data API v3 key
 
 ### Key External Libraries
