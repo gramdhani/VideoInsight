@@ -18,6 +18,9 @@ Preferred communication style: Simple, everyday language.
 - Maintained all existing functionality while reducing operational costs
 - Updated environment variable requirement from OPENAI_API_KEY to OPENROUTER_API_KEY
 - Added better timeout handling and user-friendly error messages for free model limitations
+- Fixed timestamp display to show inline within text instead of duplicate bottom placement
+- Enhanced AI prompts for better timestamp accuracy when users ask about specific video moments
+- Improved transcript search instructions for more precise timestamp responses
 
 **August 1, 2025 - v0.2.7 Video Navigation & Chat Auto-scroll:**
 - Fixed video library routing issue where clicking videos opened incorrect content
