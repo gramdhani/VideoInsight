@@ -166,7 +166,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message,
         video.transcript || "",
         video.title,
-        context
+        context,
+        video.duration
       );
       
       // Save chat message

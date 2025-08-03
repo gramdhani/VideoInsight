@@ -56,7 +56,8 @@ export async function chatAboutVideo(
   question: string, 
   transcript: string, 
   title: string,
-  previousMessages: Array<{ question: string; answer: string }>
+  previousMessages: Array<{ question: string; answer: string }>,
+  videoDuration?: string
 ): Promise<{ answer: string; timestamps: string[] }> {
   try {
     const context = previousMessages.map(msg => 
@@ -64,6 +65,10 @@ export async function chatAboutVideo(
     ).join('\n\n');
 
     console.log(`Starting chat response for video: ${title}`);
+    console.log(`Video duration: ${videoDuration}`);
+    console.log(`Transcript length: ${transcript.length} characters`);
+    console.log(`Transcript preview: ${transcript.substring(0, 200)}...`);
+    
     const response = await openai.chat.completions.create({
       model: "google/gemini-2.5-flash-lite-preview-06-17",
       messages: [
@@ -127,7 +132,7 @@ JSON RESPONSE FORMAT:
         },
         {
           role: "user",
-          content: `Previous conversation:\n${context}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nINSTRUCTIONS: Search through the transcript above to find the exact moment related to the user's question. Look for keywords, numbers, or phrases that match what they're asking about, then provide the timestamp where that content appears.`,
+          content: `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || 'Unknown'}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`,
         },
       ],
       response_format: { type: "json_object" },
@@ -154,9 +159,36 @@ JSON RESPONSE FORMAT:
       };
     }
     
+    // Validate timestamps don't exceed video duration
+    let validatedTimestamps = result.timestamps || [];
+    if (videoDuration && validatedTimestamps.length > 0) {
+      // Convert video duration (e.g., "10:23") to seconds
+      const durationParts = videoDuration.split(':').map(Number);
+      const totalDurationSeconds = durationParts.length === 2 
+        ? durationParts[0] * 60 + durationParts[1]
+        : durationParts.length === 3
+        ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
+        : 0;
+      
+      validatedTimestamps = validatedTimestamps.filter((timestamp: string) => {
+        const timestampParts = timestamp.split(':').map(Number);
+        const timestampSeconds = timestampParts.length === 2
+          ? timestampParts[0] * 60 + timestampParts[1]
+          : timestampParts.length === 3
+          ? timestampParts[0] * 3600 + timestampParts[1] * 60 + timestampParts[2]
+          : 0;
+        
+        const isValid = timestampSeconds <= totalDurationSeconds;
+        if (!isValid) {
+          console.log(`Filtered invalid timestamp ${timestamp} (${timestampSeconds}s) exceeds video duration ${videoDuration} (${totalDurationSeconds}s)`);
+        }
+        return isValid;
+      });
+    }
+    
     return {
       answer: result.answer || "I couldn't generate a response for that question.",
-      timestamps: result.timestamps || [],
+      timestamps: validatedTimestamps,
     };
   } catch (error) {
     console.error("OpenRouter chat API error:", error);
