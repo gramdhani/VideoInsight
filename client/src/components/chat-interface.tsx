@@ -209,7 +209,7 @@ export default function ChatInterface({
                   </div>
                   {msg.timestamps &&
                     msg.timestamps.length > 0 &&
-                    !msg.response.includes("[") && (
+                    !msg.response.match(/\[\d+:\d+\]/) && (
                       <div className="flex flex-wrap gap-1 mt-2 mb-2">
                         {!isMobile && (
                           <span className="text-xs text-muted-foreground mr-2">
