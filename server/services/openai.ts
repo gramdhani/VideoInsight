@@ -17,6 +17,7 @@ export async function summarizeVideo(transcript: string, title: string): Promise
   insights: number;
 }> {
   try {
+    console.log(`Starting video summary for: ${title}`);
     const response = await openai.chat.completions.create({
       model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
       messages: [
@@ -30,6 +31,8 @@ export async function summarizeVideo(transcript: string, title: string): Promise
         },
       ],
       response_format: { type: "json_object" },
+    }, {
+      timeout: 30000, // 30 second timeout
     });
 
     const result = JSON.parse(response.choices[0].message.content || '{}');
@@ -41,6 +44,10 @@ export async function summarizeVideo(transcript: string, title: string): Promise
       insights: result.insights || 0,
     };
   } catch (error) {
+    console.error("OpenRouter API error:", error);
+    if (error instanceof Error && error.message.includes('408')) {
+      throw new Error("The AI model is currently busy. Please try again in a few moments. (Free models can be slower during peak times)");
+    }
     throw new Error("Failed to summarize video: " + (error instanceof Error ? error.message : String(error)));
   }
 }
@@ -56,6 +63,7 @@ export async function chatAboutVideo(
       `Q: ${msg.question}\nA: ${msg.answer}`
     ).join('\n\n');
 
+    console.log(`Starting chat response for video: ${title}`);
     const response = await openai.chat.completions.create({
       model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
       messages: [
@@ -112,6 +120,8 @@ JSON RESPONSE FORMAT:
         },
       ],
       response_format: { type: "json_object" },
+    }, {
+      timeout: 30000, // 30 second timeout
     });
 
     let result;
@@ -138,6 +148,10 @@ JSON RESPONSE FORMAT:
       timestamps: result.timestamps || [],
     };
   } catch (error) {
+    console.error("OpenRouter chat API error:", error);
+    if (error instanceof Error && error.message.includes('408')) {
+      throw new Error("The AI is currently busy. Please try your question again in a moment. (Free models can be slower during peak times)");
+    }
     throw new Error("Failed to generate chat response: " + (error instanceof Error ? error.message : String(error)));
   }
 }
