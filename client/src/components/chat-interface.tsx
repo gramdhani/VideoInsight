@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { parseMarkdownText } from "../utils/markdown";
@@ -45,14 +46,25 @@ export default function ChatInterface({
   const [message, setMessage] = useState("");
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
   const { data: messages = [] } = useQuery({
     queryKey: ["/api/videos", video.id, "chat"],
-    queryFn: () => fetch(`/api/videos/${video.id}/chat`).then(res => res.json()),
-    enabled: !!video.id,
+    queryFn: async () => {
+      const response = await fetch(`/api/videos/${video.id}/chat`);
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Return empty array for unauthenticated users
+          return [];
+        }
+        throw new Error('Failed to fetch messages');
+      }
+      return response.json();
+    },
+    enabled: !!video.id && isAuthenticated,
   });
 
   const chatMutation = useMutation({
@@ -179,7 +191,7 @@ export default function ChatInterface({
           </div>
 
           {/* Chat Messages */}
-          {(messages as any[]).map((msg: any, index: number) => (
+          {Array.isArray(messages) && messages.map((msg: any, index: number) => (
             <div key={msg.id}>
               {/* User Message */}
               <div className="flex items-start space-x-2 sm:space-x-3 justify-end mb-3 sm:mb-4">
