@@ -207,7 +207,7 @@ export default function LibraryPage() {
                 {video.summary && (
                   <div className="flex gap-2 mb-3">
                     <Badge variant="secondary" className="text-xs">
-                      {video.summary.keyPoints.length} key points
+                      {video.summary.keyTakeaways?.length || 0} takeaways
                     </Badge>
                     <Badge variant="secondary" className="text-xs">
                       {video.summary.readingTime}
