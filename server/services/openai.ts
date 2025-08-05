@@ -11,8 +11,10 @@ const openai = new OpenAI({
 });
 
 export async function summarizeVideo(transcript: string, title: string): Promise<{
-  keyPoints: string[];
-  ahaMonents: Array<{ timestamp: string; content: string }>;
+  shortSummary: string;
+  outline: Array<{ title: string; items: string[] }>;
+  keyTakeaways: Array<{ title: string; description: string; timestamp?: string }>;
+  actionableSteps: Array<{ step: string; description: string; priority: 'high' | 'medium' | 'low' }>;
   readingTime: string;
   insights: number;
 }> {
@@ -23,7 +25,41 @@ export async function summarizeVideo(transcript: string, title: string): Promise
       messages: [
         {
           role: "system",
-          content: "You are an expert video analyst. Create a comprehensive, well-structured summary with key points and aha moments from the transcript. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url). Focus on clear, readable formatting with proper paragraphs and bullet points. Respond with JSON in this format: { 'keyPoints': string[], 'ahaMonents': Array<{ 'timestamp': string, 'content': string }>, 'readingTime': string, 'insights': number }",
+          content: `You are an expert video analyst. Create a comprehensive, well-structured summary following this exact format. Use simple, everyday language that's easy to understand. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url).
+
+Respond with JSON in this exact format:
+{
+  "shortSummary": "A brief 2-3 sentence overview of what this video is about and its main purpose",
+  "outline": [
+    {
+      "title": "Section name (e.g., Introduction, Main Concept, etc.)",
+      "items": ["Key point 1", "Key point 2", "Key point 3"]
+    }
+  ],
+  "keyTakeaways": [
+    {
+      "title": "Simple takeaway title",
+      "description": "Clear explanation of why this matters",
+      "timestamp": "MM:SS (if specific moment mentioned)"
+    }
+  ],
+  "actionableSteps": [
+    {
+      "step": "Clear action item",
+      "description": "Simple explanation of how to do it",
+      "priority": "high" or "medium" or "low"
+    }
+  ],
+  "readingTime": "X min",
+  "insights": number_of_insights
+}
+
+GUIDELINES:
+- Use simple words everyone can understand
+- Make takeaways practical and useful
+- Include timestamps when referencing specific video moments
+- Prioritize action steps: high (do first), medium (do soon), low (do later)
+- Keep everything clear and actionable`,
         },
         {
           role: "user",
@@ -38,8 +74,10 @@ export async function summarizeVideo(transcript: string, title: string): Promise
     const result = JSON.parse(response.choices[0].message.content || '{}');
     
     return {
-      keyPoints: result.keyPoints || [],
-      ahaMonents: result.ahaMonents || [],
+      shortSummary: result.shortSummary || "Video summary not available",
+      outline: result.outline || [],
+      keyTakeaways: result.keyTakeaways || [],
+      actionableSteps: result.actionableSteps || [],
       readingTime: result.readingTime || "3 min",
       insights: result.insights || 0,
     };
