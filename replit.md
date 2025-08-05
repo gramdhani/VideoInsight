@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**August 5, 2025 - v0.2.9 Enhanced Summary Format:**
+- Redesigned AI summary format to match user requirements with 4 structured sections
+- Updated database schema to support new summary structure (shortSummary, outline, keyTakeaways, actionableSteps)
+- Modified AI prompt to generate simplified, easy-to-understand content in structured format
+- Enhanced frontend components to display new summary layout with proper sections
+- Added priority badges for actionable steps (high/medium/low)
+- Updated export functionality to support new summary format for both text and PDF
+- Removed fixed height constraints from summary cards for dynamic content sizing
+- Improved content organization with clear visual hierarchy and better readability
+
 **August 3, 2025 - v0.2.8 OpenRouter Integration with Gemini Model:**
 - Migrated from OpenAI API directly to OpenRouter API for cost efficiency
 - Switched to google/gemini-2.5-flash-lite-preview-06-17 model for improved reliability

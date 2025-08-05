@@ -86,8 +86,7 @@ export default function TabbedContent({
           </div>
         </div>
 
-        <ScrollArea className="h-[calc(100vh-16rem)] sm:h-[calc(100vh-20rem)]">
-          <div className="space-y-4 sm:space-y-6 pr-2">
+        <div className="space-y-4 sm:space-y-6">
             {/* 1. Short Summary */}
             <div>
               <h3
@@ -335,8 +334,7 @@ export default function TabbedContent({
                 </Button>
               </div>
             </div>
-          </div>
-        </ScrollArea>
+        </div>
       </CardContent>
     </Card>
   );
