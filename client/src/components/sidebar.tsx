@@ -1,4 +1,4 @@
-import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus, MessageSquare } from "lucide-react";
+import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus, MessageSquare, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +52,17 @@ export default function Sidebar({ className }: SidebarProps) {
       isActive: location === "/help"
     }
   ];
+
+  // Admin-only items - only show if user is the admin
+  const isAdmin = user?.id === "40339057";
+  const adminItems = isAdmin ? [
+    {
+      href: "/settings",
+      label: "Settings",
+      icon: Settings,
+      isActive: location === "/settings"
+    }
+  ] : [];
 
   return (
     <div className={cn(
@@ -153,6 +164,41 @@ export default function Sidebar({ className }: SidebarProps) {
             );
           })}
         </nav>
+
+        {/* Admin Section - Only for admin users */}
+        {adminItems.length > 0 && (
+          <>
+            {!isCollapsed && (
+              <div className="mt-6 mb-4">
+                <h2 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
+                  Admin
+                </h2>
+              </div>
+            )}
+            
+            <nav className="space-y-2">
+              {adminItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <div className={cn(
+                      "flex items-center space-x-3 px-3 py-2 rounded-lg transition-all cursor-pointer",
+                      item.isActive 
+                        ? "bg-[hsl(263,70%,95%)] text-primary" 
+                        : "text-[var(--text-secondary)] hover:bg-[var(--muted)] hover:text-[var(--text-main)]",
+                      isCollapsed && "justify-center px-2"
+                    )}>
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      {!isCollapsed && (
+                        <span className="font-medium">{item.label}</span>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
+          </>
+        )}
       </div>
 
       {/* Footer */}

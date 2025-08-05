@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema } from "@shared/schema";
+import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema, insertPromptConfigSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo } from "./services/openai";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -249,6 +249,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error submitting feedback:", error);
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to submit feedback" });
+    }
+  });
+
+  // Admin-only prompt configuration routes
+  
+  // Get all prompt configs (admin only)
+  app.get("/api/admin/prompt-configs", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const configs = await storage.getPromptConfigs();
+      res.json(configs);
+    } catch (error) {
+      console.error("Error fetching prompt configs:", error);
+      res.status(500).json({ message: "Failed to fetch prompt configs" });
+    }
+  });
+
+  // Get active prompt config (admin only)
+  app.get("/api/admin/prompt-configs/active", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const config = await storage.getActivePromptConfig();
+      res.json(config || null);
+    } catch (error) {
+      console.error("Error fetching active prompt config:", error);
+      res.status(500).json({ message: "Failed to fetch active prompt config" });
+    }
+  });
+
+  // Create new prompt config (admin only)
+  app.post("/api/admin/prompt-configs", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertPromptConfigSchema.parse(req.body);
+      const config = await storage.createPromptConfig(validatedData);
+      res.json(config);
+    } catch (error) {
+      console.error("Error creating prompt config:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to create prompt config" });
+    }
+  });
+
+  // Update prompt config (admin only)
+  app.put("/api/admin/prompt-configs/:id", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertPromptConfigSchema.partial().parse(req.body);
+      const config = await storage.updatePromptConfig(id, validatedData);
+      res.json(config);
+    } catch (error) {
+      console.error("Error updating prompt config:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to update prompt config" });
+    }
+  });
+
+  // Delete prompt config (admin only)
+  app.delete("/api/admin/prompt-configs/:id", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deletePromptConfig(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Prompt config not found" });
+      }
+      
+      res.json({ success: true, message: "Prompt config deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting prompt config:", error);
+      res.status(500).json({ message: "Failed to delete prompt config" });
+    }
+  });
+
+  // Set active prompt config (admin only)
+  app.post("/api/admin/prompt-configs/:id/activate", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const config = await storage.setActivePromptConfig(id);
+      res.json(config);
+    } catch (error) {
+      console.error("Error activating prompt config:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to activate prompt config" });
     }
   });
   

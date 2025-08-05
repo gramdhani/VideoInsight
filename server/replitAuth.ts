@@ -155,3 +155,20 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     return;
   }
 };
+
+// Admin-only middleware - only allow specific admin user
+export const isAdmin: RequestHandler = async (req, res, next) => {
+  const user = req.user as any;
+  
+  if (!req.isAuthenticated() || !user.claims?.sub) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  
+  // Check if the user is the admin (your user ID)
+  const adminUserId = "40339057"; // This is your user ID from the logs
+  if (user.claims.sub !== adminUserId) {
+    return res.status(403).json({ message: "Admin access required" });
+  }
+  
+  return next();
+};

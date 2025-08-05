@@ -7,10 +7,13 @@ import {
   type InsertFeedback,
   type User,
   type UpsertUser,
+  type PromptConfig,
+  type InsertPromptConfig,
   users,
   videos,
   chatMessages,
-  feedbacks
+  feedbacks,
+  promptConfigs
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -34,6 +37,15 @@ export interface IStorage {
   
   // Feedback operations
   createFeedback(feedback: InsertFeedback): Promise<Feedback>;
+  
+  // Prompt config operations
+  getPromptConfigs(): Promise<PromptConfig[]>;
+  getActivePromptConfig(): Promise<PromptConfig | undefined>;
+  getPromptConfigById(id: string): Promise<PromptConfig | undefined>;
+  createPromptConfig(config: InsertPromptConfig): Promise<PromptConfig>;
+  updatePromptConfig(id: string, config: Partial<InsertPromptConfig>): Promise<PromptConfig>;
+  deletePromptConfig(id: string): Promise<boolean>;
+  setActivePromptConfig(id: string): Promise<PromptConfig>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -127,17 +139,70 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return feedback;
   }
+
+  // Prompt config operations
+  async getPromptConfigs(): Promise<PromptConfig[]> {
+    const configs = await db.select().from(promptConfigs).orderBy(sql`${promptConfigs.createdAt} DESC`);
+    return configs;
+  }
+
+  async getActivePromptConfig(): Promise<PromptConfig | undefined> {
+    const [config] = await db.select().from(promptConfigs).where(eq(promptConfigs.isActive, "true"));
+    return config;
+  }
+
+  async getPromptConfigById(id: string): Promise<PromptConfig | undefined> {
+    const [config] = await db.select().from(promptConfigs).where(eq(promptConfigs.id, id));
+    return config;
+  }
+
+  async createPromptConfig(insertConfig: InsertPromptConfig): Promise<PromptConfig> {
+    const [config] = await db
+      .insert(promptConfigs)
+      .values(insertConfig as any)
+      .returning();
+    return config;
+  }
+
+  async updatePromptConfig(id: string, updateData: Partial<InsertPromptConfig>): Promise<PromptConfig> {
+    const [config] = await db
+      .update(promptConfigs)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(promptConfigs.id, id))
+      .returning();
+    return config;
+  }
+
+  async deletePromptConfig(id: string): Promise<boolean> {
+    const result = await db.delete(promptConfigs).where(eq(promptConfigs.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async setActivePromptConfig(id: string): Promise<PromptConfig> {
+    // First deactivate all configs
+    await db.update(promptConfigs).set({ isActive: "false" });
+    
+    // Then activate the specified config
+    const [config] = await db
+      .update(promptConfigs)
+      .set({ isActive: "true", updatedAt: new Date() })
+      .where(eq(promptConfigs.id, id))
+      .returning();
+    return config;
+  }
 }
 
 export class MemStorage implements IStorage {
   private videos: Map<string, Video>;
   private chatMessages: Map<string, ChatMessage>;
   private feedbacks: Map<string, Feedback>;
+  private promptConfigs: Map<string, PromptConfig>;
 
   constructor() {
     this.videos = new Map();
     this.chatMessages = new Map();
     this.feedbacks = new Map();
+    this.promptConfigs = new Map();
   }
 
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
@@ -255,6 +320,76 @@ export class MemStorage implements IStorage {
     };
     this.feedbacks.set(id, feedback);
     return feedback;
+  }
+
+  // Prompt config operations
+  async getPromptConfigs(): Promise<PromptConfig[]> {
+    return Array.from(this.promptConfigs.values()).sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }
+
+  async getActivePromptConfig(): Promise<PromptConfig | undefined> {
+    return Array.from(this.promptConfigs.values()).find(config => config.isActive === "true");
+  }
+
+  async getPromptConfigById(id: string): Promise<PromptConfig | undefined> {
+    return this.promptConfigs.get(id);
+  }
+
+  async createPromptConfig(insertConfig: InsertPromptConfig): Promise<PromptConfig> {
+    const id = randomUUID();
+    const config: PromptConfig = { 
+      id,
+      name: insertConfig.name,
+      systemPrompt: insertConfig.systemPrompt,
+      userPrompt: insertConfig.userPrompt,
+      description: insertConfig.description || null,
+      isActive: insertConfig.isActive || "false",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.promptConfigs.set(id, config);
+    return config;
+  }
+
+  async updatePromptConfig(id: string, updateData: Partial<InsertPromptConfig>): Promise<PromptConfig> {
+    const existing = this.promptConfigs.get(id);
+    if (!existing) {
+      throw new Error("Prompt config not found");
+    }
+
+    const updated: PromptConfig = {
+      ...existing,
+      ...updateData,
+      updatedAt: new Date(),
+    };
+    this.promptConfigs.set(id, updated);
+    return updated;
+  }
+
+  async deletePromptConfig(id: string): Promise<boolean> {
+    return this.promptConfigs.delete(id);
+  }
+
+  async setActivePromptConfig(id: string): Promise<PromptConfig> {
+    // First deactivate all configs
+    Array.from(this.promptConfigs.values()).forEach(config => {
+      config.isActive = "false";
+    });
+    
+    // Then activate the specified config
+    const config = this.promptConfigs.get(id);
+    if (!config) {
+      throw new Error("Prompt config not found");
+    }
+
+    config.isActive = "true";
+    config.updatedAt = new Date();
+    this.promptConfigs.set(id, config);
+    return config;
   }
 }
 

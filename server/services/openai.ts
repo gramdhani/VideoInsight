@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { storage } from "../storage";
 
 // Using OpenRouter with deepseek model for cost-effective AI processing
 const openai = new OpenAI({
@@ -106,13 +107,9 @@ export async function chatAboutVideo(
     console.log(`Video duration: ${videoDuration}`);
     console.log(`Transcript length: ${transcript.length} characters`);
     console.log(`Transcript preview: ${transcript.substring(0, 200)}...`);
-    
-    const response = await openai.chat.completions.create({
-      model: "google/gemini-2.5-flash-lite-preview-06-17",
-      messages: [
-        {
-          role: "system",
-          content: `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
+
+    // Get active prompt configuration
+    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
 
 RESPONSE STYLE - USE SIMPLE ENGLISH:
 - Write like you're talking to a friend
@@ -166,11 +163,40 @@ JSON RESPONSE FORMAT:
 {
   "answer": "Your natural response here", 
   "timestamps": ["MM:SS"] (only include if timestamps are referenced in the answer)
-}`,
+}`;
+
+    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || 'Unknown'}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`;
+
+    // Try to get active prompt configuration from database
+    try {
+      const activeConfig = await storage.getActivePromptConfig();
+      if (activeConfig) {
+        console.log(`Using active prompt config: ${activeConfig.name}`);
+        
+        // Replace variables in system prompt
+        systemPrompt = activeConfig.systemPrompt.replace(/\$\{title\}/g, title);
+        
+        // Replace variables in user prompt
+        userPrompt = activeConfig.userPrompt
+          .replace(/\$\{context\}/g, context)
+          .replace(/\$\{videoDuration\}/g, videoDuration || 'Unknown')
+          .replace(/\$\{transcript\}/g, transcript)
+          .replace(/\$\{question\}/g, question);
+      }
+    } catch (error) {
+      console.log("Using default prompts due to error:", error);
+    }
+    
+    const response = await openai.chat.completions.create({
+      model: "google/gemini-2.5-flash-lite-preview-06-17",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
         },
         {
           role: "user",
-          content: `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || 'Unknown'}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`,
+          content: userPrompt,
         },
       ],
       response_format: { type: "json_object" },
