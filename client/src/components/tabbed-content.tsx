@@ -145,7 +145,7 @@ export default function TabbedContent({
           <TabsContent value="summary" className="space-y-4 sm:space-y-6 mt-4">
             {/* Short Summary */}
             <div>
-              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
+              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 <span>Summary</span>
               </h3>
@@ -156,7 +156,7 @@ export default function TabbedContent({
 
             {/* Outline */}
             <div>
-              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
+              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 <span>Outline</span>
               </h3>
@@ -183,7 +183,7 @@ export default function TabbedContent({
 
             {/* Key Takeaways */}
             <div>
-              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
+              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
                 <span>Key Takeaways</span>
               </h3>
@@ -214,7 +214,7 @@ export default function TabbedContent({
 
             {/* Actionable Next Steps */}
             <div>
-              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
+              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
                 <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                 <span>Next Steps</span>
               </h3>
