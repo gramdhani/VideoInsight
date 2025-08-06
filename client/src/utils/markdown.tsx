@@ -214,7 +214,7 @@ export function parseMarkdownText(
       const hasFormattingMarks = trimmedLine.includes('**') || trimmedLine.includes('[') || trimmedLine.includes('](');
       
       elements.push(
-        <p key={elements.length} className="text-foreground mb-2 text-[15px]">
+        <p key={elements.length} className="text-foreground text-[15px] mt-[16px] mb-[16px]">
           {parseFormattedText(trimmedLine)}
         </p>
       );
