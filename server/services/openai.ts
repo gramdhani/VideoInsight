@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { storage } from "../storage";
+import { needsWebSearch, searchWebWithAI } from "./webSearchAI";
 
 // Using OpenRouter with deepseek model for cost-effective AI processing
 const openai = new OpenAI({
@@ -127,8 +128,22 @@ export async function chatAboutVideo(
     console.log(`Transcript length: ${transcript.length} characters`);
     console.log(`Transcript preview: ${transcript.substring(0, 200)}...`);
 
+    // Check if question needs web search and gather information
+    let webSearchInfo = "";
+    if (needsWebSearch(question, title)) {
+      const searchResult = await searchWebWithAI(question, title);
+      if (searchResult.hasWebInfo) {
+        webSearchInfo = `\n\nSUPPLEMENTAL WEB INFORMATION:\n${searchResult.webContent}\n\nUse this current web information to enhance your response about the video content. Clearly distinguish between video content and current web information.\n`;
+      }
+    }
+
     // Get active prompt configuration
-    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
+    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps and can supplement with current web information when needed. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
+
+ENHANCED CAPABILITIES:
+- Primary focus: Analyze and discuss video content with accurate timestamps
+- Secondary support: Use current web information to provide context about competitors, market data, or topics not covered in the video
+- Always prioritize video content first, then supplement with web information when relevant
 
 RESPONSE STYLE - USE SIMPLE ENGLISH:
 - Write like you're talking to a friend
@@ -166,7 +181,12 @@ JSON RESPONSE FORMAT:
   "timestamps": ["MM:SS"] (only include if timestamps are referenced in the answer)
 }`;
 
-    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`;
+    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}${webSearchInfo}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.
+
+WHEN USING WEB INFORMATION:
+- Clearly label when information comes from current web sources vs. the video
+- Combine video insights with current data when relevant
+- Focus on video content first, use web info to add context`;
 
     const response = await openai.chat.completions.create(
       {
