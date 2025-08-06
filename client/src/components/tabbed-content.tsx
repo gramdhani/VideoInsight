@@ -8,18 +8,32 @@ import {
   ArrowRight,
   Play,
   FileDown,
+  Search,
+  Copy,
+  MessageSquare,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parseMarkdownLinks, parseMarkdownText } from "../utils/markdown";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TabbedContentProps {
   video: {
     title: string;
     youtubeId: string;
+    transcript?: string;
+    transcriptData?: Array<{
+      text: string;
+      startMs: string;
+      endMs: string;
+      startTimeText: string;
+    }>;
     summary: {
       shortSummary: string;
       outline: Array<{ title: string; items: string[] }>;
@@ -36,8 +50,11 @@ export default function TabbedContent({
   video,
   onTimestampClick,
 }: TabbedContentProps) {
-  const { summary } = video;
+  const { summary, transcriptData } = video;
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("summary");
 
   const jumpToTimestamp = (timestamp: string) => {
     // Use the callback if provided, otherwise fallback to console log
@@ -56,6 +73,39 @@ export default function TabbedContent({
     }
   };
 
+  // Filter transcript based on search query
+  const filteredTranscript = transcriptData?.filter(segment =>
+    segment.text.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  // Copy all transcript text to clipboard
+  const copyAllTranscript = async () => {
+    if (!transcriptData) return;
+    
+    const fullText = transcriptData
+      .map(segment => `${segment.startTimeText} ${segment.text}`)
+      .join('\n');
+    
+    try {
+      await navigator.clipboard.writeText(fullText);
+      toast({
+        title: "Copied to clipboard",
+        description: "The full transcript has been copied to your clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: "Failed to copy transcript to clipboard.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Format timestamp from milliseconds to MM:SS or HH:MM:SS
+  const formatTimestamp = (startTimeText: string) => {
+    return startTimeText;
+  };
+
   return (
     <Card className="modern-card shadow-modern">
       <CardContent className="p-3 sm:p-6">
@@ -64,7 +114,7 @@ export default function TabbedContent({
             className={`${isMobile ? "text-lg" : "text-xl"} font-semibold flex items-center space-x-2 text-foreground`}
           >
             <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            <span>{isMobile ? "Summary" : "AI Summary"}</span>
+            <span>{isMobile ? "Analysis" : "AI Analysis"}</span>
           </h2>
           <div className="flex space-x-2">
             <Button
@@ -86,12 +136,18 @@ export default function TabbedContent({
           </div>
         </div>
 
-        <div className="space-y-4 sm:space-y-6">
-            {/* 1. Short Summary */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
+            <TabsTrigger value="transcript" data-testid="tab-transcript">Transcript</TabsTrigger>
+            <TabsTrigger value="comments" data-testid="tab-comments">Comments</TabsTrigger>
+          </TabsList>
+
+          {/* Summary Tab */}
+          <TabsContent value="summary" className="space-y-4 sm:space-y-6 mt-4">
+            {/* Short Summary */}
             <div>
-              <h3
-                className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}
-              >
+              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 <span>Summary</span>
               </h3>
@@ -100,11 +156,9 @@ export default function TabbedContent({
               </p>
             </div>
 
-            {/* 2. Outline */}
+            {/* Outline */}
             <div>
-              <h3
-                className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}
-              >
+              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 <span>Outline</span>
               </h3>
@@ -129,11 +183,9 @@ export default function TabbedContent({
               </div>
             </div>
 
-            {/* 3. Key Takeaways */}
+            {/* Key Takeaways */}
             <div>
-              <h3
-                className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}
-              >
+              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
                 <span>Key Takeaways</span>
               </h3>
@@ -162,11 +214,9 @@ export default function TabbedContent({
               </div>
             </div>
 
-            {/* 4. Actionable Next Steps */}
+            {/* Actionable Next Steps */}
             <div>
-              <h3
-                className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}
-              >
+              <h3 className={`font-medium text-foreground mb-2 sm:mb-3 flex items-center space-x-2 ${isMobile ? "text-sm" : "text-base"}`}>
                 <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
                 <span>Next Steps</span>
               </h3>
@@ -180,10 +230,7 @@ export default function TabbedContent({
                           {step.step}
                         </h4>
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`${getPriorityColor(step.priority)} text-xs`}
-                      >
+                      <Badge variant="outline" className={`${getPriorityColor(step.priority)} text-xs`}>
                         {step.priority}
                       </Badge>
                     </div>
@@ -199,9 +246,7 @@ export default function TabbedContent({
             <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
               <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
                 <div>
-                  <div
-                    className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-primary`}
-                  >
+                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-primary`}>
                     {summary.readingTime}
                   </div>
                   <div className="text-xs text-gray-600">
@@ -209,132 +254,102 @@ export default function TabbedContent({
                   </div>
                 </div>
                 <div>
-                  <div
-                    className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}
-                  >
+                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}>
                     {summary.keyTakeaways.length}
                   </div>
                   <div className="text-xs text-gray-600">Takeaways</div>
                 </div>
                 <div>
-                  <div
-                    className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-accent`}
-                  >
+                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-accent`}>
                     {summary.insights}
                   </div>
                   <div className="text-xs text-gray-600">Insights</div>
                 </div>
               </div>
             </div>
+          </TabsContent>
 
-            {/* Export Notes */}
-            <div className="border-t border-gray-200 pt-3 sm:pt-4">
-              <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <h4
-                  className={`${isMobile ? "text-xs" : "text-sm"} font-semibold text-gray-900 flex items-center space-x-2`}
-                >
-                  <Download className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
-                  <span>Export Notes</span>
-                </h4>
+          {/* Transcript Tab */}
+          <TabsContent value="transcript" className="space-y-4 mt-4">
+            {transcriptData && transcriptData.length > 0 ? (
+              <>
+                {/* Search and Copy Controls */}
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      placeholder="Search transcript..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                      data-testid="input-search-transcript"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyAllTranscript}
+                    className="flex items-center space-x-2"
+                    data-testid="button-copy-all"
+                  >
+                    <Copy className="w-4 h-4" />
+                    <span>Copy all</span>
+                  </Button>
+                </div>
+
+                {/* Transcript Content */}
+                <ScrollArea className="h-96 w-full rounded-md border p-4">
+                  <div className="space-y-3">
+                    {(searchQuery ? filteredTranscript : transcriptData).map((segment, index) => (
+                      <div key={index} className="flex items-start space-x-3 group">
+                        <button
+                          onClick={() => jumpToTimestamp(segment.startTimeText)}
+                          className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+                          data-testid={`timestamp-${segment.startTimeText}`}
+                        >
+                          {segment.startTimeText}
+                        </button>
+                        <p className={`text-gray-700 leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
+                          {searchQuery && segment.text.toLowerCase().includes(searchQuery.toLowerCase()) ? (
+                            segment.text.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, partIndex) =>
+                              part.toLowerCase() === searchQuery.toLowerCase() ? (
+                                <mark key={partIndex} className="bg-yellow-200 px-1 rounded">
+                                  {part}
+                                </mark>
+                              ) : (
+                                part
+                              )
+                            )
+                          ) : (
+                            segment.text
+                          )}
+                        </p>
+                      </div>
+                    ))}
+                    {searchQuery && filteredTranscript.length === 0 && (
+                      <div className="text-center text-gray-500 py-8">
+                        <p>No results found for "{searchQuery}"</p>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                <p>No transcript available for this video.</p>
               </div>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`flex-1 ${isMobile ? "text-xs h-7" : "text-xs h-8"}`}
-                  onClick={() => {
-                    let content = `# ${video.title}\n\n## AI Summary\n\n### Summary\n${summary.shortSummary}\n\n### Outline\n`;
-                    summary.outline.forEach((section, index) => {
-                      content += `${index + 1}. ${section.title}\n`;
-                      section.items.forEach((item) => {
-                        content += `   - ${item}\n`;
-                      });
-                    });
-                    content += `\n### Key Takeaways\n`;
-                    summary.keyTakeaways.forEach((takeaway) => {
-                      content += `**${takeaway.title}**: ${takeaway.description}${takeaway.timestamp ? ` [${takeaway.timestamp}]` : ''}\n`;
-                    });
-                    content += `\n### Next Steps\n`;
-                    summary.actionableSteps.forEach((step, index) => {
-                      content += `${index + 1}. [${step.priority.toUpperCase()}] ${step.step}: ${step.description}\n`;
-                    });
-                    const blob = new Blob([content], { type: "text/plain" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `${video.title}-summary.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                >
-                  <FileText className="w-3 h-3 mr-1" />
-                  Text
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`flex-1 ${isMobile ? "text-xs h-7" : "text-xs h-8"}`}
-                  onClick={async () => {
-                    // Dynamic import to avoid bundling issues
-                    const { default: jsPDF } = await import("jspdf");
+            )}
+          </TabsContent>
 
-                    const pdf = new jsPDF();
-                    let yPosition = 30;
-
-                    // Title
-                    pdf.setFontSize(20);
-                    pdf.text(video.title, 20, yPosition);
-                    yPosition += 20;
-
-                    // Summary
-                    pdf.setFontSize(16);
-                    pdf.text("Summary", 20, yPosition);
-                    yPosition += 10;
-                    pdf.setFontSize(12);
-                    const summaryLines = pdf.splitTextToSize(summary.shortSummary, 170);
-                    pdf.text(summaryLines, 20, yPosition);
-                    yPosition += summaryLines.length * 7 + 10;
-
-                    // Outline
-                    pdf.setFontSize(14);
-                    pdf.text("Outline", 20, yPosition);
-                    yPosition += 10;
-                    pdf.setFontSize(12);
-                    summary.outline.forEach((section, index) => {
-                      const sectionLines = pdf.splitTextToSize(`${index + 1}. ${section.title}`, 170);
-                      pdf.text(sectionLines, 20, yPosition);
-                      yPosition += sectionLines.length * 7;
-                      section.items.forEach((item) => {
-                        const itemLines = pdf.splitTextToSize(`   - ${item}`, 170);
-                        pdf.text(itemLines, 20, yPosition);
-                        yPosition += itemLines.length * 7;
-                      });
-                      yPosition += 5;
-                    });
-
-                    // Key Takeaways
-                    yPosition += 10;
-                    pdf.setFontSize(14);
-                    pdf.text("Key Takeaways", 20, yPosition);
-                    yPosition += 15;
-                    pdf.setFontSize(12);
-                    summary.keyTakeaways.forEach((takeaway) => {
-                      const takeawayText = `${takeaway.title}: ${takeaway.description}`;
-                      const lines = pdf.splitTextToSize(takeawayText, 170);
-                      pdf.text(lines, 20, yPosition);
-                      yPosition += lines.length * 7 + 5;
-                    });
-
-                    // Save the PDF
-                    pdf.save(`${video.title}-summary.pdf`);
-                  }}
-                >
-                  <FileDown className="w-3 h-3 mr-1" />
-                  PDF
-                </Button>
-              </div>
+          {/* Comments Tab */}
+          <TabsContent value="comments" className="space-y-4 mt-4">
+            <div className="text-center text-gray-500 py-8">
+              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p>Comments feature coming soon!</p>
+              <p className="text-sm">Connect with other viewers and share insights.</p>
             </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
