@@ -1,6 +1,5 @@
 import OpenAI from "openai";
 import { storage } from "../storage";
-import { searchWebWithContent, needsWebSearch } from "./webSearch";
 
 // Using OpenRouter with deepseek model for cost-effective AI processing
 const openai = new OpenAI({
@@ -128,37 +127,8 @@ export async function chatAboutVideo(
     console.log(`Transcript length: ${transcript.length} characters`);
     console.log(`Transcript preview: ${transcript.substring(0, 200)}...`);
 
-    // Check if the question needs web search for current information
-    let webSearchResults = "";
-    if (needsWebSearch(question, title)) {
-      try {
-        console.log(`Question requires web search: ${question}`);
-        const searchResponse = await searchWebWithContent(question, 3);
-        
-        webSearchResults = `\n\nCURRENT WEB INFORMATION (searched on ${new Date().toLocaleDateString()}):\n`;
-        searchResponse.detailedResults.forEach((result, index) => {
-          webSearchResults += `\n${index + 1}. ${result.title}\n`;
-          webSearchResults += `   Source: ${result.url}\n`;
-          webSearchResults += `   Summary: ${result.snippet}\n`;
-          if (result.content) {
-            webSearchResults += `   Content: ${result.content.substring(0, 500)}...\n`;
-          }
-          webSearchResults += "\n";
-        });
-        webSearchResults += "\nUse this current information to provide accurate, up-to-date answers alongside the video content.\n";
-      } catch (searchError) {
-        console.error("Web search failed:", searchError);
-        webSearchResults = "\n\nNote: Unable to fetch current web information at this time.\n";
-      }
-    }
-
     // Get active prompt configuration
-    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps AND current web information when needed. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
-
-ENHANCED CAPABILITIES:
-- You can browse the internet for current information when questions require real-time data
-- Always prioritize video content first, then supplement with web information when relevant
-- Clearly distinguish between video content and current web information in your responses
+    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
 
 RESPONSE STYLE - USE SIMPLE ENGLISH:
 - Write like you're talking to a friend
@@ -196,12 +166,7 @@ JSON RESPONSE FORMAT:
   "timestamps": ["MM:SS"] (only include if timestamps are referenced in the answer)
 }`;
 
-    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}${webSearchResults}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.
-
-WHEN USING WEB INFORMATION:
-- Clearly label when information comes from current web sources vs. the video
-- Provide source links for web information using markdown format
-- Combine video insights with current data when relevant`;
+    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`;
 
     const response = await openai.chat.completions.create(
       {

@@ -7,6 +7,7 @@ VideoInsight AI is a full-stack web application that analyzes YouTube videos usi
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Note: User does not want web browsing/internet search capabilities integrated into the AI chat system.
 
 ## System Architecture
 

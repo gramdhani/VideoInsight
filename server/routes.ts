@@ -5,7 +5,6 @@ import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema } from
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo } from "./services/openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import webSearchRoutes from "./routes/webSearch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
@@ -252,9 +251,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to submit feedback" });
     }
   });
-
-  // Add web search routes
-  app.use("/api/web", webSearchRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
