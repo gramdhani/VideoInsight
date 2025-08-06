@@ -11,26 +11,55 @@ export interface WebSearchInfo {
   searchQuery: string;
 }
 
-// Check if a query needs web search based on keywords and context
+// Intelligent detection: Check if a query needs web search based on keywords and context
 export function needsWebSearch(question: string, videoTitle?: string): boolean {
-  const webSearchKeywords = [
-    'competitor', 'competitors', 'compare', 'vs', 'versus', 'alternative',
-    'current', 'latest', 'recent', 'today', 'now', 'price', 'cost',
-    'who is', 'what is', 'where can', 'how much does', 'is there',
-    'similar to', 'like', 'other', 'market', 'industry',
-    'reviews', 'rating', 'better than', 'worse than'
-  ];
-
   const questionLower = question.toLowerCase();
   
-  // Check for explicit web search needs
-  return webSearchKeywords.some(keyword => questionLower.includes(keyword));
+  // High-priority web search indicators (current information needed)
+  const highPriorityKeywords = [
+    'competitor', 'competitors', 'alternative', 'alternatives',
+    'compare', 'vs', 'versus', 'compared to', 'similar to',
+    'current', 'latest', 'recent', 'today', 'now', '2024', '2025',
+    'price', 'cost', 'pricing', 'how much', 'expensive',
+    'market', 'industry', 'trends', 'popular'
+  ];
+  
+  // Question patterns that need web search
+  const webSearchPatterns = [
+    /who is .+/,           // "who is the CEO of..."
+    /what is .+ doing/,    // "what is Company X doing now"
+    /is there .+/,         // "is there a better alternative"
+    /are there .+/,        // "are there competitors to..."
+    /how does .+ compare/, // "how does X compare to Y"
+    /what are the .+ options/, // "what are the current options"
+  ];
+  
+  // Context-aware detection: company/product names often need current info
+  const hasCompanyContext = /\b(company|startup|business|app|service|tool|platform)\b/.test(questionLower);
+  const hasCurrentContext = /\b(nowadays|currently|right now|these days)\b/.test(questionLower);
+  
+  // Check high-priority keywords
+  if (highPriorityKeywords.some(keyword => questionLower.includes(keyword))) {
+    return true;
+  }
+  
+  // Check question patterns
+  if (webSearchPatterns.some(pattern => pattern.test(questionLower))) {
+    return true;
+  }
+  
+  // Context-based detection
+  if (hasCompanyContext && hasCurrentContext) {
+    return true;
+  }
+  
+  return false;
 }
 
 // Use GPT-4o-mini-search-preview to gather web information
 export async function searchWebWithAI(question: string, videoTitle: string): Promise<WebSearchInfo> {
   try {
-    console.log(`Using GPT-4o-mini-search-preview for web search: ${question}`);
+    console.log(`🔍 Intelligent detection triggered web search for: ${question}`);
     
     const searchPrompt = `You have web search capabilities. The user is asking about a video titled "${videoTitle}" and has this question: "${question}"
 
