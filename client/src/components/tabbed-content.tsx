@@ -191,7 +191,7 @@ export default function TabbedContent({
                 {summary.keyTakeaways.map((takeaway, index) => (
                   <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h4 className={`font-medium text-blue-900 ${isMobile ? "text-sm" : "text-base"}`}>
+                      <h4 className="text-blue-900 text-base font-semibold">
                         {takeaway.title}
                       </h4>
                       {takeaway.timestamp && (
