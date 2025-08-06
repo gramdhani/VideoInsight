@@ -10,7 +10,6 @@ import {
   FileDown,
   Search,
   Copy,
-  MessageSquare,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -137,10 +136,9 @@ export default function TabbedContent({
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
             <TabsTrigger value="transcript" data-testid="tab-transcript">Transcript</TabsTrigger>
-            <TabsTrigger value="comments" data-testid="tab-comments">Comments</TabsTrigger>
           </TabsList>
 
           {/* Summary Tab */}
@@ -341,14 +339,7 @@ export default function TabbedContent({
             )}
           </TabsContent>
 
-          {/* Comments Tab */}
-          <TabsContent value="comments" className="space-y-4 mt-4">
-            <div className="text-center text-gray-500 py-8">
-              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p>Comments feature coming soon!</p>
-              <p className="text-sm">Connect with other viewers and share insights.</p>
-            </div>
-          </TabsContent>
+
         </Tabs>
       </CardContent>
     </Card>
