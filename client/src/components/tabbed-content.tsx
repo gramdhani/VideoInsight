@@ -170,7 +170,7 @@ export default function TabbedContent({
                       {section.items.map((item, itemIndex) => (
                         <li key={itemIndex} className="flex items-start space-x-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
-                          <span className="text-gray-600 text-[16px] mt-[2px] mb-[2px]">
+                          <span className="text-gray-600 mt-[2px] mb-[2px] text-[15px]">
                             {parseMarkdownLinks(item)}
                           </span>
                         </li>
@@ -204,7 +204,7 @@ export default function TabbedContent({
                         </button>
                       )}
                     </div>
-                    <p className={`text-blue-800 ${isMobile ? "text-xs" : "text-sm"}`}>
+                    <p className="text-blue-800 text-[15px]">
                       {parseMarkdownLinks(takeaway.description)}
                     </p>
                   </div>
@@ -224,7 +224,7 @@ export default function TabbedContent({
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-400`} />
-                        <h4 className={`font-medium text-foreground ${isMobile ? "text-sm" : "text-base"}`}>
+                        <h4 className="text-foreground text-base font-semibold">
                           {step.step}
                         </h4>
                       </div>
@@ -232,7 +232,7 @@ export default function TabbedContent({
                         {step.priority}
                       </Badge>
                     </div>
-                    <p className={`text-muted-foreground ml-6 ${isMobile ? "text-xs" : "text-sm"}`}>
+                    <p className="text-muted-foreground ml-6 text-[15px]">
                       {parseMarkdownLinks(step.description)}
                     </p>
                   </div>

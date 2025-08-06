@@ -214,7 +214,7 @@ export function parseMarkdownText(
       const hasFormattingMarks = trimmedLine.includes('**') || trimmedLine.includes('[') || trimmedLine.includes('](');
       
       elements.push(
-        <p key={elements.length} className={`text-sm leading-relaxed text-foreground ${isShortLine && !hasFormattingMarks ? 'mb-1' : 'mb-2'}`}>
+        <p key={elements.length} className="text-foreground mb-2 text-[15px]">
           {parseFormattedText(trimmedLine)}
         </p>
       );
