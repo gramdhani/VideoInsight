@@ -163,7 +163,7 @@ export default function TabbedContent({
               <div className="space-y-3">
                 {summary.outline.map((section, index) => (
                   <div key={index} className="border-l-3 border-blue-300 pl-3 sm:pl-4">
-                    <h4 className={`font-medium text-gray-800 mb-2 ${isMobile ? "text-sm" : "text-base"}`}>
+                    <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
                       {index + 1}. {section.title}
                     </h4>
                     <ul className="space-y-1">
