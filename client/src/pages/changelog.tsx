@@ -1,4 +1,4 @@
-import { Calendar, GitBranch, Zap } from "lucide-react";
+import { Calendar, GitBranch, Zap, Settings, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "../components/header";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -54,16 +54,64 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.2.7 */}
+          {/* Version 0.2.8 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.2.7</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.8</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 6, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Admin Prompt Configuration System
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Added comprehensive admin settings page for AI chat prompt configuration</li>
+                    <li>• Created database schema for storing custom prompt configurations</li>
+                    <li>• Implemented template variable system (context, transcript, videoDuration, question, title variables)</li>
+                    <li>• Added admin-only access protection with user ID validation</li>
+                    <li>• Integrated configurable prompts into AI chat system for dynamic responses</li>
+                    <li>• Created default prompt configuration for immediate functionality</li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Enhanced Transcript Interface
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Redesigned AI analysis card with tabbed interface (Summary & Transcript)</li>
+                    <li>• Added searchable transcript with real-time keyword filtering</li>
+                    <li>• Implemented "Copy all" functionality with toast notifications</li>
+                    <li>• Styled timestamps with clickable navigation to video positions</li>
+                    <li>• Added search result highlighting for better content discovery</li>
+                    <li>• Integrated transcript data from database into the UI seamlessly</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.7 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.7</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
