@@ -7,6 +7,7 @@ VideoInsight AI is a full-stack web application that analyzes YouTube videos usi
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Response format: Prioritize bullet points over paragraphs, keep responses short and concise.
 Note: Uses hybrid AI approach - GPT-4o-mini-search-preview for web research, Gemini for responses.
 
 ## System Architecture

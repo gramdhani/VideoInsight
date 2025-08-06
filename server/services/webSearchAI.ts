@@ -52,8 +52,7 @@ Format your response as factual information that can be combined with video anal
           content: searchPrompt
         }
       ],
-      max_tokens: 1000,
-      temperature: 0.3
+      max_tokens: 800
     });
 
     const webContent = response.choices[0].message.content || "";
