@@ -72,16 +72,7 @@ export const feedbacks = pgTable("feedbacks", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const promptConfigs = pgTable("prompt_configs", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull().unique(),
-  systemPrompt: text("system_prompt").notNull(),
-  userPrompt: text("user_prompt").notNull(),
-  description: text("description"),
-  isActive: varchar("is_active").default("false"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
 
 export const insertVideoSchema = createInsertSchema(videos).omit({
   id: true,
@@ -98,11 +89,7 @@ export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
   createdAt: true,
 });
 
-export const insertPromptConfigSchema = createInsertSchema(promptConfigs).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+
 
 export type InsertVideo = z.infer<typeof insertVideoSchema>;
 export type Video = typeof videos.$inferSelect;
@@ -110,8 +97,7 @@ export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
 export type Feedback = typeof feedbacks.$inferSelect;
-export type InsertPromptConfig = z.infer<typeof insertPromptConfigSchema>;
-export type PromptConfig = typeof promptConfigs.$inferSelect;
+
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;

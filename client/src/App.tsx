@@ -11,7 +11,7 @@ import Library from "./pages/library";
 import Changelog from "./pages/changelog";
 import Help from "./pages/help";
 import Feedback from "./pages/feedback";
-import Settings from "./pages/settings";
+
 import NotFound from "./pages/not-found";
 
 function Router() {
@@ -24,7 +24,7 @@ function Router() {
           <Route path="/changelog" component={Changelog} />
           <Route path="/help" component={Help} />
           <Route path="/feedback" component={Feedback} />
-          <Route path="/settings" component={Settings} />
+
           <Route component={NotFound} />
         </Switch>
       </Layout>

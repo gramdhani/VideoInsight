@@ -167,25 +167,7 @@ JSON RESPONSE FORMAT:
 
     let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || 'Unknown'}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`;
 
-    // Try to get active prompt configuration from database
-    try {
-      const activeConfig = await storage.getActivePromptConfig();
-      if (activeConfig) {
-        console.log(`Using active prompt config: ${activeConfig.name}`);
-        
-        // Replace variables in system prompt
-        systemPrompt = activeConfig.systemPrompt.replace(/\$\{title\}/g, title);
-        
-        // Replace variables in user prompt
-        userPrompt = activeConfig.userPrompt
-          .replace(/\$\{context\}/g, context)
-          .replace(/\$\{videoDuration\}/g, videoDuration || 'Unknown')
-          .replace(/\$\{transcript\}/g, transcript)
-          .replace(/\$\{question\}/g, question);
-      }
-    } catch (error) {
-      console.log("Using default prompts due to error:", error);
-    }
+
     
     const response = await openai.chat.completions.create({
       model: "google/gemini-2.5-flash-lite-preview-06-17",
