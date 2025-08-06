@@ -170,7 +170,7 @@ export default function TabbedContent({
                       {section.items.map((item, itemIndex) => (
                         <li key={itemIndex} className="flex items-start space-x-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
-                          <span className="text-gray-600 text-[16px]">
+                          <span className="text-gray-600 text-[16px] mt-[2px] mb-[2px]">
                             {parseMarkdownLinks(item)}
                           </span>
                         </li>
