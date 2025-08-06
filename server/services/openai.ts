@@ -96,8 +96,7 @@ export async function chatAboutVideo(
   transcript: string, 
   title: string,
   previousMessages: Array<{ question: string; answer: string }>,
-  videoDuration?: string,
-  showTimestamps: boolean = true
+  videoDuration?: string
 ): Promise<{ answer: string; timestamps: string[] }> {
   try {
     const context = previousMessages.map(msg => 
@@ -129,24 +128,22 @@ WORD CHOICES - SIMPLE ALTERNATIVES:
 - Instead of "implement" → say "do" or "try"
 
 TIMESTAMP USAGE - CRITICAL INSTRUCTIONS:
-${showTimestamps ? `- When users ask about specific information, events, or mentions in the video, ALWAYS search the transcript carefully
+- When users ask about specific information, events, or mentions in the video, ALWAYS search the transcript carefully
 - Include timestamps [MM:SS] when you find the relevant moment in the transcript
 - If the user asks "what timestamp did he mention X?", find that exact moment and provide the timestamp
 - Don't say "the video doesn't provide a timestamp" - instead search for the content and provide the timestamp where it occurs
-- Be specific and accurate with timestamp references` : `- DO NOT include any timestamps in your responses
-- User has disabled timestamp display, so provide information without timestamp references
-- Focus on content only without time-based navigation`}
+- Be specific and accurate with timestamp references
 
 WHEN TO USE DIFFERENT FORMATS:
 - Use bullet points ONLY when listing multiple items or steps
 - Use paragraphs for explanations, advice, or single concepts
-${showTimestamps ? `- ALWAYS include timestamps [MM:SS] when referencing specific video moments or answering timestamp questions` : `- DO NOT include any timestamps in your responses`}
+- ALWAYS include timestamps [MM:SS] when referencing specific video moments or answering timestamp questions
 - For creative questions (like "generate ideas"), focus on new ideas inspired by the video content
-${showTimestamps ? `- For specific video questions, include relevant timestamps` : `- Focus on content without time references`}
+- For specific video questions, include relevant timestamps
 
 FORMATTING RULES - CRITICAL FOR PROPER DISPLAY:
 - Format as natural paragraphs or bullet points based on content
-${showTimestamps ? `- Include timestamps [MM:SS] when referencing specific video moments` : `- Do not include any timestamps in your responses`}
+- Include timestamps [MM:SS] when referencing specific video moments
 - Format tools/websites as clickable links [text](url)
 - Use **bold** for emphasis, not HTML tags
 - NEVER use double quotes (") inside the answer text - use single quotes (') if needed
@@ -165,7 +162,7 @@ For specific questions: "The speaker talks about validating your idea by talking
 JSON RESPONSE FORMAT:
 {
   "answer": "Your natural response here", 
-  "timestamps": ${showTimestamps ? `["MM:SS"] (only include if timestamps are referenced in the answer)` : `[] (always return empty array when timestamps are disabled)`}
+  "timestamps": ["MM:SS"] (only include if timestamps are referenced in the answer)
 }`;
 
     let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || 'Unknown'}\n\nFull Video Transcript with Timestamps:\n${transcript}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.`;

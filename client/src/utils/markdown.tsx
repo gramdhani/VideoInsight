@@ -56,7 +56,6 @@ function cleanText(text: string): string {
 export function parseMarkdownText(
   text: string,
   onTimestampClick?: (timestamp: string) => void,
-  hideTimestamps: boolean = false,
 ): JSX.Element {
   // Clean the input text first
   const cleanedText = cleanText(text);
@@ -133,35 +132,29 @@ export function parseMarkdownText(
       ) {
         // Timestamp [MM:SS] or range [MM:SS - MM:SS]
         const timestamp = match[8];
-        
-        // If timestamps are hidden, don't render the timestamp
-        if (hideTimestamps) {
-          // Just skip this timestamp, don't add it to parts
-        } else {
-          // For ranges like "5:01 - 6:35", extract the first timestamp
-          const firstTimestamp = timestamp.includes(" - ")
-            ? timestamp.split(" - ")[0].trim()
-            : timestamp;
-          parts.push(
-            <button
-              key={match.index}
-              className="inline-flex items-center text-xs font-medium bg-purple-200 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-300 transition-colors ml-1 mr-1"
-              style={{
-                minHeight: "auto",
-                paddingLeft: "8px",
-                paddingRight: "8px",
-              }}
-              onClick={() => {
-                console.log(`Jump to ${timestamp}`);
-                if (onTimestampClick) {
-                  onTimestampClick(firstTimestamp);
-                }
-              }}
-            >
-              {timestamp}
-            </button>,
-          );
-        }
+        // For ranges like "5:01 - 6:35", extract the first timestamp
+        const firstTimestamp = timestamp.includes(" - ")
+          ? timestamp.split(" - ")[0].trim()
+          : timestamp;
+        parts.push(
+          <button
+            key={match.index}
+            className="inline-flex items-center text-xs font-medium bg-purple-200 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-300 transition-colors ml-1 mr-1"
+            style={{
+              minHeight: "auto",
+              paddingLeft: "8px",
+              paddingRight: "8px",
+            }}
+            onClick={() => {
+              console.log(`Jump to ${timestamp}`);
+              if (onTimestampClick) {
+                onTimestampClick(firstTimestamp);
+              }
+            }}
+          >
+            {timestamp}
+          </button>,
+        );
       }
 
       lastIndex = formatRegex.lastIndex;
