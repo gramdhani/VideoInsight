@@ -13,11 +13,14 @@ import {
   Hash,
   Zap,
   ChevronDown,
+  Settings2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { AutoTextarea } from "@/components/ui/auto-textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +53,36 @@ export default function ChatInterface({
   const queryClient = useQueryClient();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  // User preferences query
+  const { data: userPreferences } = useQuery<{ showTimestamps: boolean }>({
+    queryKey: ["/api/user/preferences"],
+    enabled: !!isAuthenticated,
+  });
+
+  const showTimestamps = userPreferences?.showTimestamps ?? true;
+
+  // Mutation to update user preferences
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (preferences: { showTimestamps: boolean }) => {
+      const response = await apiRequest("POST", "/api/user/preferences", preferences);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/preferences"] });
+      toast({
+        title: "Settings updated",
+        description: `Timestamps ${showTimestamps ? 'disabled' : 'enabled'} for AI responses`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update settings",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: messages = [] } = useQuery({
     queryKey: ["/api/videos", video.id, "chat"],
@@ -156,14 +189,36 @@ export default function ChatInterface({
             <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             <span>{isMobile ? "Ask AI" : "Ask About This Video"}</span>
           </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            title="Clear Chat"
-            className="hover:bg-muted"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            {/* Timestamp Toggle - Only show for authenticated users */}
+            {isAuthenticated && (
+              <div className="flex items-center space-x-2">
+                <Clock className={`w-4 h-4 ${showTimestamps ? 'text-primary' : 'text-muted-foreground'}`} />
+                <Switch
+                  checked={showTimestamps}
+                  onCheckedChange={(checked) => {
+                    updatePreferencesMutation.mutate({ showTimestamps: checked });
+                  }}
+                  disabled={updatePreferencesMutation.isPending}
+                  data-testid="toggle-timestamps"
+                />
+                {!isMobile && (
+                  <Label htmlFor="timestamp-toggle" className="text-sm text-muted-foreground">
+                    Timestamps
+                  </Label>
+                )}
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Clear Chat"
+              className="hover:bg-muted"
+              data-testid="button-clear-chat"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         
       </div>
@@ -217,9 +272,9 @@ export default function ChatInterface({
                   className={`bg-muted rounded-lg rounded-tl-none p-3 sm:p-4 ${isMobile ? "max-w-[85%]" : "max-w-lg"}`}
                 >
                   <div className="text-sm leading-relaxed">
-                    {parseMarkdownText(msg.response, onTimestampClick)}
+                    {parseMarkdownText(msg.response, showTimestamps ? onTimestampClick : undefined, !showTimestamps)}
                   </div>
-                  {msg.timestamps &&
+                  {showTimestamps && msg.timestamps &&
                     msg.timestamps.length > 0 &&
                     !msg.response.match(/\[\d+:\d+\]/) && (
                       <div className="flex flex-wrap gap-1 mt-2 mb-2">
@@ -236,6 +291,7 @@ export default function ChatInterface({
                               onTimestampClick?.(timestamp);
                             }}
                             className="text-sm font-medium bg-purple-200 text-purple-800 px-4 py-2 rounded-full hover:bg-purple-300 transition-colors cursor-pointer border-0 outline-none"
+                            data-testid={`button-timestamp-${i}`}
                           >
                             {timestamp}
                           </button>

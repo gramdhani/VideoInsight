@@ -9,11 +9,14 @@ import {
   type UpsertUser,
   type PromptConfig,
   type InsertPromptConfig,
+  type UserPreferences,
+  type InsertUserPreferences,
   users,
   videos,
   chatMessages,
   feedbacks,
-  promptConfigs
+  promptConfigs,
+  userPreferences
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -46,6 +49,10 @@ export interface IStorage {
   updatePromptConfig(id: string, config: Partial<InsertPromptConfig>): Promise<PromptConfig>;
   deletePromptConfig(id: string): Promise<boolean>;
   setActivePromptConfig(id: string): Promise<PromptConfig>;
+  
+  // User preferences operations
+  getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
+  upsertUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -189,6 +196,27 @@ export class DatabaseStorage implements IStorage {
       .where(eq(promptConfigs.id, id))
       .returning();
     return config;
+  }
+
+  // User preferences operations
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
+    const [preferences] = await db.select().from(userPreferences).where(eq(userPreferences.userId, userId));
+    return preferences;
+  }
+
+  async upsertUserPreferences(preferencesData: InsertUserPreferences): Promise<UserPreferences> {
+    const [preferences] = await db
+      .insert(userPreferences)
+      .values(preferencesData)
+      .onConflictDoUpdate({
+        target: userPreferences.userId,
+        set: {
+          ...preferencesData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return preferences;
   }
 }
 
@@ -390,6 +418,15 @@ export class MemStorage implements IStorage {
     config.updatedAt = new Date();
     this.promptConfigs.set(id, config);
     return config;
+  }
+
+  // User preferences operations (not supported in memory storage)
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
+    return undefined;
+  }
+
+  async upsertUserPreferences(preferencesData: InsertUserPreferences): Promise<UserPreferences> {
+    throw new Error("In-memory storage doesn't support user preferences");
   }
 }
 

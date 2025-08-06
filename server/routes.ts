@@ -161,13 +161,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         answer: msg.response,
       }));
       
+      // Get user preferences for timestamps
+      let showTimestamps = true; // Default to true
+      const userId = (req as any).user?.claims?.sub;
+      if (userId) {
+        try {
+          const preferences = await storage.getUserPreferences(userId);
+          if (preferences) {
+            showTimestamps = preferences.showTimestamps ?? true;
+          }
+        } catch (error) {
+          console.log("Could not get user preferences, using default");
+        }
+      }
+      
       // Generate AI response
       const { answer, timestamps } = await chatAboutVideo(
         message,
         video.transcript || "",
         video.title,
         context,
-        video.duration
+        video.duration,
+        showTimestamps
       );
       
       // Save chat message
@@ -327,6 +342,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error activating prompt config:", error);
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to activate prompt config" });
+    }
+  });
+
+  // Get user preferences
+  app.get("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      let preferences = await storage.getUserPreferences(userId);
+      
+      // If no preferences exist, create default preferences
+      if (!preferences) {
+        preferences = await storage.upsertUserPreferences({
+          userId,
+          showTimestamps: true,
+        });
+      }
+
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error getting user preferences:", error);
+      res.status(500).json({ message: "Failed to get user preferences" });
+    }
+  });
+
+  // Update user preferences
+  app.post("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { showTimestamps } = req.body;
+      
+      const preferences = await storage.upsertUserPreferences({
+        userId,
+        showTimestamps: showTimestamps !== undefined ? showTimestamps : true,
+      });
+
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ message: "Failed to update user preferences" });
     }
   });
   
