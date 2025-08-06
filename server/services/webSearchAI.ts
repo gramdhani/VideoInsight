@@ -3,6 +3,8 @@ import OpenAI from "openai";
 // OpenAI client for web search using GPT-4o-mini-search-preview
 const openaiSearch = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  // Ensure no default parameters that might conflict with search model
+  defaultQuery: undefined
 });
 
 export interface WebSearchInfo {
@@ -82,6 +84,7 @@ Format your response as factual information that can be combined with video anal
         }
       ],
       max_tokens: 800
+      // Note: temperature parameter removed - not supported by this model
     });
 
     const webContent = response.choices[0].message.content || "";
