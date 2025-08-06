@@ -36,16 +36,8 @@ interface TabbedContentProps {
     summary: {
       shortSummary: string;
       outline: Array<{ title: string; items: string[] }>;
-      keyTakeaways: Array<{
-        title: string;
-        description: string;
-        timestamp?: string;
-      }>;
-      actionableSteps: Array<{
-        step: string;
-        description: string;
-        priority: "high" | "medium" | "low";
-      }>;
+      keyTakeaways: Array<{ title: string; description: string; timestamp?: string }>;
+      actionableSteps: Array<{ step: string; description: string; priority: 'high' | 'medium' | 'low' }>;
       readingTime: string;
       insights: number;
     };
@@ -72,31 +64,27 @@ export default function TabbedContent({
     }
   };
 
-  const getPriorityColor = (priority: "high" | "medium" | "low") => {
+  const getPriorityColor = (priority: 'high' | 'medium' | 'low') => {
     switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
+      case 'high': return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200';
     }
   };
 
   // Filter transcript based on search query
-  const filteredTranscript =
-    transcriptData?.filter((segment) =>
-      segment.text.toLowerCase().includes(searchQuery.toLowerCase()),
-    ) || [];
+  const filteredTranscript = transcriptData?.filter(segment =>
+    segment.text.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
   // Copy all transcript text to clipboard
   const copyAllTranscript = async () => {
     if (!transcriptData) return;
-
+    
     const fullText = transcriptData
-      .map((segment) => `${segment.startTimeText} ${segment.text}`)
-      .join("\n");
-
+      .map(segment => `${segment.startTimeText} ${segment.text}`)
+      .join('\n');
+    
     try {
       await navigator.clipboard.writeText(fullText);
       toast({
@@ -149,25 +137,19 @@ export default function TabbedContent({
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="summary" data-testid="tab-summary">
-              Summary
-            </TabsTrigger>
-            <TabsTrigger value="transcript" data-testid="tab-transcript">
-              Transcript
-            </TabsTrigger>
+            <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
+            <TabsTrigger value="transcript" data-testid="tab-transcript">Transcript</TabsTrigger>
           </TabsList>
 
           {/* Summary Tab */}
-          <TabsContent value="summary" className="space-y-4 sm:space-y-6 mt-8">
+          <TabsContent value="summary" className="space-y-4 sm:space-y-6 mt-4">
             {/* Short Summary */}
             <div>
               <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                 <span>Summary</span>
               </h3>
-              <p
-                className={`text-foreground leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}
-              >
+              <p className={`text-foreground leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
                 {parseMarkdownLinks(summary.shortSummary)}
               </p>
             </div>
@@ -180,19 +162,13 @@ export default function TabbedContent({
               </h3>
               <div className="space-y-3">
                 {summary.outline.map((section, index) => (
-                  <div
-                    key={index}
-                    className="border-l-3 border-blue-300 pl-3 sm:pl-4"
-                  >
+                  <div key={index} className="border-l-3 border-blue-300 pl-3 sm:pl-4">
                     <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
                       {index + 1}. {section.title}
                     </h4>
                     <ul className="space-y-1">
                       {section.items.map((item, itemIndex) => (
-                        <li
-                          key={itemIndex}
-                          className="flex items-start space-x-2"
-                        >
+                        <li key={itemIndex} className="flex items-start space-x-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
                           <span className="text-gray-600 mt-[2px] mb-[2px] text-[15px]">
                             {parseMarkdownLinks(item)}
@@ -213,10 +189,7 @@ export default function TabbedContent({
               </h3>
               <div className="space-y-3">
                 {summary.keyTakeaways.map((takeaway, index) => (
-                  <div
-                    key={index}
-                    className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4"
-                  >
+                  <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="text-blue-900 text-base font-semibold">
                         {takeaway.title}
@@ -247,23 +220,15 @@ export default function TabbedContent({
               </h3>
               <div className="space-y-3">
                 {summary.actionableSteps.map((step, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
-                  >
+                  <div key={index} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-2">
-                        <ArrowRight
-                          className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-400`}
-                        />
+                        <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-400`} />
                         <h4 className="text-foreground text-base font-semibold">
                           {step.step}
                         </h4>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className={`${getPriorityColor(step.priority)} text-xs`}
-                      >
+                      <Badge variant="outline" className={`${getPriorityColor(step.priority)} text-xs`}>
                         {step.priority}
                       </Badge>
                     </div>
@@ -279,9 +244,7 @@ export default function TabbedContent({
             <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
               <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
                 <div>
-                  <div
-                    className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-primary`}
-                  >
+                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-primary`}>
                     {summary.readingTime}
                   </div>
                   <div className="text-xs text-gray-600">
@@ -289,17 +252,13 @@ export default function TabbedContent({
                   </div>
                 </div>
                 <div>
-                  <div
-                    className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}
-                  >
+                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}>
                     {summary.keyTakeaways.length}
                   </div>
                   <div className="text-xs text-gray-600">Takeaways</div>
                 </div>
                 <div>
-                  <div
-                    className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-accent`}
-                  >
+                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-accent`}>
                     {summary.insights}
                   </div>
                   <div className="text-xs text-gray-600">Insights</div>
@@ -339,48 +298,32 @@ export default function TabbedContent({
                 {/* Transcript Content */}
                 <ScrollArea className="h-96 w-full rounded-md border p-4">
                   <div className="space-y-3">
-                    {(searchQuery ? filteredTranscript : transcriptData).map(
-                      (segment, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start space-x-3 group"
+                    {(searchQuery ? filteredTranscript : transcriptData).map((segment, index) => (
+                      <div key={index} className="flex items-start space-x-3 group">
+                        <button
+                          onClick={() => jumpToTimestamp(segment.startTimeText)}
+                          className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+                          data-testid={`timestamp-${segment.startTimeText}`}
                         >
-                          <button
-                            onClick={() =>
-                              jumpToTimestamp(segment.startTimeText)
-                            }
-                            className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
-                            data-testid={`timestamp-${segment.startTimeText}`}
-                          >
-                            {segment.startTimeText}
-                          </button>
-                          <p
-                            className={`text-gray-700 leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}
-                          >
-                            {searchQuery &&
+                          {segment.startTimeText}
+                        </button>
+                        <p className={`text-gray-700 leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
+                          {searchQuery && segment.text.toLowerCase().includes(searchQuery.toLowerCase()) ? (
+                            segment.text.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, partIndex) =>
+                              part.toLowerCase() === searchQuery.toLowerCase() ? (
+                                <mark key={partIndex} className="bg-yellow-200 px-1 rounded">
+                                  {part}
+                                </mark>
+                              ) : (
+                                part
+                              )
+                            )
+                          ) : (
                             segment.text
-                              .toLowerCase()
-                              .includes(searchQuery.toLowerCase())
-                              ? segment.text
-                                  .split(new RegExp(`(${searchQuery})`, "gi"))
-                                  .map((part, partIndex) =>
-                                    part.toLowerCase() ===
-                                    searchQuery.toLowerCase() ? (
-                                      <mark
-                                        key={partIndex}
-                                        className="bg-yellow-200 px-1 rounded"
-                                      >
-                                        {part}
-                                      </mark>
-                                    ) : (
-                                      part
-                                    ),
-                                  )
-                              : segment.text}
-                          </p>
-                        </div>
-                      ),
-                    )}
+                          )}
+                        </p>
+                      </div>
+                    ))}
                     {searchQuery && filteredTranscript.length === 0 && (
                       <div className="text-center text-gray-500 py-8">
                         <p>No results found for "{searchQuery}"</p>
@@ -395,6 +338,8 @@ export default function TabbedContent({
               </div>
             )}
           </TabsContent>
+
+
         </Tabs>
       </CardContent>
     </Card>
