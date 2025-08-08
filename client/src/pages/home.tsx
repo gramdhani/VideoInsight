@@ -97,6 +97,14 @@ export default function Home() {
             <div
               className={`space-y-4 sm:space-y-6 ${isMobile ? "pb-16" : ""}`}
             >
+              {/* Quick Questions - Available to all users */}
+              <QuickActions video={{
+                id: currentVideo.id,
+                youtubeId: currentVideo.youtubeId,
+                title: currentVideo.title,
+                transcript: currentVideo.transcript || undefined,
+              }} />
+              
               <div
                 className={
                   isMobile

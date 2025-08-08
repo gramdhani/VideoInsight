@@ -62,3 +62,11 @@ The project employs a monorepo structure separating client, server, and shared c
 *   Improved context-aware decision making for web search activation
 *   Optimized response generation combining video insights with current web data
 *   Added visual indicators (🔍) for web search activation in logs
+
+**✓ Context-Aware Quick Questions Feature (August 2025)**
+*   Replaced static question templates with AI-generated context-specific questions
+*   Added generateQuickQuestions AI service using existing OpenRouter Gemini integration
+*   Created GET `/api/videos/:youtubeId/quick-questions` endpoint for dynamic question generation
+*   Updated QuickActions component with loading states and error handling
+*   Questions now analyze video transcript and title to generate personalized conversation starters
+*   Positioned Quick Questions above chat interface for easy access to all users
