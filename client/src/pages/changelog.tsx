@@ -54,16 +54,73 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.2.9 */}
+          {/* Version 0.3.0 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.2.9</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.3.0</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 9, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Enhanced Quick Questions Experience
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Quick questions now trigger immediate AI responses instead of filling input box</li>
+                    <li>• Shortened question generation from 120-160 to 40-70 characters for better readability</li>
+                    <li>• Click-to-chat functionality provides instant engagement with video content</li>
+                    <li>• Questions appear directly in chat interface when no previous messages exist</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Improved Authentication Handling
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Added clear authentication checks for quick question interactions</li>
+                    <li>• Implemented informative error messages for unauthenticated users</li>
+                    <li>• Seamless user experience with proper login prompts when needed</li>
+                    <li>• Enhanced security for AI chat functionality</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    UI/UX Improvements
+                  </h3>
+                  <ul className="text-green-800 text-sm space-y-1">
+                    <li>• Disabled button states during AI processing to prevent multiple requests</li>
+                    <li>• Loading indicators and visual feedback for better user experience</li>
+                    <li>• Streamlined question interaction workflow</li>
+                    <li>• Enhanced responsive design for mobile and desktop</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.9 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.9</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
