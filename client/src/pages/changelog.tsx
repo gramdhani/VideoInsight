@@ -54,16 +54,74 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.2.8 */}
+          {/* Version 0.2.9 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.2.8</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.9</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 8, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Intelligent Web Search Integration
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Added automatic detection system for questions requiring current information</li>
+                    <li>• Web search triggers for keywords: competitors, alternatives, current, latest, pricing, market trends</li>
+                    <li>• Smart question pattern recognition: "who is...", "what is X doing", "is there a better..."</li>
+                    <li>• Combines video content with real-time web data when relevant</li>
+                    <li>• Visual indicators (🔍) for web search activation in logs</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Enhanced Response Formatting
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Implemented mandatory bullet point formatting for all AI responses</li>
+                    <li>• Prioritized concise, scannable content over lengthy paragraphs</li>
+                    <li>• Added structured formatting with sub-bullets for detailed information</li>
+                    <li>• Responses now start immediately with bullets (no introductory paragraphs)</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    API Integration Fixes
+                  </h3>
+                  <ul className="text-green-800 text-sm space-y-1">
+                    <li>• Resolved GPT-4o-mini-search-preview temperature parameter compatibility error</li>
+                    <li>• Stabilized hybrid AI system communication between OpenAI and OpenRouter APIs</li>
+                    <li>• Improved error handling and fallback mechanisms</li>
+                    <li>• Enhanced intelligent detection logic with multi-layer keyword analysis</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.2.8 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.2.8</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
