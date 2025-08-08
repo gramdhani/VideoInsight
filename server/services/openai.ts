@@ -129,22 +129,23 @@ export async function generateQuickQuestions(
 Analyze the video transcript and title to create 4 context-specific questions that would naturally arise from watching this video. These should be conversational, like a curious friend asking follow-up questions.
 
 CRITICAL LENGTH REQUIREMENT:
-- Each question MUST be between 120-140 characters maximum
-- Keep questions concise but engaging and specific to the video content
-- Count characters carefully - exceed 140 and the question will be rejected
+- Each question MUST be 80-120 characters maximum - NO EXCEPTIONS
+- Prioritize brevity over elaborate phrasing
+- Cut unnecessary words while keeping context-specific references
+- Questions exceeding 120 characters will be completely rejected
 
 STYLE GUIDELINES:
-- Write questions as if someone just watched the video and wants to dig deeper
-- Make them conversational and natural (like "So you're saying..." or "Wait, does this mean...")
-- Focus on practical applications, implications, or clarifications
-- Reference specific concepts, tools, or ideas mentioned in the video
-- Avoid generic questions that could apply to any video
+- Use short, punchy conversation starters
+- Start with simple phrases: "So...", "Wait...", "Could...", "Does..."
+- Reference ONE specific concept/tool/idea per question maximum
+- Remove filler words and excessive detail
+- Make them sound like quick follow-up questions
 
-EXAMPLES OF GOOD SHORT CONTEXT-AWARE QUESTIONS:
-- "So I could really streamline consent management with Consent Pro?"
-- "Wait, does this mean I need to rethink compliance handling?"
-- "Could this approach work for smaller businesses like mine?"
-- "Would implementing this workflow save me 5 hours a week?"
+EXAMPLES OF PROPERLY SHORT QUESTIONS (80-120 chars):
+- "So Reddit alone got you to $17K MRR with zero marketing budget?"
+- "Wait, you built App Alchemi in just two weeks using AI?"
+- "Could this Reddit strategy work for B2B products too?"
+- "Does this mean UI libraries are key for fast prototyping?"
 
 Respond with JSON in this exact format:
 {
