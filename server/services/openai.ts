@@ -124,28 +124,35 @@ export async function generateQuickQuestions(
         messages: [
           {
             role: "system",
-            content: `You are an expert at generating engaging conversation starters based on video content. 
+            content: `You are an expert at generating short, punchy conversation starters based on video content.
 
-Analyze the video transcript and title to create 4 context-specific questions that would naturally arise from watching this video. These should be conversational, like a curious friend asking follow-up questions.
+Generate 4 SHORT questions about specific details from this video. Be extremely concise.
 
-CRITICAL LENGTH REQUIREMENT:
-- Each question MUST be 120-160 characters maximum - NO EXCEPTIONS
-- Cut unnecessary words while keeping context-specific references
-- Questions exceeding 160 characters will be completely rejected
+CRITICAL LENGTH RULES:
+- Each question MUST be 40-70 characters maximum
+- Be direct and specific, no fluff
+- Reference specific things mentioned in the video
 
-STYLE GUIDELINES:
-- Start with simple phrases: "So...", "Wait...", "Could...", "Does..."
-- Make them sound like quick follow-up questions
+STYLE:
+- Casual and direct
+- Skip unnecessary intro words
+- Get straight to the point
 
-EXAMPLES OF PROPERLY SHORT QUESTIONS (80-120 chars):
-- "So Reddit alone got you to $17K MRR with zero marketing budget?"
-- "Wait, you built App Alchemi in just two weeks using AI?"
-- "Could this Reddit strategy work for B2B products too?"
-- "Does this mean UI libraries are key for fast prototyping?"
+GOOD EXAMPLES (under 70 chars):
+- "How did Flutter speed things up?"
+- "Why did the grid design work so well?"
+- "What changed after 6 months?"
+- "How much did Reddit ads cost?"
+- "Why no user accounts?"
+- "What's your daily user count?"
 
-Respond with JSON in this exact format:
+BAD EXAMPLES (too long/vague):
+- "So, you went from a regular programming job to building this app..." (too long)
+- "What was interesting about your approach?" (too vague)
+
+Respond with JSON:
 {
-  "questions": ["Question 1", "Question 2", "Question 3", "Question 4"]
+  "questions": ["Q1", "Q2", "Q3", "Q4"]
 }`,
           },
           {
