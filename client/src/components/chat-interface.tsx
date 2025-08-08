@@ -198,7 +198,7 @@ export default function ChatInterface({
                   <button
                     key={index}
                     onClick={() => setMessage(question)}
-                    className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-muted border border-transparent hover:border-primary/20 transition-all text-sm leading-relaxed"
+                    className="w-full text-left p-3 rounded-lg bg-gray-50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 hover:border-primary/30 transition-all text-sm leading-relaxed shadow-sm"
                     data-testid={`quick-question-${index}`}
                   >
                     {question}
