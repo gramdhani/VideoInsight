@@ -185,24 +185,7 @@ export default function ChatInterface({
       {/* Chat Messages */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-3 sm:p-4">
         <div className="space-y-3 sm:space-y-4">
-          {/* Welcome Message */}
-          <div className="flex items-start space-x-2 sm:space-x-3">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-              <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-            </div>
-            <div
-              className={`bg-muted rounded-lg rounded-tl-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-xs"}`}
-            >
-              <p className="text-xs sm:text-sm text-foreground">
-                {isMobile
-                  ? "Hi! Ask me anything about this video."
-                  : "Hi! I've analyzed the video. Ask me anything about the content, key concepts, or specific moments."}
-              </p>
-              <span className="text-xs text-muted-foreground mt-1 block">
-                Just now
-              </span>
-            </div>
-          </div>
+
 
           {/* Quick Questions - Only show when there are no messages */}
           {messages.length === 0 && !questionsLoading && questions.length > 0 && (
