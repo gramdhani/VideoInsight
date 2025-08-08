@@ -111,6 +111,76 @@ GUIDELINES:
   }
 }
 
+export async function generateQuickQuestions(
+  transcript: string,
+  title: string,
+): Promise<string[]> {
+  try {
+    console.log(`Generating context-aware questions for: ${title}`);
+    
+    const response = await openai.chat.completions.create(
+      {
+        model: "google/gemini-2.5-flash-lite-preview-06-17",
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert at generating engaging conversation starters based on video content. 
+
+Analyze the video transcript and title to create 4 context-specific questions that would naturally arise from watching this video. These should be conversational, like a curious friend asking follow-up questions.
+
+STYLE GUIDELINES:
+- Write questions as if someone just watched the video and wants to dig deeper
+- Make them conversational and natural (like "Oh, so I could really..." or "Wait, does this mean...")
+- Focus on practical applications, implications, or clarifications
+- Reference specific concepts, tools, or ideas mentioned in the video
+- Avoid generic questions that could apply to any video
+
+EXAMPLES OF GOOD CONTEXT-AWARE QUESTIONS:
+- "Oh, so I could really streamline my consent management with this new Consent Pro product?"
+- "Wait, does this mean I need to rethink how I handle compliance with these tightening laws?"
+- "Could this approach actually work for smaller businesses like mine?"
+- "So if I implement this workflow, would it really save me 5 hours a week?"
+
+Respond with JSON in this exact format:
+{
+  "questions": ["Question 1", "Question 2", "Question 3", "Question 4"]
+}`,
+          },
+          {
+            role: "user",
+            content: `Generate 4 context-aware conversation starter questions for this video:
+
+Title: "${title}"
+
+Transcript: ${transcript.substring(0, 4000)}...`, // Limit transcript length for token efficiency
+          },
+        ],
+        response_format: { type: "json_object" },
+      },
+      {
+        timeout: 30000,
+      },
+    );
+
+    const result = JSON.parse(response.choices[0].message.content || "{}");
+    return result.questions || [
+      "What's the main takeaway from this video?",
+      "How could I apply this to my situation?", 
+      "What tools or resources were mentioned?",
+      "Are there any potential challenges with this approach?"
+    ];
+  } catch (error) {
+    console.error("Error generating quick questions:", error);
+    // Return fallback questions if AI fails
+    return [
+      "What's the main takeaway from this video?",
+      "How could I apply this to my situation?", 
+      "What tools or resources were mentioned?",
+      "Are there any potential challenges with this approach?"
+    ];
+  }
+}
+
 export async function chatAboutVideo(
   question: string,
   transcript: string,

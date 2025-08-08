@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
-import { summarizeVideo, chatAboutVideo } from "./services/openai";
+import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./services/openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -225,6 +225,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching chat messages:", error);
       res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+
+  // Generate context-aware quick questions for video (accessible to all users)
+  app.get("/api/videos/:youtubeId/quick-questions", async (req, res) => {
+    try {
+      const { youtubeId } = req.params;
+      
+      // Get video data - youtubeId could be youtubeId or internal ID
+      let video = await storage.getVideo(youtubeId);
+      if (!video) {
+        // Try to find by internal ID
+        video = await storage.getVideoById(youtubeId);
+      }
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      if (!video.transcript) {
+        return res.status(400).json({ message: "Video transcript not available" });
+      }
+      
+      // Generate context-aware questions using AI
+      const questions = await generateQuickQuestions(video.transcript, video.title);
+      
+      res.json({ questions });
+    } catch (error) {
+      console.error("Error generating quick questions:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to generate quick questions" });
     }
   });
 
