@@ -117,7 +117,7 @@ export async function generateQuickQuestions(
 ): Promise<string[]> {
   try {
     console.log(`Generating context-aware questions for: ${title}`);
-    
+
     const response = await openai.chat.completions.create(
       {
         model: "google/gemini-2.5-flash-lite-preview-06-17",
@@ -129,16 +129,12 @@ export async function generateQuickQuestions(
 Analyze the video transcript and title to create 4 context-specific questions that would naturally arise from watching this video. These should be conversational, like a curious friend asking follow-up questions.
 
 CRITICAL LENGTH REQUIREMENT:
-- Each question MUST be 80-120 characters maximum - NO EXCEPTIONS
-- Prioritize brevity over elaborate phrasing
+- Each question MUST be 120-160 characters maximum - NO EXCEPTIONS
 - Cut unnecessary words while keeping context-specific references
-- Questions exceeding 120 characters will be completely rejected
+- Questions exceeding 160 characters will be completely rejected
 
 STYLE GUIDELINES:
-- Use short, punchy conversation starters
 - Start with simple phrases: "So...", "Wait...", "Could...", "Does..."
-- Reference ONE specific concept/tool/idea per question maximum
-- Remove filler words and excessive detail
 - Make them sound like quick follow-up questions
 
 EXAMPLES OF PROPERLY SHORT QUESTIONS (80-120 chars):
@@ -169,20 +165,22 @@ Transcript: ${transcript.substring(0, 4000)}...`, // Limit transcript length for
     );
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
-    return result.questions || [
-      "What's the main takeaway from this video?",
-      "How could I apply this to my situation?", 
-      "What tools or resources were mentioned?",
-      "Are there any potential challenges with this approach?"
-    ];
+    return (
+      result.questions || [
+        "What's the main takeaway from this video?",
+        "How could I apply this to my situation?",
+        "What tools or resources were mentioned?",
+        "Are there any potential challenges with this approach?",
+      ]
+    );
   } catch (error) {
     console.error("Error generating quick questions:", error);
     // Return fallback questions if AI fails
     return [
       "What's the main takeaway from this video?",
-      "How could I apply this to my situation?", 
+      "How could I apply this to my situation?",
       "What tools or resources were mentioned?",
-      "Are there any potential challenges with this approach?"
+      "Are there any potential challenges with this approach?",
     ];
   }
 }
