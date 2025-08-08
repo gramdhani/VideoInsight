@@ -35,3 +35,30 @@ The project employs a monorepo structure separating client, server, and shared c
 *   **AI Services:** OpenRouter API (using `google/gemini-2.5-flash-lite-preview-06-17` model) for AI-powered video analysis and chat.
 *   **Video Metadata:** YouTube Data API v3 for fetching video metadata.
 *   **Environment Variables:** Requires `DATABASE_URL`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, and `YOUTUBE_API_KEY`.
+
+## Recent Updates & Changelog
+
+### August 2025 - Enhanced AI Chat System
+
+**✓ Intelligent Web Search Integration**
+*   Added automatic detection system for questions requiring current information
+*   Web search triggers for keywords: competitors, alternatives, current, latest, pricing, market trends
+*   Smart question pattern recognition: "who is...", "what is X doing", "is there a better..."
+*   Combines video content with real-time web data when relevant
+
+**✓ Fixed API Integration Issues**
+*   Resolved GPT-4o-mini-search-preview temperature parameter compatibility error
+*   Stabilized hybrid AI system communication between OpenAI and OpenRouter APIs
+*   Improved error handling and fallback mechanisms
+
+**✓ Enhanced Response Formatting**
+*   Implemented mandatory bullet point formatting for all AI responses
+*   Prioritized concise, scannable content over lengthy paragraphs
+*   Added structured formatting with sub-bullets for detailed information
+*   Responses now start immediately with bullets (no introductory paragraphs)
+
+**✓ System Architecture Improvements**
+*   Enhanced intelligent detection logic with multi-layer keyword analysis
+*   Improved context-aware decision making for web search activation
+*   Optimized response generation combining video insights with current web data
+*   Added visual indicators (🔍) for web search activation in logs
