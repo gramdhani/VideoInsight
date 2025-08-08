@@ -35,6 +35,7 @@ interface ChatInterfaceProps {
     id: string;
     youtubeId: string;
     title: string;
+    transcript?: string;
   };
   onTimestampClick?: (timestamp: string) => void;
 }
@@ -66,6 +67,19 @@ export default function ChatInterface({
     },
     enabled: !!video.id && isAuthenticated,
   });
+
+  // Fetch context-aware questions for this specific video
+  const { data: questionsData, isLoading: questionsLoading } = useQuery({
+    queryKey: ["/api/videos", video.youtubeId, "quick-questions"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", `/api/videos/${video.youtubeId}/quick-questions`);
+      return response.json();
+    },
+    staleTime: 1000 * 60 * 30, // Cache for 30 minutes
+    enabled: !!video.youtubeId,
+  });
+
+  const questions = questionsData?.questions || [];
 
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
@@ -189,6 +203,47 @@ export default function ChatInterface({
               </span>
             </div>
           </div>
+
+          {/* Quick Questions - Only show when there are no messages */}
+          {messages.length === 0 && !questionsLoading && questions.length > 0 && (
+            <div className="space-y-3">
+              <div className="text-sm font-medium text-muted-foreground px-1">
+                Start your video chat with these quick questions!
+              </div>
+              <div className="space-y-2">
+                {questions.map((question: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => setMessage(question)}
+                    className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-muted border border-transparent hover:border-primary/20 transition-all text-sm leading-relaxed"
+                    data-testid={`quick-question-${index}`}
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Loading state for Quick Questions */}
+          {messages.length === 0 && questionsLoading && (
+            <div className="space-y-3">
+              <div className="text-sm font-medium text-muted-foreground px-1">
+                Generating context-aware questions...
+              </div>
+              <div className="space-y-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-full p-3 rounded-lg bg-muted/30 animate-pulse"
+                  >
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-4 bg-muted rounded w-1/2 mt-1"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Chat Messages */}
           {Array.isArray(messages) && messages.map((msg: any, index: number) => (

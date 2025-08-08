@@ -10,7 +10,7 @@ import VideoPlayer, { VideoPlayerRef } from "../components/video-player";
 import TabbedContent from "../components/tabbed-content";
 import ChatInterface from "../components/chat-interface";
 import NotesExport from "../components/notes-export";
-import QuickActions from "../components/quick-actions";
+
 import AuthPaywall from "../components/auth-paywall";
 import type { Video } from "@shared/schema";
 
@@ -97,14 +97,7 @@ export default function Home() {
             <div
               className={`space-y-4 sm:space-y-6 ${isMobile ? "pb-16" : ""}`}
             >
-              {/* Quick Questions - Available to all users */}
-              <QuickActions video={{
-                id: currentVideo.id,
-                youtubeId: currentVideo.youtubeId,
-                title: currentVideo.title,
-                transcript: currentVideo.transcript || undefined,
-              }} />
-              
+
               <div
                 className={
                   isMobile
@@ -114,13 +107,23 @@ export default function Home() {
               >
                 {isAuthenticated ? (
                   <ChatInterface
-                    video={currentVideo}
+                    video={{
+                      id: currentVideo.id,
+                      youtubeId: currentVideo.youtubeId,
+                      title: currentVideo.title,
+                      transcript: currentVideo.transcript || undefined,
+                    }}
                     onTimestampClick={handleTimestampClick}
                   />
                 ) : (
                   <AuthPaywall title="Sign in to chat with AI about this video">
                     <ChatInterface
-                      video={currentVideo}
+                      video={{
+                        id: currentVideo.id,
+                        youtubeId: currentVideo.youtubeId,
+                        title: currentVideo.title,
+                        transcript: currentVideo.transcript || undefined,
+                      }}
                       onTimestampClick={handleTimestampClick}
                     />
                   </AuthPaywall>
