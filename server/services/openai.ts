@@ -128,18 +128,23 @@ export async function generateQuickQuestions(
 
 Analyze the video transcript and title to create 4 context-specific questions that would naturally arise from watching this video. These should be conversational, like a curious friend asking follow-up questions.
 
+CRITICAL LENGTH REQUIREMENT:
+- Each question MUST be between 120-140 characters maximum
+- Keep questions concise but engaging and specific to the video content
+- Count characters carefully - exceed 140 and the question will be rejected
+
 STYLE GUIDELINES:
 - Write questions as if someone just watched the video and wants to dig deeper
-- Make them conversational and natural (like "Oh, so I could really..." or "Wait, does this mean...")
+- Make them conversational and natural (like "So you're saying..." or "Wait, does this mean...")
 - Focus on practical applications, implications, or clarifications
 - Reference specific concepts, tools, or ideas mentioned in the video
 - Avoid generic questions that could apply to any video
 
-EXAMPLES OF GOOD CONTEXT-AWARE QUESTIONS:
-- "Oh, so I could really streamline my consent management with this new Consent Pro product?"
-- "Wait, does this mean I need to rethink how I handle compliance with these tightening laws?"
-- "Could this approach actually work for smaller businesses like mine?"
-- "So if I implement this workflow, would it really save me 5 hours a week?"
+EXAMPLES OF GOOD SHORT CONTEXT-AWARE QUESTIONS:
+- "So I could really streamline consent management with Consent Pro?"
+- "Wait, does this mean I need to rethink compliance handling?"
+- "Could this approach work for smaller businesses like mine?"
+- "Would implementing this workflow save me 5 hours a week?"
 
 Respond with JSON in this exact format:
 {
