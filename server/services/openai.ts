@@ -198,6 +198,8 @@ export async function chatAboutVideo(
       .join("\n\n");
 
     console.log(`Starting chat response for video: ${title}`);
+    console.log(`User question: ${question}`);
+    console.log(`Previous messages count: ${previousMessages.length}`);
     console.log(`Video duration: ${videoDuration}`);
     console.log(`Transcript length: ${transcript.length} characters`);
     console.log(`Transcript preview: ${transcript.substring(0, 200)}...`);
@@ -212,57 +214,63 @@ export async function chatAboutVideo(
     }
 
     // Get active prompt configuration
-    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps and can supplement with current web information when needed. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
+    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps and can supplement with current web information when needed.
+
+CRITICAL INSTRUCTION: EACH QUESTION IS UNIQUE
+- EVERY user question must receive a UNIQUE, SPECIFIC response tailored to that exact question
+- DO NOT reuse previous answers or give generic responses
+- Carefully read and directly address what the user is asking RIGHT NOW
+- If the user asks "should I build this tool?" - give advice specific to their situation
+- If the user asks about a competitor tool - analyze that specific tool
+- NEVER give the same answer to different questions
 
 ENHANCED CAPABILITIES:
 - Primary focus: Analyze and discuss video content with accurate timestamps
 - Secondary support: Use current web information to provide context about competitors, market data, or topics not covered in the video
 - Always prioritize video content first, then supplement with web information when relevant
 
-CRITICAL: BULLET POINTS ARE MANDATORY
-- YOU MUST START EVERY RESPONSE WITH BULLET POINTS
-- NO PARAGRAPHS AT THE BEGINNING - START WITH BULLETS IMMEDIATELY
-- Use bullet points for everything: video info, web research results, explanations
-- Only use a paragraph if absolutely impossible to format as bullets
-
-RESPONSE STYLE - BULLET POINTS FIRST:
-- • Use bullet points for video content analysis
-- • Use bullet points for web research results  
-- • Use bullet points for competitor information
-- • Use bullet points for explanations and answers
+RESPONSE STYLE - BULLET POINTS:
+- Start responses with bullet points (•) when listing information
 - Keep each bullet to 1-2 short sentences maximum
-- Write like you're talking to a friend - simple words
+- Write in simple, conversational language
+- Be specific and directly answer the user's exact question
 
-TIMESTAMP USAGE - CRITICAL INSTRUCTIONS:
-- When a user asks about specific information, events, or mentions in a video, you must ALWAYS search the transcript carefully
-- Include timestamps in [MM:SS] format whenever you reference a specific moment
-- If the user asks "what timestamp did he mention X?", find that exact moment and provide the precise timestamp
+TIMESTAMP USAGE:
+- Include timestamps in [MM:SS] format when referencing specific moments
+- Search the transcript carefully for exact moments mentioned
 
-FORMATTING RULES - CRITICAL FOR PROPER DISPLAY:
-- Format tools and websites as clickable links: link text
+FORMATTING RULES:
+- Format tools and websites as clickable links when possible
 - Use bold for emphasis, not HTML tags
-- NEVER use double quotes (") inside the answer text - use single quotes (') if needed
-- NEVER use curly braces {} or backslashes () inside the answer text
-
-MANDATORY BULLET FORMAT EXAMPLES:
-For Session app competitors question, respond EXACTLY like this:
-"• Session is a Pomodoro focus app mentioned at [11:45]
-• Video doesn't name direct competitors but suggests many alternatives exist
-• From current web research, Session alternatives include:
-  - **Forest** - Gamified focus app that grows virtual trees
-  - **Focus@Will** - Music service optimized for concentration  
-  - **Freedom** - Cross-device app and website blocker
-  - **Cold Turkey** - Strict blocking capabilities"
-
-NEVER start with paragraphs. ALWAYS start with bullet points (•) immediately.
+- Use single quotes (') instead of double quotes (") in text
+- Avoid curly braces {} or backslashes in the answer text
 
 JSON RESPONSE FORMAT:
 {
-  "answer": "Your natural response here", 
+  "answer": "Your unique response tailored to this specific question", 
   "timestamps": ["MM:SS"] (only include if timestamps are referenced in the answer)
 }`;
 
-    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}${webSearchInfo}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.
+    let userPrompt = `CURRENT USER QUESTION (Answer THIS specific question, not previous ones):
+"${question}"
+
+Request ID: ${Date.now()}-${Math.random().toString(36).substring(7)}
+
+Previous conversation context (for reference only, DO NOT repeat previous answers):
+${context}
+
+Video Duration: ${videoDuration || "Unknown"}
+
+Full Video Transcript with Timestamps:
+${transcript}${webSearchInfo}
+
+CRITICAL INSTRUCTIONS:
+1. Answer the CURRENT question above: "${question}"
+2. This is a NEW question - provide a UNIQUE answer specific to what's being asked NOW
+3. DO NOT repeat any previous answer even if the topic seems similar
+4. Focus on the specific aspect the user is asking about in THIS question
+
+IMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.
 
 WHEN USING WEB INFORMATION:
 - Clearly label when information comes from current web sources vs. the video
@@ -283,6 +291,9 @@ WHEN USING WEB INFORMATION:
           },
         ],
         response_format: { type: "json_object" },
+        temperature: 0.7, // Add some variability to responses
+        max_tokens: 2000, // Ensure sufficient response length
+        seed: Date.now(), // Use timestamp as seed for uniqueness
       },
       {
         timeout: 30000, // 30 second timeout
