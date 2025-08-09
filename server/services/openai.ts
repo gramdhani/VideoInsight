@@ -2,9 +2,14 @@ import OpenAI from "openai";
 import { storage } from "../storage";
 import { needsWebSearch, searchWebWithAI } from "./webSearchAI";
 
-// Using OpenAI GPT-4o-mini for all AI processing
+// Using OpenRouter with OpenAI GPT-4o-mini model for cost-effective AI processing
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": "https://videoinsight-ai.replit.app", // Your site URL for rankings
+    "X-Title": "VideoInsight AI", // Your site name for rankings
+  },
 });
 
 export async function summarizeVideo(
@@ -30,7 +35,7 @@ export async function summarizeVideo(
     console.log(`Starting video summary for: ${title}`);
     const response = await openai.chat.completions.create(
       {
-        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "openai/gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -93,7 +98,7 @@ GUIDELINES:
       insights: result.insights || 0,
     };
   } catch (error) {
-    console.error("OpenAI API error:", error);
+    console.error("OpenRouter API error:", error);
     if (error instanceof Error && error.message.includes("408")) {
       throw new Error(
         "The AI model is currently busy. Please try again in a few moments.",
@@ -115,7 +120,7 @@ export async function generateQuickQuestions(
 
     const response = await openai.chat.completions.create(
       {
-        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "openai/gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -266,7 +271,7 @@ WHEN USING WEB INFORMATION:
 
     const response = await openai.chat.completions.create(
       {
-        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "openai/gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -349,7 +354,7 @@ WHEN USING WEB INFORMATION:
       timestamps: validatedTimestamps,
     };
   } catch (error) {
-    console.error("OpenAI chat API error:", error);
+    console.error("OpenRouter chat API error:", error);
     if (error instanceof Error && error.message.includes("408")) {
       throw new Error(
         "The AI is currently busy. Please try your question again in a moment.",

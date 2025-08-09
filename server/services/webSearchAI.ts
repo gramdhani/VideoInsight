@@ -1,8 +1,13 @@
 import OpenAI from "openai";
 
-// OpenAI client using GPT-4o-mini for web search simulation
+// OpenRouter client using OpenAI GPT-4o-mini for web search simulation  
 const openaiSearch = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": "https://videoinsight-ai.replit.app", // Your site URL for rankings
+    "X-Title": "VideoInsight AI", // Your site name for rankings
+  },
 });
 
 export interface WebSearchInfo {
@@ -74,7 +79,7 @@ Important: Be clear that this is general knowledge, not current web search resul
 Format your response as informative context that supplements video analysis.`;
 
     const response = await openaiSearch.chat.completions.create({
-      model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      model: "openai/gpt-4o-mini",
       messages: [
         {
           role: "user",
