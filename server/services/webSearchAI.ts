@@ -1,10 +1,8 @@
 import OpenAI from "openai";
 
-// OpenAI client for web search using GPT-4o-mini-search-preview
+// OpenAI client using GPT-4o-mini for web search simulation
 const openaiSearch = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-  // Ensure no default parameters that might conflict with search model
-  defaultQuery: undefined
 });
 
 export interface WebSearchInfo {
@@ -58,42 +56,43 @@ export function needsWebSearch(question: string, videoTitle?: string): boolean {
   return false;
 }
 
-// Use GPT-4o-mini-search-preview to gather web information
+// Use GPT-4o-mini to simulate web search information (without real web search)
 export async function searchWebWithAI(question: string, videoTitle: string): Promise<WebSearchInfo> {
   try {
-    console.log(`🔍 Intelligent detection triggered web search for: ${question}`);
+    console.log(`🔍 Simulating web search for: ${question}`);
     
-    const searchPrompt = `You have web search capabilities. The user is asking about a video titled "${videoTitle}" and has this question: "${question}"
+    const searchPrompt = `The user is asking about a video titled "${videoTitle}" and has this question: "${question}"
 
-Please search the web for current, relevant information that would help answer this question. Focus on:
-- Competitors or alternatives mentioned in the question
-- Current market information, pricing, or comparisons
-- Recent developments or updates
-- Industry context that supplements video content
+Since this question appears to need current market information, competitors, or pricing data, provide general knowledge-based information that would typically be found through web search. Focus on:
+- Known competitors or alternatives in the space
+- General market information and industry context
+- Common pricing models or approaches
+- Industry trends you're aware of
 
-Provide a comprehensive summary of what you found, including sources when possible. If you can't find relevant information, say so clearly.
+Important: Be clear that this is general knowledge, not current web search results. If you don't have specific current information, acknowledge that and provide what general context you can.
 
-Format your response as factual information that can be combined with video analysis.`;
+Format your response as informative context that supplements video analysis.`;
 
     const response = await openaiSearch.chat.completions.create({
-      model: "gpt-4o-mini-search-preview", // This model has web search capabilities
+      model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
         {
           role: "user",
           content: searchPrompt
         }
       ],
-      max_tokens: 800
-      // Note: temperature parameter removed - not supported by this model
+      max_tokens: 800,
+      temperature: 0.7
     });
 
     const webContent = response.choices[0].message.content || "";
     
-    // Check if meaningful web information was found
+    // Check if meaningful information was provided
     const hasWebInfo = webContent.length > 50 && 
                       !webContent.toLowerCase().includes("i cannot search") &&
                       !webContent.toLowerCase().includes("i don't have access") &&
-                      !webContent.toLowerCase().includes("unable to search");
+                      !webContent.toLowerCase().includes("unable to search") &&
+                      !webContent.toLowerCase().includes("i don't have specific current information");
 
     return {
       hasWebInfo,

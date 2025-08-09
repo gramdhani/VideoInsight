@@ -2,14 +2,9 @@ import OpenAI from "openai";
 import { storage } from "../storage";
 import { needsWebSearch, searchWebWithAI } from "./webSearchAI";
 
-// Using OpenRouter with deepseek model for cost-effective AI processing
+// Using OpenAI GPT-4o-mini for all AI processing
 const openai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    "HTTP-Referer": "https://videoinsight-ai.replit.app", // Your site URL for rankings
-    "X-Title": "VideoInsight AI", // Your site name for rankings
-  },
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function summarizeVideo(
@@ -35,7 +30,7 @@ export async function summarizeVideo(
     console.log(`Starting video summary for: ${title}`);
     const response = await openai.chat.completions.create(
       {
-        model: "google/gemini-2.5-flash-lite-preview-06-17",
+        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -98,10 +93,10 @@ GUIDELINES:
       insights: result.insights || 0,
     };
   } catch (error) {
-    console.error("OpenRouter API error:", error);
+    console.error("OpenAI API error:", error);
     if (error instanceof Error && error.message.includes("408")) {
       throw new Error(
-        "The AI model is currently busy. Please try again in a few moments. (Free models can be slower during peak times)",
+        "The AI model is currently busy. Please try again in a few moments.",
       );
     }
     throw new Error(
@@ -120,7 +115,7 @@ export async function generateQuickQuestions(
 
     const response = await openai.chat.completions.create(
       {
-        model: "google/gemini-2.5-flash-lite-preview-06-17",
+        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -271,7 +266,7 @@ WHEN USING WEB INFORMATION:
 
     const response = await openai.chat.completions.create(
       {
-        model: "google/gemini-2.5-flash-lite-preview-06-17",
+        model: "gpt-4o-mini", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -354,10 +349,10 @@ WHEN USING WEB INFORMATION:
       timestamps: validatedTimestamps,
     };
   } catch (error) {
-    console.error("OpenRouter chat API error:", error);
+    console.error("OpenAI chat API error:", error);
     if (error instanceof Error && error.message.includes("408")) {
       throw new Error(
-        "The AI is currently busy. Please try your question again in a moment. (Free models can be slower during peak times)",
+        "The AI is currently busy. Please try your question again in a moment.",
       );
     }
     throw new Error(

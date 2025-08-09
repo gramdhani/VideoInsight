@@ -17,11 +17,11 @@ The project employs a monorepo structure separating client, server, and shared c
 **Technology Stack:**
 *   **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui (with Radix UI), TanStack Query, Wouter.
 *   **Backend:** Node.js, Express.js, TypeScript, Drizzle ORM, PostgreSQL (via Neon serverless).
-*   **AI Models:** Google Gemini 2.5 Flash Lite (primary responses) via OpenRouter API, GPT-4o-mini-search-preview (web research) via OpenAI API.
+*   **AI Models:** OpenAI GPT-4o-mini (all AI processing) via OpenAI API.
 
 **Key Architectural Decisions & Features:**
 *   **Database Schema:** Utilizes `videos` and `chat_messages` tables. The `videos` table stores structured AI summaries in JSONB format, including short summaries, outlines, key takeaways, and actionable steps with priority badges.
-*   **AI Integration:** Hybrid AI system - Gemini generates structured video summaries and conversational responses, while GPT-4o-mini-search-preview handles web research when questions require current information (competitors, pricing, etc.). AI responses combine video insights with current web data when relevant, formatted for readability with proper markdown and contextual intelligence.
+*   **AI Integration:** Unified AI system using OpenAI GPT-4o-mini for all processing - generates structured video summaries, conversational responses, and provides general knowledge context when questions require market information (competitors, pricing, etc.). AI responses combine video insights with general knowledge when relevant, formatted for readability with proper markdown and contextual intelligence.
 *   **User Interface:** Features a modern violet/purple color scheme with a clean design aesthetic, rounded corners, and shadows. It includes a collapsible sidebar for desktop navigation and comprehensive mobile responsiveness with a mobile-first navigation approach.
 *   **Video Analysis Flow:** Users submit a YouTube URL, triggering the backend to extract metadata, obtain transcripts, and generate structured summaries which are then stored and displayed on the frontend.
 *   **Chat Interaction Flow:** Users can submit questions about video content, with the backend sending the question and video context to the AI. AI responses include relevant timestamps, and chat messages are stored and displayed.
@@ -32,11 +32,21 @@ The project employs a monorepo structure separating client, server, and shared c
 ## External Dependencies
 
 *   **Database:** PostgreSQL (specifically Neon serverless) via `@neondatabase/serverless` and `drizzle-orm`.
-*   **AI Services:** OpenRouter API (using `google/gemini-2.5-flash-lite-preview-06-17` model) for AI-powered video analysis and chat.
+*   **AI Services:** OpenAI API (using `gpt-4o-mini` model) for AI-powered video analysis and chat.
 *   **Video Metadata:** YouTube Data API v3 for fetching video metadata.
-*   **Environment Variables:** Requires `DATABASE_URL`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, and `YOUTUBE_API_KEY`.
+*   **Environment Variables:** Requires `DATABASE_URL`, `OPENAI_API_KEY`, and `YOUTUBE_API_KEY`.
 
 ## Recent Updates & Changelog
+
+### August 2025 - Unified AI Model Migration
+
+**✓ Migrated from Hybrid AI to Single OpenAI Model**
+*   Replaced Google Gemini 2.5 Flash Lite with OpenAI GPT-4o-mini for all AI processing
+*   Removed OpenRouter API dependency - now using only OpenAI API
+*   Unified video summarization, chat responses, and general knowledge context under one model
+*   Updated environment variables - removed OPENROUTER_API_KEY requirement
+*   Simplified web search simulation using GPT-4o-mini general knowledge instead of real-time search
+*   Enhanced error messages and logging to reflect single API architecture
 
 ### August 2025 - Enhanced AI Chat System
 
