@@ -282,6 +282,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Prompt configuration endpoints (requires authentication)
+  
+  // Get all prompt configurations
+  app.get("/api/admin/prompt-configs", isAuthenticated, async (req, res) => {
+    try {
+      const configs = await storage.getAllPromptConfigs();
+      res.json(configs);
+    } catch (error) {
+      console.error("Error fetching prompt configs:", error);
+      res.status(500).json({ message: "Failed to fetch prompt configurations" });
+    }
+  });
+
+  // Get active prompt configuration
+  app.get("/api/admin/prompt-configs/active", async (req, res) => {
+    try {
+      const config = await storage.getActivePromptConfig();
+      res.json(config);
+    } catch (error) {
+      console.error("Error fetching active prompt config:", error);
+      res.status(500).json({ message: "Failed to fetch active prompt configuration" });
+    }
+  });
+
+  // Create new prompt configuration
+  app.post("/api/admin/prompt-configs", isAuthenticated, async (req, res) => {
+    try {
+      const { insertPromptConfigSchema } = await import("@shared/schema");
+      const validatedData = insertPromptConfigSchema.parse(req.body);
+      const config = await storage.createPromptConfig(validatedData);
+      res.json(config);
+    } catch (error) {
+      console.error("Error creating prompt config:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to create prompt configuration" });
+    }
+  });
+
+  // Update prompt configuration
+  app.put("/api/admin/prompt-configs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { updatePromptConfigSchema } = await import("@shared/schema");
+      const validatedData = updatePromptConfigSchema.parse(req.body);
+      const config = await storage.updatePromptConfig(id, validatedData);
+      
+      if (!config) {
+        return res.status(404).json({ message: "Prompt configuration not found" });
+      }
+      
+      res.json(config);
+    } catch (error) {
+      console.error("Error updating prompt config:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to update prompt configuration" });
+    }
+  });
+
+  // Delete prompt configuration
+  app.delete("/api/admin/prompt-configs/:id", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deletePromptConfig(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Prompt configuration not found" });
+      }
+      
+      res.json({ success: true, message: "Prompt configuration deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting prompt config:", error);
+      res.status(500).json({ message: "Failed to delete prompt configuration" });
+    }
+  });
+
+  // Activate prompt configuration
+  app.post("/api/admin/prompt-configs/:id/activate", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const activated = await storage.activatePromptConfig(id);
+      
+      if (!activated) {
+        return res.status(404).json({ message: "Prompt configuration not found" });
+      }
+      
+      res.json({ success: true, message: "Prompt configuration activated successfully" });
+    } catch (error) {
+      console.error("Error activating prompt config:", error);
+      res.status(500).json({ message: "Failed to activate prompt configuration" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

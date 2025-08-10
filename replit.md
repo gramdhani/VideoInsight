@@ -38,6 +38,29 @@ The project employs a monorepo structure separating client, server, and shared c
 
 ## Recent Updates & Changelog
 
+### January 2025 - AI Prompt Configuration System
+
+**✓ Dynamic Prompt Management**
+*   Added web-based interface for managing AI chat prompts at `/settings`
+*   Database-backed prompt configurations with create, read, update, delete operations
+*   Support for multiple prompt configurations with activation system
+*   Template variable system for dynamic content injection (${context}, ${transcript}, ${videoDuration}, ${question}, ${title}, ${webSearchInfo})
+*   Real-time prompt switching without code changes
+*   Default configurations provided for standard and concise response modes
+
+**✓ Settings Page Features**
+*   Authentication-protected admin interface for prompt management
+*   Visual prompt editor with syntax highlighting for system and user prompts
+*   Template variable documentation and examples
+*   One-click activation to switch between different prompt configurations
+*   Copy-to-clipboard functionality for sharing prompt templates
+
+**✓ Technical Implementation**
+*   Added `prompt_configs` table to PostgreSQL database schema
+*   RESTful API endpoints for prompt configuration CRUD operations
+*   Integration with existing OpenAI service to use active prompt configuration
+*   Fallback to default prompts if no configuration is active
+
 ### August 2025 - Unified AI Model Migration
 
 **✓ Migrated from Gemini to OpenAI Model via OpenRouter**

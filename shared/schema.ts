@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, jsonb, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, jsonb, timestamp, index, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -72,7 +72,16 @@ export const feedbacks = pgTable("feedbacks", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-
+export const promptConfigs = pgTable("prompt_configs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  systemPrompt: text("system_prompt").notNull(),
+  userPrompt: text("user_prompt").notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 export const insertVideoSchema = createInsertSchema(videos).omit({
   id: true,
@@ -89,7 +98,17 @@ export const insertFeedbackSchema = createInsertSchema(feedbacks).omit({
   createdAt: true,
 });
 
+export const insertPromptConfigSchema = createInsertSchema(promptConfigs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
+export const updatePromptConfigSchema = createInsertSchema(promptConfigs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
 
 export type InsertVideo = z.infer<typeof insertVideoSchema>;
 export type Video = typeof videos.$inferSelect;
@@ -97,7 +116,9 @@ export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
 export type Feedback = typeof feedbacks.$inferSelect;
-
+export type InsertPromptConfig = z.infer<typeof insertPromptConfigSchema>;
+export type UpdatePromptConfig = z.infer<typeof updatePromptConfigSchema>;
+export type PromptConfig = typeof promptConfigs.$inferSelect;
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;

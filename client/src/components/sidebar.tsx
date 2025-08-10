@@ -1,4 +1,4 @@
-import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus, MessageSquare } from "lucide-react";
+import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus, MessageSquare, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,6 +39,12 @@ export default function Sidebar({ className }: SidebarProps) {
   ];
 
   const supportItems = [
+    {
+      href: "/settings",
+      label: "Settings",
+      icon: Settings,
+      isActive: location === "/settings"
+    },
     {
       href: "/feedback",
       label: "Share Feedback",

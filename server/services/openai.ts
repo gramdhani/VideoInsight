@@ -211,8 +211,18 @@ export async function chatAboutVideo(
       }
     }
 
-    // Get active prompt configuration
-    let systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps and can supplement with current web information when needed. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
+    // Get active prompt configuration or use default
+    const activeConfig = await storage.getActivePromptConfig();
+    
+    let systemPrompt: string;
+    let userPromptTemplate: string | undefined;
+    
+    if (activeConfig) {
+      systemPrompt = activeConfig.systemPrompt;
+      userPromptTemplate = activeConfig.userPrompt;
+    } else {
+      // Default system prompt
+      systemPrompt = `You are an AI assistant helping users understand a video titled "${title}". You have access to the complete video transcript with timestamps and can supplement with current web information when needed. When users ask about specific information, events, numbers, or quotes, carefully search through the transcript to find the exact moment and provide the accurate timestamp.
 
 ENHANCED CAPABILITIES:
 - Primary focus: Analyze and discuss video content with accurate timestamps
@@ -261,13 +271,28 @@ JSON RESPONSE FORMAT:
   "answer": "Your natural response here", 
   "timestamps": ["MM:SS"] (only include if timestamps are referenced in the answer)
 }`;
+    }
 
-    let userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}${webSearchInfo}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.
+    // Process template variables if custom prompt is used
+    let userPrompt: string;
+    if (userPromptTemplate) {
+      // Replace template variables
+      userPrompt = userPromptTemplate
+        .replace(/\${context}/g, context)
+        .replace(/\${videoDuration}/g, videoDuration || "Unknown")
+        .replace(/\${transcript}/g, transcript)
+        .replace(/\${webSearchInfo}/g, webSearchInfo)
+        .replace(/\${question}/g, question)
+        .replace(/\${title}/g, title);
+    } else {
+      // Default user prompt
+      userPrompt = `Previous conversation:\n${context}\n\nVideo Duration: ${videoDuration || "Unknown"}\n\nFull Video Transcript with Timestamps:\n${transcript}${webSearchInfo}\n\nUser Question: ${question}\n\nIMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps. If you cannot find the exact information with a timestamp in the transcript, say so honestly. Make sure any timestamps you reference do not exceed the video duration.
 
 WHEN USING WEB INFORMATION:
 - Clearly label when information comes from current web sources vs. the video
 - Combine video insights with current data when relevant
 - Focus on video content first, use web info to add context`;
+    }
 
     const response = await openai.chat.completions.create(
       {
