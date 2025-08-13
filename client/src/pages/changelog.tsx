@@ -100,6 +100,21 @@ function ChangelogContent() {
                   </ul>
                 </div>
 
+                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-orange-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Personalized Action Plan Feature
+                  </h3>
+                  <ul className="text-orange-800 text-sm space-y-1">
+                    <li>• Added user profile system with personal descriptions and role-based planning</li>
+                    <li>• AI-generated personalized action plans tailored to user experience and goals</li>
+                    <li>• Priority action items with effort/impact ratings and measurable metrics</li>
+                    <li>• Quick wins section for immediate momentum building</li>
+                    <li>• Profile management page with create, edit, and delete functionality</li>
+                    <li>• Plan caching system to avoid regenerating identical plans</li>
+                  </ul>
+                </div>
+
                 <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
                   <h3 className="font-medium text-green-900 mb-2 flex items-center">
                     <FileText className="w-4 h-4 mr-2" />
