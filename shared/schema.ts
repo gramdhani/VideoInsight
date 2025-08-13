@@ -86,8 +86,8 @@ export const promptConfigs = pgTable("prompt_configs", {
 export const profiles = pgTable("profiles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id),
+  name: text("name").notNull(),
   description: text("description").notNull(),
-  displayName: text("display_name").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

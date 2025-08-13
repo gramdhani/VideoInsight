@@ -390,22 +390,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/profiles", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { description } = req.body;
+      const { name, description } = req.body;
+      
+      if (!name || name.trim().length === 0) {
+        return res.status(400).json({ message: "Profile name is required" });
+      }
       
       if (!description || description.trim().length === 0) {
         return res.status(400).json({ message: "Profile description is required" });
       }
       
-      // Generate display name from first part of description (first 50 chars or until punctuation)
-      const displayName = description
-        .substring(0, 50)
-        .split(/[.!?]/)[0]
-        .trim() || description.substring(0, 30) + "...";
-      
       const profileData = insertProfileSchema.parse({
         userId,
-        description,
-        displayName,
+        name: name.trim(),
+        description: description.trim(),
       });
       
       const profile = await storage.createProfile(profileData);
@@ -440,19 +438,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const { id } = req.params;
-      const { description } = req.body;
+      const { name, description } = req.body;
       
-      if (!description || description.trim().length === 0) {
-        return res.status(400).json({ message: "Profile description is required" });
+      // Build updates object with only provided fields
+      const updates: { name?: string; description?: string } = {};
+      
+      if (name !== undefined) {
+        if (!name || name.trim().length === 0) {
+          return res.status(400).json({ message: "Profile name cannot be empty" });
+        }
+        updates.name = name.trim();
       }
       
-      // Generate display name from first part of description (first 50 chars or until punctuation)
-      const displayName = description
-        .substring(0, 50)
-        .split(/[.!?]/)[0]
-        .trim() || description.substring(0, 30) + "...";
+      if (description !== undefined) {
+        if (!description || description.trim().length === 0) {
+          return res.status(400).json({ message: "Profile description cannot be empty" });
+        }
+        updates.description = description.trim();
+      }
       
-      const updated = await storage.updateProfile(id, userId, { description, displayName });
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "At least one field (name or description) must be provided" });
+      }
+      
+      const updated = await storage.updateProfile(id, userId, updates);
       
       if (!updated) {
         return res.status(404).json({ message: "Profile not found or access denied" });

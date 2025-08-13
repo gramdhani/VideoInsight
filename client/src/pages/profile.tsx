@@ -13,6 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, User, Plus, Edit3 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,8 +26,10 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+  const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
   // Fetch user profiles
@@ -36,13 +40,13 @@ export default function ProfilePage() {
 
   // Create profile mutation
   const createProfile = useMutation({
-    mutationFn: async (description: string) => {
+    mutationFn: async ({ name, description }: { name: string; description: string }) => {
       const response = await fetch("/api/profiles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({ name, description }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -53,6 +57,7 @@ export default function ProfilePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
       setIsCreateOpen(false);
+      setName("");
       setDescription("");
       toast({
         title: "Profile created",
@@ -70,13 +75,13 @@ export default function ProfilePage() {
 
   // Edit profile mutation
   const editProfile = useMutation({
-    mutationFn: async ({ profileId, description }: { profileId: string; description: string }) => {
+    mutationFn: async ({ profileId, name, description }: { profileId: string; name: string; description: string }) => {
       const response = await fetch(`/api/profiles/${profileId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({ name, description }),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -87,6 +92,7 @@ export default function ProfilePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
       setEditingProfile(null);
+      setEditName("");
       setEditDescription("");
       toast({
         title: "Profile updated",
@@ -134,20 +140,22 @@ export default function ProfilePage() {
   });
 
   const handleCreateProfile = () => {
-    if (description.trim()) {
-      createProfile.mutate(description);
+    if (name.trim() && description.trim()) {
+      createProfile.mutate({ name, description });
     }
   };
 
   const handleEditProfile = (profile: Profile) => {
     setEditingProfile(profile);
+    setEditName(profile.name);
     setEditDescription(profile.description);
   };
 
   const handleSaveEdit = () => {
-    if (editingProfile && editDescription.trim()) {
+    if (editingProfile && editName.trim() && editDescription.trim()) {
       editProfile.mutate({
         profileId: editingProfile.id,
+        name: editName,
         description: editDescription,
       });
     }
@@ -218,19 +226,35 @@ export default function ProfilePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-4">
-              <Textarea
-                placeholder="I'm a Webflow freelancer with 2 years of experience, focusing on small business clients. I want to scale my business and improve my pricing strategy."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={6}
-                className="resize-none"
-                data-testid="textarea-profile-description"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="profile-name">Profile Name</Label>
+                <Input
+                  id="profile-name"
+                  placeholder="Webflow Freelancer"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full"
+                  data-testid="input-profile-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profile-description">Description</Label>
+                <Textarea
+                  id="profile-description"
+                  placeholder="I'm a Webflow freelancer with 2 years of experience, focusing on small business clients. I want to scale my business and improve my pricing strategy."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={6}
+                  className="resize-none"
+                  data-testid="textarea-profile-description"
+                />
+              </div>
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
                   onClick={() => {
                     setIsCreateOpen(false);
+                    setName("");
                     setDescription("");
                   }}
                   data-testid="button-cancel"
@@ -239,7 +263,7 @@ export default function ProfilePage() {
                 </Button>
                 <Button
                   onClick={handleCreateProfile}
-                  disabled={!description.trim() || createProfile.isPending}
+                  disabled={!name.trim() || !description.trim() || createProfile.isPending}
                   data-testid="button-save-profile"
                 >
                   {createProfile.isPending ? "Creating..." : "Save Profile"}
@@ -259,19 +283,35 @@ export default function ProfilePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-4">
-              <Textarea
-                placeholder="I'm a Webflow freelancer with 2 years of experience, focusing on small business clients. I want to scale my business and improve my pricing strategy."
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                rows={6}
-                className="resize-none"
-                data-testid="textarea-edit-description"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="edit-profile-name">Profile Name</Label>
+                <Input
+                  id="edit-profile-name"
+                  placeholder="Webflow Freelancer"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full"
+                  data-testid="input-edit-profile-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-profile-description">Description</Label>
+                <Textarea
+                  id="edit-profile-description"
+                  placeholder="I'm a Webflow freelancer with 2 years of experience, focusing on small business clients. I want to scale my business and improve my pricing strategy."
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  rows={6}
+                  className="resize-none"
+                  data-testid="textarea-edit-description"
+                />
+              </div>
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
                   onClick={() => {
                     setEditingProfile(null);
+                    setEditName("");
                     setEditDescription("");
                   }}
                   data-testid="button-cancel-edit"
@@ -280,7 +320,7 @@ export default function ProfilePage() {
                 </Button>
                 <Button
                   onClick={handleSaveEdit}
-                  disabled={!editDescription.trim() || editProfile.isPending}
+                  disabled={!editName.trim() || !editDescription.trim() || editProfile.isPending}
                   data-testid="button-save-edit"
                 >
                   {editProfile.isPending ? "Saving..." : "Save Changes"}
@@ -310,7 +350,7 @@ export default function ProfilePage() {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <CardTitle className="text-lg">{profile.displayName}</CardTitle>
+                      <CardTitle className="text-lg">{profile.name}</CardTitle>
                       <CardDescription className="text-xs mt-1">
                         Created {new Date(profile.createdAt!).toLocaleDateString()}
                       </CardDescription>

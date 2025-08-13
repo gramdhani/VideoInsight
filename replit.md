@@ -142,7 +142,8 @@ The project employs a monorepo structure separating client, server, and shared c
 
 **✓ Profile Management Enhancement**
 *   Added edit functionality to profile page with edit button on each profile card
-*   PATCH `/api/profiles/:id` endpoint for updating profile descriptions
-*   Edit dialog with pre-filled description and save/cancel actions
-*   Automatic display name regeneration when description is updated
+*   PATCH `/api/profiles/:id` endpoint for updating profile names and descriptions
+*   Edit dialog with pre-filled name and description fields and save/cancel actions
+*   Separate profile name field (e.g., "Webflow Freelancer") for better organization
 *   User-friendly edit and delete buttons with clear visual indicators
+*   Database migration from displayName to dedicated name field

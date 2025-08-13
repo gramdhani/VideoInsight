@@ -452,7 +452,7 @@ export default function TabbedContent({
                     <SelectContent>
                       {profiles.map((profile: Profile) => (
                         <SelectItem key={profile.id} value={profile.id}>
-                          {profile.displayName}
+                          {profile.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
