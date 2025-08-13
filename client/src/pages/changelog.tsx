@@ -54,16 +54,75 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.3.0 */}
+          {/* Version 0.4.0 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.3.0</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.4.0</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 13, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Unified AI Model Migration
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Migrated from Google Gemini 2.5 Flash Lite to OpenAI GPT-4o-mini for all AI processing</li>
+                    <li>• Unified video summarization, chat responses, and general knowledge context under single model</li>
+                    <li>• Maintained cost-effective access through OpenRouter API integration</li>
+                    <li>• Fixed Gemini seed parameter compatibility errors with OpenAI model switch</li>
+                    <li>• Enhanced consistency across all AI-powered features</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Enhanced AI Chat System
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Intelligent web search integration for questions requiring current information</li>
+                    <li>• Automatic detection of keywords: competitors, alternatives, current, latest, pricing, market trends</li>
+                    <li>• Smart pattern recognition for questions like "who is...", "what is X doing", "is there a better..."</li>
+                    <li>• Combines video content with real-time web data when relevant</li>
+                    <li>• Visual indicators for web search activation in system logs</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    System Improvements
+                  </h3>
+                  <ul className="text-green-800 text-sm space-y-1">
+                    <li>• Resolved API integration issues and improved error handling</li>
+                    <li>• Stabilized hybrid AI system communication between OpenAI and OpenRouter</li>
+                    <li>• Enhanced response formatting with mandatory bullet point structure</li>
+                    <li>• Improved fallback mechanisms for better reliability</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.3.0 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.3.0</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />

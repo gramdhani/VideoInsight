@@ -247,7 +247,7 @@ export default function Sidebar({ className }: SidebarProps) {
       {!isCollapsed && (
         <div className="p-4 border-t border-[var(--border-light)]">
           <div className="text-xs text-[var(--text-secondary)] text-center">
-            VideoInsight AI v0.3.0
+            VideoInsight AI v0.4.0
           </div>
         </div>
       )}
