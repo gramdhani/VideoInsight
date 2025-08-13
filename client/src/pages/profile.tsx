@@ -46,6 +46,7 @@ export default function ProfilePage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ name, description }),
       });
       if (!response.ok) {
@@ -81,6 +82,7 @@ export default function ProfilePage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ name, description }),
       });
       if (!response.ok) {
@@ -116,6 +118,7 @@ export default function ProfilePage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
       });
       if (!response.ok) {
         const error = await response.json();
