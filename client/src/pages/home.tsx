@@ -83,6 +83,7 @@ export default function Home() {
               <VideoPlayer ref={videoPlayerRef} video={currentVideo} />
               <TabbedContent
                 video={{
+                  id: currentVideo.id,
                   title: currentVideo.title,
                   youtubeId: currentVideo.youtubeId,
                   transcript: currentVideo.transcript || undefined,
