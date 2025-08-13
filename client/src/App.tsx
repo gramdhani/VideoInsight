@@ -12,6 +12,7 @@ import Changelog from "./pages/changelog";
 import Help from "./pages/help";
 import Feedback from "./pages/feedback";
 import Settings from "./pages/settings";
+import Profile from "./pages/profile";
 
 import NotFound from "./pages/not-found";
 
@@ -22,6 +23,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/library" component={Library} />
+          <Route path="/profile" component={Profile} />
           <Route path="/changelog" component={Changelog} />
           <Route path="/help" component={Help} />
           <Route path="/feedback" component={Feedback} />

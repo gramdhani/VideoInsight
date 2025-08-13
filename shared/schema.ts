@@ -83,6 +83,40 @@ export const promptConfigs = pgTable("prompt_configs", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const profiles = pgTable("profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  description: text("description").notNull(),
+  displayName: text("display_name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const personalizedPlans = pgTable("personalized_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  videoId: varchar("video_id").references(() => videos.id).notNull(),
+  profileId: varchar("profile_id").references(() => profiles.id).notNull(),
+  plan: jsonb("plan").$type<{
+    items: Array<{
+      title: string;
+      whyItMatters: string;
+      steps: string[];
+      effort: 'low' | 'medium' | 'high';
+      impact: 'low' | 'medium' | 'high';
+      metric: {
+        name: string;
+        target: string;
+        timeframeDays: number;
+      };
+      suggestedDeadlineDays: number;
+    }>;
+    quickWins: Array<{
+      title: string;
+      steps: string[];
+    }>;
+  }>().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertVideoSchema = createInsertSchema(videos).omit({
   id: true,
   createdAt: true,
@@ -110,6 +144,16 @@ export const updatePromptConfigSchema = createInsertSchema(promptConfigs).omit({
   updatedAt: true,
 }).partial();
 
+export const insertProfileSchema = createInsertSchema(profiles).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPersonalizedPlanSchema = createInsertSchema(personalizedPlans).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertVideo = z.infer<typeof insertVideoSchema>;
 export type Video = typeof videos.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
@@ -119,6 +163,10 @@ export type Feedback = typeof feedbacks.$inferSelect;
 export type InsertPromptConfig = z.infer<typeof insertPromptConfigSchema>;
 export type UpdatePromptConfig = z.infer<typeof updatePromptConfigSchema>;
 export type PromptConfig = typeof promptConfigs.$inferSelect;
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+export type Profile = typeof profiles.$inferSelect;
+export type InsertPersonalizedPlan = z.infer<typeof insertPersonalizedPlanSchema>;
+export type PersonalizedPlan = typeof personalizedPlans.$inferSelect;
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;

@@ -10,6 +10,10 @@ import {
   FileDown,
   Search,
   Copy,
+  Target,
+  Clock,
+  Zap,
+  BarChart,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,11 +23,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parseMarkdownLinks, parseMarkdownText } from "../utils/markdown";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Profile, PersonalizedPlan } from "@shared/schema";
 
 interface TabbedContentProps {
   video: {
+    id?: string;
     title: string;
     youtubeId: string;
     transcript?: string;
@@ -52,8 +68,69 @@ export default function TabbedContent({
   const { summary, transcriptData } = video;
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("summary");
+  const [selectedProfileId, setSelectedProfileId] = useState<string>("");
+  const [currentPlan, setCurrentPlan] = useState<PersonalizedPlan | null>(null);
+
+  // Fetch user profiles
+  const { data: profiles = [] } = useQuery<Profile[]>({
+    queryKey: ["/api/profiles"],
+    enabled: isAuthenticated && activeTab === "plan",
+  });
+
+  // Fetch existing plan if profile is selected
+  const { data: existingPlan } = useQuery<PersonalizedPlan>({
+    queryKey: [`/api/videos/${video.id}/plans/${selectedProfileId}`],
+    enabled: !!video.id && !!selectedProfileId && isAuthenticated,
+  });
+
+  // Generate personalized plan mutation
+  const generatePlan = useMutation({
+    mutationFn: async (profileId: string) => {
+      if (!video.id) throw new Error("Video ID is required");
+      
+      const response = await fetch(`/api/videos/${video.id}/plans`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ profileId }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to generate plan");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setCurrentPlan(data);
+      queryClient.invalidateQueries({ 
+        queryKey: [`/api/videos/${video.id}/plans/${selectedProfileId}`] 
+      });
+      toast({
+        title: "Plan generated",
+        description: "Your personalized action plan is ready.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to generate plan",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update current plan when existing plan loads
+  useEffect(() => {
+    if (existingPlan) {
+      setCurrentPlan(existingPlan);
+    }
+  }, [existingPlan]);
 
   const jumpToTimestamp = (timestamp: string) => {
     // Use the callback if provided, otherwise fallback to console log
@@ -136,8 +213,9 @@ export default function TabbedContent({
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
+            <TabsTrigger value="plan" data-testid="tab-plan">Personalized Plan</TabsTrigger>
             <TabsTrigger value="transcript" data-testid="tab-transcript">Transcript</TabsTrigger>
           </TabsList>
 
@@ -339,6 +417,155 @@ export default function TabbedContent({
             )}
           </TabsContent>
 
+          {/* Personalized Plan Tab */}
+          <TabsContent value="plan" className="space-y-4 mt-4">
+            {!isAuthenticated ? (
+              <div className="text-center py-8">
+                <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Sign in to create personalized plans</h3>
+                <p className="text-muted-foreground mb-4">
+                  Get tailored action plans based on your profile
+                </p>
+                <Button onClick={() => window.location.href = '/api/login'} data-testid="button-signin-plan">
+                  Sign In
+                </Button>
+              </div>
+            ) : profiles.length === 0 ? (
+              <div className="text-center py-8">
+                <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No profiles found</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create a profile first to get personalized action plans
+                </p>
+                <Button onClick={() => window.location.href = '/profile'} data-testid="button-create-profile-plan">
+                  Create Profile
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Profile Selector */}
+                <div className="flex items-center space-x-4">
+                  <Select value={selectedProfileId} onValueChange={setSelectedProfileId}>
+                    <SelectTrigger className="flex-1" data-testid="select-profile">
+                      <SelectValue placeholder="Select a profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {profiles.map((profile: Profile) => (
+                        <SelectItem key={profile.id} value={profile.id}>
+                          {profile.displayName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={() => generatePlan.mutate(selectedProfileId)}
+                    disabled={!selectedProfileId || generatePlan.isPending}
+                    data-testid="button-generate-plan"
+                  >
+                    {generatePlan.isPending ? "Generating..." : "Generate Plan"}
+                  </Button>
+                </div>
+
+                {/* Personalized Plan Content */}
+                {currentPlan && currentPlan.plan && (
+                  <div className="space-y-6">
+                    {/* Priority Action Items */}
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                        <Target className="w-5 h-5 text-primary" />
+                        <span>Priority Action Items</span>
+                      </h3>
+                      <div className="space-y-4">
+                        {currentPlan.plan.items?.map((item, index) => (
+                          <Card key={index} className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-start">
+                                <h4 className="font-semibold text-lg flex-1">{item.title}</h4>
+                                <div className="flex space-x-2">
+                                  <Badge variant={item.effort === 'low' ? 'secondary' : item.effort === 'medium' ? 'default' : 'destructive'}>
+                                    {item.effort} effort
+                                  </Badge>
+                                  <Badge variant={item.impact === 'high' ? 'default' : item.impact === 'medium' ? 'secondary' : 'outline'}>
+                                    {item.impact} impact
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              <p className="text-muted-foreground text-sm">{item.whyItMatters}</p>
+
+                              <div className="space-y-2">
+                                <div className="text-sm font-medium">Steps:</div>
+                                <ol className="list-decimal list-inside space-y-1">
+                                  {item.steps?.map((step, stepIndex) => (
+                                    <li key={stepIndex} className="text-sm text-muted-foreground">
+                                      {step}
+                                    </li>
+                                  ))}
+                                </ol>
+                              </div>
+
+                              <div className="flex items-center justify-between text-sm">
+                                <div className="flex items-center space-x-4">
+                                  <div className="flex items-center space-x-1">
+                                    <BarChart className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-muted-foreground">
+                                      {item.metric?.name}: {item.metric?.target} in {item.metric?.timeframeDays} days
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Clock className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-muted-foreground">
+                                    Complete in {item.suggestedDeadlineDays} days
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Wins */}
+                    {currentPlan.plan.quickWins && currentPlan.plan.quickWins.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                          <Zap className="w-5 h-5 text-accent" />
+                          <span>Quick Wins</span>
+                        </h3>
+                        <div className="grid gap-3 md:grid-cols-3">
+                          {currentPlan.plan.quickWins.map((quickWin, index) => (
+                            <Card key={index} className="p-4">
+                              <h4 className="font-semibold mb-2">{quickWin.title}</h4>
+                              <ul className="space-y-1">
+                                {quickWin.steps?.map((step, stepIndex) => (
+                                  <li key={stepIndex} className="text-sm text-muted-foreground flex items-start">
+                                    <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                                    {step}
+                                  </li>
+                                ))}
+                              </ul>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Empty State */}
+                {selectedProfileId && !currentPlan && !generatePlan.isPending && (
+                  <div className="text-center py-8">
+                    <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">No plan generated yet</h3>
+                    <p className="text-muted-foreground">
+                      Click "Generate Plan" to create your personalized action plan
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </TabsContent>
 
         </Tabs>
       </CardContent>

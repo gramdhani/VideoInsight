@@ -1,4 +1,4 @@
-import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus, MessageSquare, Settings } from "lucide-react";
+import { Play, Home, GitBranch, HelpCircle, ChevronLeft, User, LogOut, Library, Plus, MessageSquare, Settings, UserCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +29,12 @@ export default function Sidebar({ className }: SidebarProps) {
       label: "Library",
       icon: Library,
       isActive: location === "/library"
+    },
+    {
+      href: "/profile",
+      label: "Profiles",
+      icon: UserCircle,
+      isActive: location === "/profile"
     },
     {
       href: "/changelog",

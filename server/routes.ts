@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema } from "@shared/schema";
+import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema, insertProfileSchema, insertPersonalizedPlanSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./services/openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -369,6 +369,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error activating prompt config:", error);
       res.status(500).json({ message: "Failed to activate prompt configuration" });
+    }
+  });
+
+  // Profile endpoints (requires authentication)
+  
+  // Get user profiles
+  app.get("/api/profiles", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const profiles = await storage.getUserProfiles(userId);
+      res.json(profiles);
+    } catch (error) {
+      console.error("Error fetching profiles:", error);
+      res.status(500).json({ message: "Failed to fetch profiles" });
+    }
+  });
+
+  // Create new profile
+  app.post("/api/profiles", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { description } = req.body;
+      
+      if (!description || description.trim().length === 0) {
+        return res.status(400).json({ message: "Profile description is required" });
+      }
+      
+      // Generate display name from first part of description (first 50 chars or until punctuation)
+      const displayName = description
+        .substring(0, 50)
+        .split(/[.!?]/)[0]
+        .trim() || description.substring(0, 30) + "...";
+      
+      const profileData = insertProfileSchema.parse({
+        userId,
+        description,
+        displayName,
+      });
+      
+      const profile = await storage.createProfile(profileData);
+      res.json(profile);
+    } catch (error) {
+      console.error("Error creating profile:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to create profile" });
+    }
+  });
+
+  // Delete profile
+  app.delete("/api/profiles/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+      
+      const deleted = await storage.deleteProfile(id, userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Profile not found or access denied" });
+      }
+      
+      res.json({ success: true, message: "Profile deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+      res.status(500).json({ message: "Failed to delete profile" });
+    }
+  });
+
+  // Personalized plan endpoints
+  
+  // Get personalized plan for a video and profile
+  app.get("/api/videos/:videoId/plans/:profileId", isAuthenticated, async (req: any, res) => {
+    try {
+      const { videoId, profileId } = req.params;
+      const plan = await storage.getPersonalizedPlan(videoId, profileId);
+      
+      if (!plan) {
+        return res.status(404).json({ message: "Personalized plan not found" });
+      }
+      
+      res.json(plan);
+    } catch (error) {
+      console.error("Error fetching personalized plan:", error);
+      res.status(500).json({ message: "Failed to fetch personalized plan" });
+    }
+  });
+
+  // Generate personalized plan
+  app.post("/api/videos/:videoId/plans", isAuthenticated, async (req: any, res) => {
+    try {
+      const { videoId } = req.params;
+      const { profileId } = req.body;
+      
+      if (!profileId) {
+        return res.status(400).json({ message: "Profile ID is required" });
+      }
+      
+      // Check if plan already exists
+      const existingPlan = await storage.getPersonalizedPlan(videoId, profileId);
+      if (existingPlan) {
+        return res.json(existingPlan);
+      }
+      
+      // Get video and profile
+      const [video, profile] = await Promise.all([
+        storage.getVideoById(videoId),
+        storage.getProfile(profileId),
+      ]);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      // Generate personalized plan using AI
+      const { generatePersonalizedPlan } = await import("./services/openai");
+      const planData = await generatePersonalizedPlan(
+        video.transcript || "",
+        video.summary,
+        profile.description
+      );
+      
+      // Save plan
+      const plan = await storage.createPersonalizedPlan({
+        videoId,
+        profileId,
+        plan: planData,
+      });
+      
+      res.json(plan);
+    } catch (error) {
+      console.error("Error generating personalized plan:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to generate personalized plan" });
     }
   });
 

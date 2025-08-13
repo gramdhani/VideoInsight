@@ -391,3 +391,127 @@ WHEN USING WEB INFORMATION:
     );
   }
 }
+
+export async function generatePersonalizedPlan(
+  transcript: string,
+  summary: any,
+  profileDescription: string
+): Promise<{
+  items: Array<{
+    title: string;
+    whyItMatters: string;
+    steps: string[];
+    effort: 'low' | 'medium' | 'high';
+    impact: 'low' | 'medium' | 'high';
+    metric: {
+      name: string;
+      target: string;
+      timeframeDays: number;
+    };
+    suggestedDeadlineDays: number;
+  }>;
+  quickWins: Array<{
+    title: string;
+    steps: string[];
+  }>;
+}> {
+  try {
+    console.log(`Generating personalized plan for profile: ${profileDescription.substring(0, 50)}...`);
+    
+    const systemPrompt = `You are a career coach that converts video insights into a PERSONALIZED action plan.
+- Always adapt to the user's context (role, experience, goals) from PROFILE.
+- Be specific, pragmatic, and measurable. Avoid generic advice.
+- Prefer low-effort/high-impact items first.
+
+Output Requirements:
+Prioritize the top 5 items that fit the PROFILE.
+Each item must include:
+title
+whyItMatters
+steps (3–5)
+effort (low|medium|high)
+impact (low|medium|high)
+metric (name, target, timeframeDays)
+suggestedDeadlineDays
+Also include 3 quickWins (1–2 steps each).
+
+Respond with JSON in this exact format:
+{
+  "items": [
+    {
+      "title": "Action item title",
+      "whyItMatters": "Why this is important for the user",
+      "steps": ["Step 1", "Step 2", "Step 3"],
+      "effort": "low",
+      "impact": "high",
+      "metric": {
+        "name": "Metric name",
+        "target": "Specific target",
+        "timeframeDays": 30
+      },
+      "suggestedDeadlineDays": 7
+    }
+  ],
+  "quickWins": [
+    {
+      "title": "Quick win title",
+      "steps": ["Step 1", "Step 2"]
+    }
+  ]
+}`;
+
+    const userPrompt = `PROFILE: ${profileDescription}
+
+VIDEO SUMMARY:
+${summary?.shortSummary || ''}
+
+KEY TAKEAWAYS:
+${summary?.keyTakeaways?.map((t: any) => `- ${t.title}: ${t.description}`).join('\n') || ''}
+
+ACTIONABLE STEPS FROM VIDEO:
+${summary?.actionableSteps?.map((s: any) => `- ${s.step}: ${s.description} (${s.priority} priority)`).join('\n') || ''}
+
+VIDEO TRANSCRIPT EXCERPT:
+${transcript.substring(0, 3000)}
+
+Create a personalized action plan that adapts these video insights specifically for this user's profile.`;
+
+    const response = await openai.chat.completions.create(
+      {
+        model: "openai/gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+        response_format: { type: "json_object" },
+      },
+      {
+        timeout: 30000,
+      },
+    );
+
+    const result = JSON.parse(response.choices[0].message.content || "{}");
+
+    return {
+      items: result.items || [],
+      quickWins: result.quickWins || [],
+    };
+  } catch (error) {
+    console.error("OpenRouter API error for personalized plan:", error);
+    if (error instanceof Error && error.message.includes("408")) {
+      throw new Error(
+        "The AI model is currently busy. Please try again in a few moments.",
+      );
+    }
+    throw new Error(
+      "Failed to generate personalized plan: " +
+        (error instanceof Error ? error.message : String(error)),
+    );
+  }
+}

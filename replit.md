@@ -111,3 +111,31 @@ The project employs a monorepo structure separating client, server, and shared c
 *   Added authentication checks with clear error messages for unauthenticated users
 *   Enhanced loading states and disabled button interactions during AI processing
 *   Questions now appear directly in chat interface when no previous messages exist
+
+### January 2025 - Personalized Action Plan Feature
+
+**✓ User Profile System**
+*   Added profile creation with text descriptions (e.g., "I'm a Webflow freelancer with 2 years of experience")
+*   Database-backed profile storage with CRUD operations
+*   Profile management page at `/profile` with create, view, and delete functionality
+*   Display name extracted from first part of description for easy identification
+
+**✓ Personalized Plan Generation**
+*   Added "Personalized Plan" tab to video summary interface
+*   Profile selector dropdown for choosing which profile to use for plan generation
+*   AI-powered plan generation using OpenAI to convert video insights into actionable steps
+*   Plans tailored to user's specific role, experience level, and goals
+
+**✓ Structured Action Plans**
+*   Priority Action Items: 5 specific tasks with titles, explanations, and concrete steps
+*   Effort/Impact ratings: Visual badges showing effort level (low/medium/high) and expected impact
+*   Measurable metrics: Each item includes specific KPIs with targets and timeframes
+*   Suggested deadlines: Realistic completion timelines based on task complexity
+*   Quick Wins section: 3 immediate actions users can take for early momentum
+
+**✓ Technical Implementation**
+*   Added `profiles` and `personalized_plans` tables to PostgreSQL schema
+*   RESTful API endpoints for profile and plan management
+*   Integration with OpenAI for intelligent plan generation
+*   Career coach system prompt for pragmatic, specific action plans
+*   Plan caching to avoid regenerating identical plans

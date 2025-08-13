@@ -10,12 +10,18 @@ import {
   type PromptConfig,
   type InsertPromptConfig,
   type UpdatePromptConfig,
+  type Profile,
+  type InsertProfile,
+  type PersonalizedPlan,
+  type InsertPersonalizedPlan,
 
   users,
   videos,
   chatMessages,
   feedbacks,
   promptConfigs,
+  profiles,
+  personalizedPlans,
 
 } from "@shared/schema";
 import { randomUUID } from "crypto";
@@ -49,6 +55,16 @@ export interface IStorage {
   updatePromptConfig(id: string, config: UpdatePromptConfig): Promise<PromptConfig | undefined>;
   deletePromptConfig(id: string): Promise<boolean>;
   activatePromptConfig(id: string): Promise<boolean>;
+  
+  // Profile operations
+  getUserProfiles(userId: string): Promise<Profile[]>;
+  getProfile(id: string): Promise<Profile | undefined>;
+  createProfile(profile: InsertProfile): Promise<Profile>;
+  deleteProfile(id: string, userId: string): Promise<boolean>;
+  
+  // Personalized plan operations
+  getPersonalizedPlan(videoId: string, profileId: string): Promise<PersonalizedPlan | undefined>;
+  createPersonalizedPlan(plan: InsertPersonalizedPlan): Promise<PersonalizedPlan>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -195,6 +211,54 @@ export class DatabaseStorage implements IStorage {
       .where(eq(promptConfigs.id, id));
     
     return (result.rowCount ?? 0) > 0;
+  }
+  
+  // Profile operations
+  async getUserProfiles(userId: string): Promise<Profile[]> {
+    const userProfiles = await db.select().from(profiles)
+      .where(eq(profiles.userId, userId))
+      .orderBy(sql`${profiles.createdAt} DESC`);
+    return userProfiles;
+  }
+
+  async getProfile(id: string): Promise<Profile | undefined> {
+    const [profile] = await db.select().from(profiles).where(eq(profiles.id, id));
+    return profile;
+  }
+
+  async createProfile(insertProfile: InsertProfile): Promise<Profile> {
+    const [profile] = await db
+      .insert(profiles)
+      .values(insertProfile as any)
+      .returning();
+    return profile;
+  }
+
+  async deleteProfile(id: string, userId: string): Promise<boolean> {
+    // First delete all personalized plans for this profile
+    await db.delete(personalizedPlans).where(eq(personalizedPlans.profileId, id));
+    
+    // Then delete the profile (only if it belongs to the user)
+    const result = await db.delete(profiles).where(
+      sql`${profiles.id} = ${id} AND ${profiles.userId} = ${userId}`
+    );
+    return (result.rowCount ?? 0) > 0;
+  }
+  
+  // Personalized plan operations
+  async getPersonalizedPlan(videoId: string, profileId: string): Promise<PersonalizedPlan | undefined> {
+    const [plan] = await db.select().from(personalizedPlans).where(
+      sql`${personalizedPlans.videoId} = ${videoId} AND ${personalizedPlans.profileId} = ${profileId}`
+    );
+    return plan;
+  }
+
+  async createPersonalizedPlan(insertPlan: InsertPersonalizedPlan): Promise<PersonalizedPlan> {
+    const [plan] = await db
+      .insert(personalizedPlans)
+      .values(insertPlan as any)
+      .returning();
+    return plan;
   }
 }
 
@@ -353,6 +417,32 @@ export class MemStorage implements IStorage {
 
   async activatePromptConfig(id: string): Promise<boolean> {
     return false;
+  }
+  
+  // Profile operations - not implemented for MemStorage
+  async getUserProfiles(userId: string): Promise<Profile[]> {
+    return [];
+  }
+
+  async getProfile(id: string): Promise<Profile | undefined> {
+    return undefined;
+  }
+
+  async createProfile(profile: InsertProfile): Promise<Profile> {
+    throw new Error("In-memory storage doesn't support profiles");
+  }
+
+  async deleteProfile(id: string, userId: string): Promise<boolean> {
+    return false;
+  }
+  
+  // Personalized plan operations - not implemented for MemStorage
+  async getPersonalizedPlan(videoId: string, profileId: string): Promise<PersonalizedPlan | undefined> {
+    return undefined;
+  }
+
+  async createPersonalizedPlan(plan: InsertPersonalizedPlan): Promise<PersonalizedPlan> {
+    throw new Error("In-memory storage doesn't support personalized plans");
   }
 }
 
