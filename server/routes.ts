@@ -435,6 +435,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update profile
+  app.patch("/api/profiles/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { id } = req.params;
+      const { description } = req.body;
+      
+      if (!description || description.trim().length === 0) {
+        return res.status(400).json({ message: "Profile description is required" });
+      }
+      
+      // Generate display name from first part of description (first 50 chars or until punctuation)
+      const displayName = description
+        .substring(0, 50)
+        .split(/[.!?]/)[0]
+        .trim() || description.substring(0, 30) + "...";
+      
+      const updated = await storage.updateProfile(id, userId, { description, displayName });
+      
+      if (!updated) {
+        return res.status(404).json({ message: "Profile not found or access denied" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to update profile" });
+    }
+  });
+
   // Personalized plan endpoints
   
   // Get personalized plan for a video and profile

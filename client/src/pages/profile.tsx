@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, User, Plus } from "lucide-react";
+import { Trash2, User, Plus, Edit3 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Header from "@/components/header";
 import type { Profile } from "@shared/schema";
@@ -25,6 +25,8 @@ export default function ProfilePage() {
   const isMobile = useIsMobile();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
+  const [editDescription, setEditDescription] = useState("");
 
   // Fetch user profiles
   const { data: profiles = [], isLoading: profilesLoading } = useQuery<Profile[]>({
@@ -66,6 +68,40 @@ export default function ProfilePage() {
     },
   });
 
+  // Edit profile mutation
+  const editProfile = useMutation({
+    mutationFn: async ({ profileId, description }: { profileId: string; description: string }) => {
+      const response = await fetch(`/api/profiles/${profileId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ description }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update profile");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/profiles"] });
+      setEditingProfile(null);
+      setEditDescription("");
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to update profile",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Delete profile mutation
   const deleteProfile = useMutation({
     mutationFn: async (profileId: string) => {
@@ -100,6 +136,20 @@ export default function ProfilePage() {
   const handleCreateProfile = () => {
     if (description.trim()) {
       createProfile.mutate(description);
+    }
+  };
+
+  const handleEditProfile = (profile: Profile) => {
+    setEditingProfile(profile);
+    setEditDescription(profile.description);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingProfile && editDescription.trim()) {
+      editProfile.mutate({
+        profileId: editingProfile.id,
+        description: editDescription,
+      });
     }
   };
 
@@ -199,6 +249,47 @@ export default function ProfilePage() {
           </DialogContent>
         </Dialog>
 
+        {/* Edit Profile Dialog */}
+        <Dialog open={!!editingProfile} onOpenChange={() => setEditingProfile(null)}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Profile</DialogTitle>
+              <DialogDescription>
+                Update your profile description
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <Textarea
+                placeholder="I'm a Webflow freelancer with 2 years of experience, focusing on small business clients. I want to scale my business and improve my pricing strategy."
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                rows={6}
+                className="resize-none"
+                data-testid="textarea-edit-description"
+              />
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditingProfile(null);
+                    setEditDescription("");
+                  }}
+                  data-testid="button-cancel-edit"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveEdit}
+                  disabled={!editDescription.trim() || editProfile.isPending}
+                  data-testid="button-save-edit"
+                >
+                  {editProfile.isPending ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Profiles List */}
         {profiles.length === 0 ? (
           <Card>
@@ -224,15 +315,25 @@ export default function ProfilePage() {
                         Created {new Date(profile.createdAt!).toLocaleDateString()}
                       </CardDescription>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteProfile.mutate(profile.id)}
-                      disabled={deleteProfile.isPending}
-                      data-testid={`button-delete-${profile.id}`}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditProfile(profile)}
+                        data-testid={`button-edit-${profile.id}`}
+                      >
+                        <Edit3 className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteProfile.mutate(profile.id)}
+                        disabled={deleteProfile.isPending}
+                        data-testid={`button-delete-${profile.id}`}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

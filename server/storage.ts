@@ -60,6 +60,7 @@ export interface IStorage {
   getUserProfiles(userId: string): Promise<Profile[]>;
   getProfile(id: string): Promise<Profile | undefined>;
   createProfile(profile: InsertProfile): Promise<Profile>;
+  updateProfile(id: string, userId: string, updates: { description: string; displayName: string }): Promise<Profile | undefined>;
   deleteProfile(id: string, userId: string): Promise<boolean>;
   
   // Personalized plan operations
@@ -230,6 +231,15 @@ export class DatabaseStorage implements IStorage {
     const [profile] = await db
       .insert(profiles)
       .values(insertProfile as any)
+      .returning();
+    return profile;
+  }
+
+  async updateProfile(id: string, userId: string, updates: { description: string; displayName: string }): Promise<Profile | undefined> {
+    const [profile] = await db
+      .update(profiles)
+      .set(updates)
+      .where(sql`${profiles.id} = ${id} AND ${profiles.userId} = ${userId}`)
       .returning();
     return profile;
   }
@@ -429,6 +439,10 @@ export class MemStorage implements IStorage {
   }
 
   async createProfile(profile: InsertProfile): Promise<Profile> {
+    throw new Error("In-memory storage doesn't support profiles");
+  }
+
+  async updateProfile(id: string, userId: string, updates: { description: string; displayName: string }): Promise<Profile | undefined> {
     throw new Error("In-memory storage doesn't support profiles");
   }
 
