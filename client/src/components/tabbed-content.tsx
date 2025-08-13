@@ -533,7 +533,7 @@ export default function TabbedContent({
                           <Zap className="w-5 h-5 text-accent" />
                           <span>Quick Wins</span>
                         </h3>
-                        <div className="grid gap-3 md:grid-cols-3">
+                        <div className="space-y-3">
                           {currentPlan.plan.quickWins.map((quickWin, index) => (
                             <Card key={index} className="p-4">
                               <h4 className="font-semibold mb-2">{quickWin.title}</h4>
