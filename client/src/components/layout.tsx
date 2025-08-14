@@ -15,8 +15,10 @@ export default function Layout({ children, className }: LayoutProps) {
     // On mobile, we'll keep the existing header-based navigation for now
     // This preserves the mobile UX that was already optimized
     return (
-      <div className="min-h-screen bg-background">
-        {children}
+      <div className="min-h-screen bg-background mobile-fade-in">
+        <div className="safe-area-inset">
+          {children}
+        </div>
       </div>
     );
   }

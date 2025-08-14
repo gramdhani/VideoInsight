@@ -162,21 +162,25 @@ export default function ChatInterface({
       }`}
     >
       {/* Chat Header */}
-      <div className="border-b border-border p-3 sm:p-4">
+      <div className={`border-b border-border ${isMobile ? 'p-4' : 'p-3 sm:p-4'}`}>
         <div className="flex items-center justify-between">
           <h2
-            className={`${isMobile ? "text-base" : "text-lg"} font-semibold flex items-center space-x-2 text-foreground`}
+            className={`${
+              isMobile ? "text-base" : "text-lg"
+            } font-semibold flex items-center space-x-2 text-foreground`}
           >
-            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+            <MessageCircle className={`text-primary ${
+              isMobile ? 'w-5 h-5' : 'w-4 h-4 sm:w-5 sm:h-5'
+            }`} />
             <span>{isMobile ? "Ask AI" : "Ask About This Video"}</span>
           </h2>
           <Button
             variant="ghost"
-            size="sm"
+            size={isMobile ? "default" : "sm"}
             title="Clear Chat"
-            className="hover:bg-muted"
+            className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} />
           </Button>
         </div>
         
@@ -209,7 +213,11 @@ export default function ChatInterface({
                       chatMutation.mutate(question);
                     }}
                     disabled={chatMutation.isPending}
-                    className="w-full text-left p-3 rounded-lg bg-gray-50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 hover:border-primary/30 transition-all text-sm leading-relaxed shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-full text-left rounded-lg bg-gray-50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 hover:border-primary/30 transition-all leading-relaxed shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isMobile 
+                        ? 'p-4 text-sm touch-target' 
+                        : 'p-3 text-sm'
+                    }`}
                     data-testid={`quick-question-${index}`}
                   >
                     {question}

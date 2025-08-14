@@ -32,7 +32,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
   }));
   
   return (
-    <Card className="modern-card shadow-modern overflow-hidden">
+    <Card className={`modern-card shadow-modern overflow-hidden ${isMobile ? 'mobile-card' : ''}`}>
       <div className="aspect-video bg-gray-900 relative">
         <iframe
           ref={iframeRef}
@@ -44,11 +44,21 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         />
       </div>
-      <CardContent className="p-3 sm:p-4">
-        <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'} mb-2 text-foreground leading-tight`}>
+      <CardContent className={`${isMobile ? 'p-4' : 'p-3 sm:p-4'}`}>
+        <h3 className={`font-semibold ${
+          isMobile 
+            ? 'text-lg mb-3 text-foreground leading-tight' 
+            : 'text-base sm:text-lg mb-2 text-foreground leading-tight'
+        }`}>
           {video.title}
         </h3>
-        <div className={`flex items-center ${isMobile ? 'flex-col items-start space-y-1' : 'space-x-4'} ${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+        <div className={`flex items-center ${
+          isMobile 
+            ? 'flex-col items-start space-y-2' 
+            : 'space-x-4'
+        } ${
+          isMobile ? 'text-sm' : 'text-xs sm:text-sm'
+        } text-muted-foreground`}>
           <span className="font-medium">{video.channel}</span>
           {!isMobile && (
             <>
@@ -57,7 +67,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ video }, ref
             </>
           )}
           {isMobile && (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4 text-xs">
               <span>{video.duration}</span>
               <span>{video.views}</span>
             </div>

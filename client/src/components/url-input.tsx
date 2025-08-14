@@ -60,11 +60,13 @@ export default function UrlInput({ onVideoAnalyzed, show = true }: UrlInputProps
   if (!show) return null;
 
   return (
-    <Card className="modern-card shadow-modern mb-6 sm:mb-8">
-      <CardContent className="p-4 sm:p-6">
+    <Card className={`modern-card shadow-modern mb-6 sm:mb-8 ${isMobile ? 'mobile-card mobile-fade-in' : ''}`}>
+      <CardContent className={`${isMobile ? 'p-4' : 'p-4 sm:p-6'}`}>
         <form onSubmit={handleSubmit} className={`${isMobile ? 'space-y-4' : 'flex flex-col md:flex-row gap-4'}`}>
           <div className="flex-1">
-            <Label htmlFor="youtube-url" className={`block ${isMobile ? 'text-sm' : 'text-sm'} font-medium text-foreground mb-2`}>
+            <Label htmlFor="youtube-url" className={`block font-medium text-foreground mb-2 ${
+              isMobile ? 'text-sm' : 'text-sm'
+            }`}>
               YouTube Video URL
             </Label>
             <div className="relative">

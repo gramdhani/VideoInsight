@@ -76,10 +76,14 @@ export default function Home() {
         {/* Responsive Layout */}
         {currentVideo && currentVideo.summary && (
           <div
-            className={`${isMobile ? "space-y-4" : "grid lg:grid-cols-2 gap-8"}`}
+            className={`${
+              isMobile 
+                ? "space-y-4 mobile-fade-in" 
+                : "grid lg:grid-cols-2 gap-8"
+            }`}
           >
             {/* Left Column / Mobile Stack */}
-            <div className="space-y-4 sm:space-y-6">
+            <div className={`space-y-4 sm:space-y-6 ${isMobile ? "mobile-padding" : ""}`}>
               <VideoPlayer ref={videoPlayerRef} video={currentVideo} />
               <TabbedContent
                 video={{
@@ -96,7 +100,9 @@ export default function Home() {
 
             {/* Right Column - Sticky Chat on Desktop, Inline on Mobile */}
             <div
-              className={`space-y-4 sm:space-y-6 ${isMobile ? "pb-16" : ""}`}
+              className={`space-y-4 sm:space-y-6 ${
+                isMobile ? "pb-16 mobile-padding" : ""
+              }`}
             >
 
               <div

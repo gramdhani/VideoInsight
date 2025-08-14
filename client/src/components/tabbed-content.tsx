@@ -183,40 +183,70 @@ export default function TabbedContent({
   };
 
   return (
-    <Card className="modern-card shadow-modern">
-      <CardContent className="p-3 sm:p-6">
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+    <Card className={`modern-card shadow-modern ${isMobile ? 'mobile-card' : ''}`}>
+      <CardContent className={`${isMobile ? 'p-4' : 'p-3 sm:p-6'}`}>
+        <div className={`flex items-center justify-between mb-3 sm:mb-4 ${
+          isMobile ? 'flex-col space-y-3' : ''
+        }`}>
           <h2
-            className={`${isMobile ? "text-lg" : "text-xl"} font-semibold flex items-center space-x-2 text-foreground`}
+            className={`${
+              isMobile ? "text-lg" : "text-xl"
+            } font-semibold flex items-center space-x-2 text-foreground`}
           >
-            <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+            <Lightbulb className={`text-primary ${
+              isMobile ? 'w-5 h-5' : 'w-4 h-4 sm:w-5 sm:h-5'
+            }`} />
             <span>{isMobile ? "Analysis" : "AI Analysis"}</span>
           </h2>
           <div className="flex space-x-2">
             <Button
               variant="ghost"
-              size="sm"
+              size={isMobile ? "default" : "sm"}
               title="Regenerate Summary"
-              className="hover:bg-muted"
+              className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
             >
-              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+              <RotateCcw className={`${
+                isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
+              }`} />
             </Button>
             <Button
               variant="ghost"
-              size="sm"
+              size={isMobile ? "default" : "sm"}
               title="Export Summary"
-              className="hover:bg-muted"
+              className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
             >
-              <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Download className={`${
+                isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
+              }`} />
             </Button>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="summary" data-testid="tab-summary">Summary</TabsTrigger>
-            <TabsTrigger value="plan" data-testid="tab-plan">Personalized Plan</TabsTrigger>
-            <TabsTrigger value="transcript" data-testid="tab-transcript">Transcript</TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-3 ${
+            isMobile ? 'h-12' : ''
+          }`}>
+            <TabsTrigger 
+              value="summary" 
+              data-testid="tab-summary"
+              className={isMobile ? 'text-sm touch-target' : ''}
+            >
+              Summary
+            </TabsTrigger>
+            <TabsTrigger 
+              value="plan" 
+              data-testid="tab-plan"
+              className={isMobile ? 'text-sm touch-target' : ''}
+            >
+              {isMobile ? "Plan" : "Personalized Plan"}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="transcript" 
+              data-testid="tab-transcript"
+              className={isMobile ? 'text-sm touch-target' : ''}
+            >
+              Transcript
+            </TabsTrigger>
           </TabsList>
 
           {/* Summary Tab */}

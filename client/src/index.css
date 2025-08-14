@@ -146,6 +146,26 @@
     min-width: 44px;
   }
 
+  /* Enhanced mobile interactions */
+  @media (max-width: 768px) {
+    /* Increase touch targets for better usability */
+    .touch-target {
+      min-height: 48px;
+      min-width: 48px;
+    }
+
+    /* Improve form elements for mobile */
+    input, textarea, select {
+      font-size: 16px; /* Prevents zoom on iOS */
+      padding: 12px 16px;
+    }
+
+    /* Better mobile modals and sheets */
+    [data-radix-popper-content-wrapper] {
+      z-index: 1000;
+    }
+  }
+
   /* Fix mobile viewport issues */
   @media (max-width: 768px) {
     .sticky {
@@ -204,6 +224,25 @@
     .mobile-touch-target {
       margin-left: 8px;
     }
+
+    /* Enhanced mobile card styling */
+    .mobile-card {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 16px;
+    }
+
+    /* Mobile-optimized text sizes */
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    h4 { font-size: 1.125rem; }
+
+    /* Better mobile navigation */
+    .mobile-nav-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
   }
 }
 
@@ -243,21 +282,72 @@
     width: 100% !important;
   }
 
-  /* Improve mobile tap targets */
-  .mobile-tap-target {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 12px !important;
+  /* Enhanced mobile utilities */
+  .mobile-padding {
+    padding: 16px !important;
   }
 
-  /* Better mobile spacing */
-  .mobile-spacing {
-    margin: 8px 0 !important;
+  .mobile-margin {
+    margin: 16px !important;
   }
 
-  /* Mobile-optimized cards */
-  .mobile-card {
-    margin: 8px 0 !important;
-    border-radius: 8px !important;
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Mobile-specific animations */
+  .mobile-fade-in {
+    animation: mobileSlideUp 0.3s ease-out;
+  }
+}
+
+/* Mobile animation keyframes */
+@keyframes mobileSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Safe area handling for modern mobile devices */
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Additional mobile-specific improvements */
+@media (max-width: 768px) {
+  /* Improve scrolling on iOS */
+  body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Ensure consistent button padding */
+  button:not(.touch-target) {
+    padding: 8px 16px;
+  }
+  
+  /* Better focus states for accessibility */
+  button:focus, 
+  input:focus, 
+  textarea:focus, 
+  [tabindex]:focus {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
