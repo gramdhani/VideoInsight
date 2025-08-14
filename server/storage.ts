@@ -40,6 +40,7 @@ export interface IStorage {
   getAllVideos(): Promise<Video[]>;
   getUserVideos(userId: string): Promise<Video[]>;
   createVideo(video: InsertVideo): Promise<Video>;
+  updateVideo(id: string, updates: Partial<Video>): Promise<Video>;
   deleteVideo(videoId: string, userId: string): Promise<boolean>;
   getChatMessages(videoId: string): Promise<ChatMessage[]>;
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -124,6 +125,18 @@ export class DatabaseStorage implements IStorage {
     const [video] = await db
       .insert(videos)
       .values(insertVideo as any)
+      .returning();
+    return video;
+  }
+
+  async updateVideo(id: string, updates: Partial<Video>): Promise<Video> {
+    const [video] = await db
+      .update(videos)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(videos.id, id))
       .returning();
     return video;
   }
