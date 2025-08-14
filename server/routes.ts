@@ -81,6 +81,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to analyze video" });
     }
   });
+
+  // Re-analyze YouTube video (refresh the AI summary)
+  app.post("/api/videos/re-analyze", async (req: any, res) => {
+    try {
+      const { youtubeId } = req.body;
+      
+      // Get userId if user is authenticated, otherwise null
+      let userId = null;
+      if (req.user && req.user.claims && req.user.claims.sub) {
+        userId = req.user.claims.sub;
+      }
+      
+      if (!youtubeId) {
+        return res.status(400).json({ message: "YouTube ID is required" });
+      }
+      
+      // Get existing video to retrieve transcript
+      let existingVideo;
+      if (userId) {
+        existingVideo = await storage.getUserVideo(userId, youtubeId);
+      } else {
+        existingVideo = await storage.getVideo(youtubeId);
+      }
+      
+      if (!existingVideo) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      // Generate fresh AI summary
+      const summary = await summarizeVideo(existingVideo.transcript || "", existingVideo.title);
+      
+      // Update the video with new summary
+      const updatedVideo = await storage.updateVideo(existingVideo.id, { summary });
+      
+      res.json(updatedVideo);
+    } catch (error) {
+      console.error("Error re-analyzing video:", error);
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to re-analyze video" });
+    }
+  });
   
   // Get all videos (requires authentication)
   app.get("/api/videos", isAuthenticated, async (req: any, res) => {

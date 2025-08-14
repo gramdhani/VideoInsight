@@ -14,6 +14,7 @@ import {
   Clock,
   Zap,
   BarChart,
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,12 +22,13 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parseMarkdownLinks, parseMarkdownText } from "../utils/markdown";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Select,
@@ -73,6 +75,7 @@ export default function TabbedContent({
   const [activeTab, setActiveTab] = useState("summary");
   const [selectedProfileId, setSelectedProfileId] = useState<string>("");
   const [currentPlan, setCurrentPlan] = useState<PersonalizedPlan | null>(null);
+  const [isResummarizing, setIsResummarizing] = useState(false);
 
   // Fetch user profiles
   const { data: profiles = [] } = useQuery<Profile[]>({
@@ -84,6 +87,37 @@ export default function TabbedContent({
   const { data: existingPlan } = useQuery<PersonalizedPlan>({
     queryKey: [`/api/videos/${video.id}/plans/${selectedProfileId}`],
     enabled: !!video.id && !!selectedProfileId && isAuthenticated,
+  });
+
+  // Re-summarize video mutation
+  const resummaryMutation = useMutation({
+    mutationFn: async () => {
+      if (!video.youtubeId) throw new Error("Video ID is required");
+      
+      const response = await apiRequest("POST", "/api/videos/re-analyze", { 
+        youtubeId: video.youtubeId 
+      });
+      return response.json();
+    },
+    onSuccess: (updatedVideo) => {
+      setIsResummarizing(false);
+      // Update the video data in the query cache
+      queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
+      queryClient.setQueryData([`/api/videos/id/${video.id}`], updatedVideo);
+      
+      toast({
+        title: "Summary regenerated",
+        description: "The AI has created a fresh analysis of this video.",
+      });
+    },
+    onError: (error: any) => {
+      setIsResummarizing(false);
+      toast({
+        title: "Failed to regenerate summary",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Generate personalized plan mutation
@@ -204,10 +238,21 @@ export default function TabbedContent({
               size={isMobile ? "default" : "sm"}
               title="Regenerate Summary"
               className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
+              onClick={() => {
+                setIsResummarizing(true);
+                resummaryMutation.mutate();
+              }}
+              disabled={resummaryMutation.isPending || isResummarizing}
             >
-              <RotateCcw className={`${
-                isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
-              }`} />
+              {resummaryMutation.isPending || isResummarizing ? (
+                <Loader2 className={`animate-spin ${
+                  isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
+                }`} />
+              ) : (
+                <RotateCcw className={`${
+                  isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
+                }`} />
+              )}
             </Button>
             <Button
               variant="ghost"
@@ -251,16 +296,115 @@ export default function TabbedContent({
 
           {/* Summary Tab */}
           <TabsContent value="summary" className="space-y-4 sm:space-y-6 mt-4">
-            {/* Short Summary */}
-            <div>
-              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
-                <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-                <span>Summary</span>
-              </h3>
-              <p className={`text-foreground leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
-                {parseMarkdownLinks(summary.shortSummary)}
-              </p>
-            </div>
+            {isResummarizing || resummaryMutation.isPending ? (
+              // Skeleton Loading State
+              <div className="space-y-6">
+                {/* Short Summary Skeleton */}
+                <div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Skeleton className="w-4 h-4 rounded" />
+                    <Skeleton className="h-6 w-24" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </div>
+
+                {/* Outline Skeleton */}
+                <div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Skeleton className="w-4 h-4 rounded" />
+                    <Skeleton className="h-6 w-16" />
+                  </div>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="border-l-3 border-gray-200 pl-4">
+                        <Skeleton className="h-5 w-48 mb-2" />
+                        <div className="space-y-2">
+                          <div className="flex items-start space-x-2">
+                            <Skeleton className="w-1.5 h-1.5 rounded-full mt-2" />
+                            <Skeleton className="h-4 w-full" />
+                          </div>
+                          <div className="flex items-start space-x-2">
+                            <Skeleton className="w-1.5 h-1.5 rounded-full mt-2" />
+                            <Skeleton className="h-4 w-4/5" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Key Takeaways Skeleton */}
+                <div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Skeleton className="w-4 h-4 rounded" />
+                    <Skeleton className="h-6 w-32" />
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <Skeleton className="h-5 w-40" />
+                          <Skeleton className="h-6 w-16 rounded" />
+                        </div>
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4 mt-1" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Next Steps Skeleton */}
+                <div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Skeleton className="w-4 h-4 rounded" />
+                    <Skeleton className="h-6 w-24" />
+                  </div>
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Skeleton className="w-4 h-4" />
+                            <Skeleton className="h-5 w-32" />
+                          </div>
+                          <Skeleton className="h-6 w-16 rounded" />
+                        </div>
+                        <Skeleton className="h-4 w-full ml-6" />
+                        <Skeleton className="h-4 w-4/5 ml-6 mt-1" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quick Stats Skeleton */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i}>
+                        <Skeleton className="h-6 w-12 mx-auto mb-2" />
+                        <Skeleton className="h-3 w-16 mx-auto" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Actual Content
+              <>
+                {/* Short Summary */}
+                <div>
+                  <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                    <span>Summary</span>
+                  </h3>
+                  <p className={`text-foreground leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
+                    {parseMarkdownLinks(summary.shortSummary)}
+                  </p>
+                </div>
 
             {/* Outline */}
             <div>
@@ -373,6 +517,8 @@ export default function TabbedContent({
                 </div>
               </div>
             </div>
+              </>
+            )}
           </TabsContent>
 
           {/* Transcript Tab */}
