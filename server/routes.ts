@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema, insertProfileSchema, insertPersonalizedPlanSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./services/openai";
+import { generateQuickAction } from "./services/quickActions";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -110,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Generate fresh AI summary
-      const summary = await summarizeVideo(existingVideo.transcript || "", existingVideo.title);
+      const summary = await summarizeVideo(existingVideo.transcript || "", existingVideo.title, storage);
       
       // Update the video with new summary
       const updatedVideo = await storage.updateVideo(existingVideo.id, { summary });
@@ -201,14 +202,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         answer: msg.response,
       }));
       
-      // Generate AI response
-      const { answer, timestamps } = await chatAboutVideo(
-        message,
-        video.transcript || "",
-        video.title,
-        context,
-        video.duration
-      );
+      // Check if this is a Quick Action request
+      const quickActionMappings: Record<string, string> = {
+        "Give me a shorter summary of this video": "Shorter Summary",
+        "Break down the main ideas and key points": "Detailed Analysis",
+        "What are the action items from this video?": "Action Items",
+        "Give me the key quotes from this video": "Key Quotes"
+      };
+      
+      const quickActionType = quickActionMappings[message];
+      
+      let answer: string;
+      let timestamps: string[];
+      
+      if (quickActionType) {
+        // Use configurable Quick Action prompt
+        const result = await generateQuickAction(
+          quickActionType,
+          video.transcript || "",
+          video.title,
+          context,
+          storage
+        );
+        answer = result.answer;
+        timestamps = result.timestamps;
+      } else {
+        // Regular chat response
+        const result = await chatAboutVideo(
+          message,
+          video.transcript || "",
+          video.title,
+          context,
+          video.duration
+        );
+        answer = result.answer;
+        timestamps = result.timestamps;
+      }
       
       // Save chat message
       const chatMessage = await storage.createChatMessage({
@@ -330,8 +359,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { type } = req.query;
       let configs;
       
-      if (type && (type === "chat" || type === "summary")) {
-        configs = await storage.getPromptConfigsByType(type as "chat" | "summary");
+      if (type && (type === "chat" || type === "summary" || type === "quick_action")) {
+        configs = await storage.getPromptConfigsByType(type as "chat" | "summary" | "quick_action");
       } else {
         configs = await storage.getAllPromptConfigs();
       }

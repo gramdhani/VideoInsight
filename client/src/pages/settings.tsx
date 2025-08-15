@@ -31,7 +31,7 @@ export default function Settings() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedConfig, setSelectedConfig] = useState<PromptConfig | null>(null);
-  const [currentConfigType, setCurrentConfigType] = useState<"chat" | "summary">("chat");
+  const [currentConfigType, setCurrentConfigType] = useState<"chat" | "summary" | "quick_action">("chat");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,6 +41,7 @@ export default function Settings() {
       systemPrompt: "",
       userPrompt: "",
       type: "chat",
+      quickActionType: undefined,
     },
   });
 
@@ -113,15 +114,30 @@ export default function Settings() {
     }
   };
 
+  const getDefaultPrompts = (type: "chat" | "summary" | "quick_action") => {
+    if (type === "chat") {
+      return { systemPrompt: defaultSystemPrompt, userPrompt: defaultUserPrompt };
+    } else if (type === "summary") {
+      return { systemPrompt: defaultSummarySystemPrompt, userPrompt: defaultSummaryUserPrompt };
+    } else {
+      return {
+        systemPrompt: "You are an expert at creating specific, actionable responses. Focus on the most important points that viewers can immediately use. Always include timestamps when available and format any tools or websites as clickable links.",
+        userPrompt: 'Analyze "${title}" and provide the requested information. Include timestamps and links where relevant.'
+      };
+    }
+  };
+
   const handleCreate = () => {
     setIsEditMode(false);
     setSelectedConfig(null);
+    const defaults = getDefaultPrompts(currentConfigType);
     form.reset({
       name: "",
       description: "",
-      systemPrompt: currentConfigType === "chat" ? defaultSystemPrompt : defaultSummarySystemPrompt,
-      userPrompt: currentConfigType === "chat" ? defaultUserPrompt : defaultSummaryUserPrompt,
+      systemPrompt: defaults.systemPrompt,
+      userPrompt: defaults.userPrompt,
       type: currentConfigType,
+      quickActionType: undefined,
     });
     setIsDialogOpen(true);
   };
@@ -142,7 +158,8 @@ export default function Settings() {
       description: config.description || "",
       systemPrompt: config.systemPrompt,
       userPrompt: config.userPrompt,
-      type: config.type as "chat" | "summary" || "chat",
+      type: config.type as "chat" | "summary" | "quick_action" || "chat",
+      quickActionType: config.quickActionType || undefined,
     });
     setIsDialogOpen(true);
   };
@@ -164,7 +181,7 @@ export default function Settings() {
 
     return (
       <div className="grid gap-4">
-        {configs.map((config) => (
+        {configs.map((config: PromptConfig) => (
           <Card key={config.id} className={config.isActive ? "border-primary" : ""}>
             <CardHeader>
               <div className="flex justify-between items-start">
@@ -314,10 +331,11 @@ export default function Settings() {
           </div>
 
           {/* Sub-tabs for Chat and Summary configurations */}
-          <Tabs value={currentConfigType} onValueChange={(value) => setCurrentConfigType(value as "chat" | "summary")} className="space-y-4">
+          <Tabs value={currentConfigType} onValueChange={(value) => setCurrentConfigType(value as "chat" | "summary" | "quick_action")} className="space-y-4">
             <TabsList>
               <TabsTrigger value="chat">Chat Responses</TabsTrigger>
               <TabsTrigger value="summary">Video Summaries</TabsTrigger>
+              <TabsTrigger value="quick_action">Quick Actions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="chat" className="space-y-4">
@@ -330,6 +348,13 @@ export default function Settings() {
             <TabsContent value="summary" className="space-y-4">
               <div className="text-sm text-muted-foreground mb-4">
                 Configure AI prompts for automatic video summarization.
+              </div>
+              {renderConfigurationContent()}
+            </TabsContent>
+
+            <TabsContent value="quick_action" className="space-y-4">
+              <div className="text-sm text-muted-foreground mb-4">
+                Configure AI prompts for quick action buttons like "Shorter Summary", "Detailed Analysis", "Action Items", and "Key Quotes".
               </div>
               {renderConfigurationContent()}
             </TabsContent>
@@ -464,10 +489,11 @@ IMPORTANT: Only provide timestamps that exist in the transcript above.`}
                       <SelectContent>
                         <SelectItem value="chat">Chat Responses</SelectItem>
                         <SelectItem value="summary">Video Summaries</SelectItem>
+                        <SelectItem value="quick_action">Quick Actions</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Choose whether this configuration is for chat responses or video summaries
+                      Choose whether this configuration is for chat responses, video summaries, or quick actions
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -501,6 +527,35 @@ IMPORTANT: Only provide timestamps that exist in the transcript above.`}
                   </FormItem>
                 )}
               />
+
+              {form.watch("type") === "quick_action" && (
+                <FormField
+                  control={form.control}
+                  name="quickActionType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quick Action Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-quick-action-type">
+                            <SelectValue placeholder="Select quick action type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Shorter Summary">Shorter Summary</SelectItem>
+                          <SelectItem value="Detailed Analysis">Detailed Analysis</SelectItem>
+                          <SelectItem value="Action Items">Action Items</SelectItem>
+                          <SelectItem value="Key Quotes">Key Quotes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Choose which quick action this configuration applies to
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               
               <FormField
                 control={form.control}

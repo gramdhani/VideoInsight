@@ -78,7 +78,8 @@ export const promptConfigs = pgTable("prompt_configs", {
   systemPrompt: text("system_prompt").notNull(),
   userPrompt: text("user_prompt").notNull(),
   description: text("description"),
-  type: text("type").notNull().default("chat"), // "chat" or "summary"
+  type: text("type").notNull().default("chat"), // "chat", "summary", or "quick_action"
+  quickActionType: text("quick_action_type"), // For quick actions: "Shorter Summary", "Detailed Analysis", etc.
   isActive: boolean("is_active").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -138,7 +139,8 @@ export const insertPromptConfigSchema = createInsertSchema(promptConfigs).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  type: z.enum(["chat", "summary"]),
+  type: z.enum(["chat", "summary", "quick_action"]),
+  quickActionType: z.enum(["Shorter Summary", "Detailed Analysis", "Action Items", "Key Quotes"]).optional(),
 });
 
 export const updatePromptConfigSchema = createInsertSchema(promptConfigs).omit({

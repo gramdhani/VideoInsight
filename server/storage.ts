@@ -132,10 +132,7 @@ export class DatabaseStorage implements IStorage {
   async updateVideo(id: string, updates: Partial<Video>): Promise<Video> {
     const [video] = await db
       .update(videos)
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
+      .set(updates)
       .where(eq(videos.id, id))
       .returning();
     return video;
@@ -179,7 +176,7 @@ export class DatabaseStorage implements IStorage {
     return configs;
   }
 
-  async getPromptConfigsByType(type: "chat" | "summary"): Promise<PromptConfig[]> {
+  async getPromptConfigsByType(type: "chat" | "summary" | "quick_action"): Promise<PromptConfig[]> {
     const configs = await db.select().from(promptConfigs)
       .where(eq(promptConfigs.type, type))
       .orderBy(sql`${promptConfigs.createdAt} DESC`);
@@ -228,15 +225,28 @@ export class DatabaseStorage implements IStorage {
     return (result.rowCount ?? 0) > 0;
   }
 
+  async getActiveQuickActionPromptConfig(quickActionType: string): Promise<PromptConfig | undefined> {
+    const [config] = await db.select().from(promptConfigs)
+      .where(sql`${promptConfigs.isActive} = true AND ${promptConfigs.type} = 'quick_action' AND ${promptConfigs.quickActionType} = ${quickActionType}`);
+    return config;
+  }
+
   async activatePromptConfig(id: string): Promise<boolean> {
     // Get the config to determine its type
     const configToActivate = await this.getPromptConfig(id);
     if (!configToActivate) return false;
     
-    // First deactivate all configs of the same type
-    await db.update(promptConfigs)
-      .set({ isActive: false })
-      .where(eq(promptConfigs.type, configToActivate.type));
+    // For quick actions, deactivate only configs of the same quick action type
+    if (configToActivate.type === 'quick_action' && configToActivate.quickActionType) {
+      await db.update(promptConfigs)
+        .set({ isActive: false })
+        .where(sql`${promptConfigs.type} = 'quick_action' AND ${promptConfigs.quickActionType} = ${configToActivate.quickActionType}`);
+    } else {
+      // For other types, deactivate all configs of the same type
+      await db.update(promptConfigs)
+        .set({ isActive: false })
+        .where(eq(promptConfigs.type, configToActivate.type));
+    }
     
     // Then activate the specified one
     const result = await db
@@ -381,6 +391,17 @@ export class MemStorage implements IStorage {
     return video;
   }
 
+  async updateVideo(id: string, updates: Partial<Video>): Promise<Video> {
+    const existingVideo = this.videos.get(id);
+    if (!existingVideo) {
+      throw new Error("Video not found");
+    }
+    
+    const updatedVideo = { ...existingVideo, ...updates };
+    this.videos.set(id, updatedVideo);
+    return updatedVideo;
+  }
+
   async deleteVideo(videoId: string, userId: string): Promise<boolean> {
     const video = this.videos.get(videoId);
     if (!video || video.userId !== userId) {
@@ -438,11 +459,23 @@ export class MemStorage implements IStorage {
     return [];
   }
 
+  async getPromptConfigsByType(type: "chat" | "summary" | "quick_action"): Promise<PromptConfig[]> {
+    return [];
+  }
+
   async getPromptConfig(id: string): Promise<PromptConfig | undefined> {
     return undefined;
   }
 
   async getActivePromptConfig(): Promise<PromptConfig | undefined> {
+    return undefined;
+  }
+
+  async getActiveSummaryPromptConfig(): Promise<PromptConfig | undefined> {
+    return undefined;
+  }
+
+  async getActiveQuickActionPromptConfig(quickActionType: string): Promise<PromptConfig | undefined> {
     return undefined;
   }
 

@@ -38,6 +38,32 @@ The project employs a monorepo structure separating client, server, and shared c
 
 ## Recent Updates & Changelog
 
+### August 2025 - Configurable Quick Actions System
+
+**✓ Database Schema Extension for Quick Actions**
+*   Extended `prompt_configs` table with `quickActionType` field for "Shorter Summary", "Detailed Analysis", "Action Items", "Key Quotes"
+*   Added support for "quick_action" type alongside existing "chat" and "summary" configurations
+*   Enhanced storage interface with `getActiveQuickActionPromptConfig()` method for type-specific lookups
+*   Updated activation logic to handle Quick Action configurations independently by type
+
+**✓ Dynamic Quick Actions Processing**
+*   Migrated hard-coded Quick Action prompts ("Shorter Summary", "Detailed Analysis", "Action Items", "Key Quotes") to configurable database system
+*   Enhanced chat API endpoint to detect Quick Action messages and route through configurable prompts
+*   Added `generateQuickAction` service function with template variable substitution (${title}, ${transcript})
+*   Maintained fallback to original hard-coded prompts if no active configuration exists
+
+**✓ Enhanced Settings UI for Quick Actions Management**
+*   Added "Quick Actions" tab to settings page alongside "Chat Responses" and "Video Summaries"
+*   Created conditional Quick Action Type selector for choosing specific action type during configuration
+*   Added default Quick Action prompt templates with expert guidance system prompts
+*   Enhanced form handling to support Quick Action configuration creation, editing, and activation
+
+**✓ Complete Quick Actions Workflow Integration**
+*   Connected frontend Quick Action buttons through chat interface to configurable backend prompts
+*   Added database seeding with original Quick Action prompts as active configurations
+*   Implemented proper Quick Action type filtering and activation system
+*   Enhanced API routes to support Quick Action type queries and management
+
 ### January 2025 - AI Prompt Configuration System
 
 **✓ Dynamic Prompt Management**
