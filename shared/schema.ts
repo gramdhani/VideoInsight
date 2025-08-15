@@ -78,6 +78,7 @@ export const promptConfigs = pgTable("prompt_configs", {
   systemPrompt: text("system_prompt").notNull(),
   userPrompt: text("user_prompt").notNull(),
   description: text("description"),
+  type: text("type").notNull().default("chat"), // "chat" or "summary"
   isActive: boolean("is_active").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -136,6 +137,8 @@ export const insertPromptConfigSchema = createInsertSchema(promptConfigs).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  type: z.enum(["chat", "summary"]),
 });
 
 export const updatePromptConfigSchema = createInsertSchema(promptConfigs).omit({

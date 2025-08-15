@@ -179,13 +179,27 @@ export class DatabaseStorage implements IStorage {
     return configs;
   }
 
+  async getPromptConfigsByType(type: "chat" | "summary"): Promise<PromptConfig[]> {
+    const configs = await db.select().from(promptConfigs)
+      .where(eq(promptConfigs.type, type))
+      .orderBy(sql`${promptConfigs.createdAt} DESC`);
+    return configs;
+  }
+
   async getPromptConfig(id: string): Promise<PromptConfig | undefined> {
     const [config] = await db.select().from(promptConfigs).where(eq(promptConfigs.id, id));
     return config;
   }
 
   async getActivePromptConfig(): Promise<PromptConfig | undefined> {
-    const [config] = await db.select().from(promptConfigs).where(eq(promptConfigs.isActive, true));
+    const [config] = await db.select().from(promptConfigs)
+      .where(sql`${promptConfigs.isActive} = true AND ${promptConfigs.type} = 'chat'`);
+    return config;
+  }
+
+  async getActiveSummaryPromptConfig(): Promise<PromptConfig | undefined> {
+    const [config] = await db.select().from(promptConfigs)
+      .where(sql`${promptConfigs.isActive} = true AND ${promptConfigs.type} = 'summary'`);
     return config;
   }
 
@@ -215,8 +229,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async activatePromptConfig(id: string): Promise<boolean> {
-    // First deactivate all configs
-    await db.update(promptConfigs).set({ isActive: false });
+    // Get the config to determine its type
+    const configToActivate = await this.getPromptConfig(id);
+    if (!configToActivate) return false;
+    
+    // First deactivate all configs of the same type
+    await db.update(promptConfigs)
+      .set({ isActive: false })
+      .where(eq(promptConfigs.type, configToActivate.type));
     
     // Then activate the specified one
     const result = await db

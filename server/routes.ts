@@ -59,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const videoInfo = await getVideoInfo(youtubeId);
       
       // Generate AI summary
-      const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title);
+      const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title, storage);
       
       // Create video record
       const video = await storage.createVideo({
@@ -327,7 +327,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all prompt configurations
   app.get("/api/admin/prompt-configs", isAuthenticated, async (req, res) => {
     try {
-      const configs = await storage.getAllPromptConfigs();
+      const { type } = req.query;
+      let configs;
+      
+      if (type && (type === "chat" || type === "summary")) {
+        configs = await storage.getPromptConfigsByType(type as "chat" | "summary");
+      } else {
+        configs = await storage.getAllPromptConfigs();
+      }
+      
       res.json(configs);
     } catch (error) {
       console.error("Error fetching prompt configs:", error);
@@ -338,7 +346,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get active prompt configuration
   app.get("/api/admin/prompt-configs/active", async (req, res) => {
     try {
-      const config = await storage.getActivePromptConfig();
+      const { type } = req.query;
+      let config;
+      
+      if (type === "summary") {
+        config = await storage.getActiveSummaryPromptConfig();
+      } else {
+        config = await storage.getActivePromptConfig();
+      }
+      
       res.json(config);
     } catch (error) {
       console.error("Error fetching active prompt config:", error);

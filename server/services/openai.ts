@@ -15,6 +15,7 @@ const openai = new OpenAI({
 export async function summarizeVideo(
   transcript: string,
   title: string,
+  storage: any,
 ): Promise<{
   shortSummary: string;
   outline: Array<{ title: string; items: string[] }>;
@@ -33,13 +34,19 @@ export async function summarizeVideo(
 }> {
   try {
     console.log(`Starting video summary for: ${title}`);
-    const response = await openai.chat.completions.create(
-      {
-        model: "openai/gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are an expert video analyst. Create a comprehensive, well-structured summary following this exact format. Use simple, everyday language that's easy to understand. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url).
+    
+    // Get active summary prompt configuration or use default
+    const activeSummaryConfig = await storage.getActiveSummaryPromptConfig();
+    
+    let systemPrompt: string;
+    let userPromptTemplate: string;
+    
+    if (activeSummaryConfig) {
+      systemPrompt = activeSummaryConfig.systemPrompt;
+      userPromptTemplate = activeSummaryConfig.userPrompt;
+    } else {
+      // Default system prompt for video summarization
+      systemPrompt = `You are an expert video analyst. Create a comprehensive, well-structured summary following this exact format. Use simple, everyday language that's easy to understand. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url).
 
 Respond with JSON in this exact format:
 {
@@ -73,11 +80,32 @@ GUIDELINES:
 - Make takeaways practical and useful
 - Include timestamps when referencing specific video moments
 - Prioritize action steps: high (do first), medium (do soon), low (do later)
-- Keep everything clear and actionable`,
+- Keep everything clear and actionable`;
+
+      // Default user prompt template
+      userPromptTemplate = `Analyze this video transcript for "\${title}":\n\n\${transcript}`;
+    }
+    
+    // Replace template variables in user prompt
+    let userPrompt = userPromptTemplate;
+    if (userPromptTemplate.includes('${title}')) {
+      userPrompt = userPrompt.replace(/\$\{title\}/g, title);
+    }
+    if (userPromptTemplate.includes('${transcript}')) {
+      userPrompt = userPrompt.replace(/\$\{transcript\}/g, transcript);
+    }
+    
+    const response = await openai.chat.completions.create(
+      {
+        model: "openai/gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
           },
           {
             role: "user",
-            content: `Analyze this video transcript for "${title}":\n\n${transcript}`,
+            content: userPrompt,
           },
         ],
         response_format: { type: "json_object" },

@@ -1,143 +1,130 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Settings2, Plus, Edit, Trash2, CheckCircle, Copy, Save } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Settings2, Edit, Trash2, Copy, CheckCircle, Save } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import type { PromptConfig } from "@shared/schema";
+import { insertPromptConfigSchema, type PromptConfig } from "../../../shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
-const promptConfigSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+const formSchema = insertPromptConfigSchema.extend({
   description: z.string().optional(),
-  systemPrompt: z.string().min(1, "System prompt is required"),
-  userPrompt: z.string().min(1, "User prompt is required"),
 });
 
-type PromptConfigFormData = z.infer<typeof promptConfigSchema>;
-
-export default function SettingsPage() {
+export default function Settings() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedConfig, setSelectedConfig] = useState<PromptConfig | null>(null);
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedConfig, setSelectedConfig] = useState<PromptConfig | null>(null);
+  const [currentConfigType, setCurrentConfigType] = useState<"chat" | "summary">("chat");
 
-  // Fetch all prompt configurations
-  const { data: configs = [], isLoading } = useQuery<PromptConfig[]>({
-    queryKey: ["/api/admin/prompt-configs"],
-    enabled: !!user,
-  });
-
-  // Fetch active configuration
-  const { data: activeConfig } = useQuery<PromptConfig>({
-    queryKey: ["/api/admin/prompt-configs/active"],
-  });
-
-  const form = useForm<PromptConfigFormData>({
-    resolver: zodResolver(promptConfigSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
       systemPrompt: "",
       userPrompt: "",
+      type: "chat",
     },
   });
 
-  // Create prompt configuration
+  const { data: configs = [], isLoading } = useQuery({
+    queryKey: ["/api/prompt-configs", currentConfigType],
+    queryFn: async () => {
+      const response = await fetch(`/api/prompt-configs?type=${currentConfigType}`);
+      return response.json();
+    },
+  });
+
   const createMutation = useMutation({
-    mutationFn: async (data: PromptConfigFormData) => {
-      const response = await fetch("/api/admin/prompt-configs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to create configuration");
-      return response.json();
-    },
+    mutationFn: (data: z.infer<typeof formSchema>) => apiRequest("/api/prompt-configs", "POST", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
-      toast({ title: "Configuration created successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
       setIsDialogOpen(false);
       form.reset();
+      toast({ title: "Success", description: "Configuration created successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to create configuration", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to create configuration", variant: "destructive" });
     },
   });
 
-  // Update prompt configuration
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: PromptConfigFormData }) => {
-      const response = await fetch(`/api/admin/prompt-configs/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Failed to update configuration");
-      return response.json();
-    },
+    mutationFn: ({ id, data }: { id: string; data: z.infer<typeof formSchema> }) => 
+      apiRequest(`/api/prompt-configs/${id}`, "PATCH", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
-      toast({ title: "Configuration updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
       setIsDialogOpen(false);
       form.reset();
+      setSelectedConfig(null);
+      toast({ title: "Success", description: "Configuration updated successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to update configuration", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to update configuration", variant: "destructive" });
     },
   });
 
-  // Delete prompt configuration
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/admin/prompt-configs/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete configuration");
-      return response.json();
-    },
+    mutationFn: (id: string) => apiRequest(`/api/prompt-configs/${id}`, "DELETE"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
-      toast({ title: "Configuration deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
+      toast({ title: "Success", description: "Configuration deleted successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to delete configuration", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to delete configuration", variant: "destructive" });
     },
   });
 
-  // Activate prompt configuration
   const activateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/admin/prompt-configs/${id}/activate`, {
-        method: "POST",
-      });
-      if (!response.ok) throw new Error("Failed to activate configuration");
-      return response.json();
-    },
+    mutationFn: (id: string) => apiRequest(`/api/prompt-configs/${id}/activate`, "POST"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs/active"] });
-      toast({ title: "Configuration activated successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
+      toast({ title: "Success", description: "Configuration activated successfully" });
     },
-    onError: () => {
-      toast({ title: "Failed to activate configuration", variant: "destructive" });
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to activate configuration", variant: "destructive" });
     },
   });
 
-  const handleSubmit = (data: PromptConfigFormData) => {
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title: "Copied", description: "Text copied to clipboard" });
+    } catch {
+      toast({ title: "Error", description: "Failed to copy text", variant: "destructive" });
+    }
+  };
+
+  const handleCreate = () => {
+    setIsEditMode(false);
+    setSelectedConfig(null);
+    form.reset({
+      name: "",
+      description: "",
+      systemPrompt: currentConfigType === "chat" ? defaultSystemPrompt : defaultSummarySystemPrompt,
+      userPrompt: currentConfigType === "chat" ? defaultUserPrompt : defaultSummaryUserPrompt,
+      type: currentConfigType,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = (data: z.infer<typeof formSchema>) => {
     if (isEditMode && selectedConfig) {
       updateMutation.mutate({ id: selectedConfig.id, data });
     } else {
@@ -153,25 +140,133 @@ export default function SettingsPage() {
       description: config.description || "",
       systemPrompt: config.systemPrompt,
       userPrompt: config.userPrompt,
+      type: config.type as "chat" | "summary" || "chat",
     });
     setIsDialogOpen(true);
   };
 
-  const handleCreate = () => {
-    setSelectedConfig(null);
-    setIsEditMode(false);
-    form.reset({
-      name: "",
-      description: "",
-      systemPrompt: defaultSystemPrompt,
-      userPrompt: defaultUserPrompt,
-    });
-    setIsDialogOpen(true);
-  };
+  const renderConfigurationContent = () => {
+    if (isLoading) {
+      return <div className="flex justify-center py-8">Loading configurations...</div>;
+    }
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({ title: "Copied to clipboard" });
+    if (configs.length === 0) {
+      return (
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-muted-foreground">No configurations found. Create your first prompt configuration to get started.</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <div className="grid gap-4">
+        {configs.map((config) => (
+          <Card key={config.id} className={config.isActive ? "border-primary" : ""}>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    {config.name}
+                    {config.isActive && (
+                      <Badge variant="default" className="ml-2">
+                        Active
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  {config.description && (
+                    <CardDescription className="mt-2">
+                      {config.description}
+                    </CardDescription>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  {!config.isActive && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => activateMutation.mutate(config.id)}
+                      data-testid={`button-activate-${config.id}`}
+                    >
+                      <CheckCircle className="mr-1 h-4 w-4" />
+                      Activate
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(config)}
+                    data-testid={`button-edit-${config.id}`}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" data-testid={`button-delete-${config.id}`}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Configuration</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete "{config.name}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => deleteMutation.mutate(config.id)}
+                          className="bg-destructive text-destructive-foreground"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <Label>System Prompt</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(config.systemPrompt)}
+                    data-testid={`button-copy-system-${config.id}`}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+                <pre className="bg-muted p-3 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
+                  {config.systemPrompt.substring(0, 200)}...
+                </pre>
+              </div>
+              
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <Label>User Prompt Template</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(config.userPrompt)}
+                    data-testid={`button-copy-user-${config.id}`}
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                </div>
+                <pre className="bg-muted p-3 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
+                  {config.userPrompt.substring(0, 200)}...
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   };
 
   if (!user) {
@@ -216,124 +311,27 @@ export default function SettingsPage() {
             </Button>
           </div>
 
-          {isLoading ? (
-            <Card>
-              <CardContent className="p-6">
-                <p>Loading configurations...</p>
-              </CardContent>
-            </Card>
-          ) : configs.length === 0 ? (
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-muted-foreground">No configurations found. Create your first prompt configuration to get started.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {configs.map((config) => (
-                <Card key={config.id} className={config.isActive ? "border-primary" : ""}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          {config.name}
-                          {config.isActive && (
-                            <Badge variant="default" className="ml-2">
-                              Active
-                            </Badge>
-                          )}
-                        </CardTitle>
-                        {config.description && (
-                          <CardDescription className="mt-2">
-                            {config.description}
-                          </CardDescription>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {!config.isActive && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => activateMutation.mutate(config.id)}
-                            data-testid={`button-activate-${config.id}`}
-                          >
-                            <CheckCircle className="mr-1 h-4 w-4" />
-                            Activate
-                          </Button>
-                        )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(config)}
-                          data-testid={`button-edit-${config.id}`}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm" data-testid={`button-delete-${config.id}`}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Configuration</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{config.name}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => deleteMutation.mutate(config.id)}
-                                className="bg-destructive text-destructive-foreground"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <Label>System Prompt</Label>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(config.systemPrompt)}
-                          data-testid={`button-copy-system-${config.id}`}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <pre className="bg-muted p-3 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
-                        {config.systemPrompt.substring(0, 200)}...
-                      </pre>
-                    </div>
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <Label>User Prompt Template</Label>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(config.userPrompt)}
-                          data-testid={`button-copy-user-${config.id}`}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <pre className="bg-muted p-3 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
-                        {config.userPrompt.substring(0, 200)}...
-                      </pre>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          {/* Sub-tabs for Chat and Summary configurations */}
+          <Tabs value={currentConfigType} onValueChange={(value) => setCurrentConfigType(value as "chat" | "summary")} className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="chat">Chat Responses</TabsTrigger>
+              <TabsTrigger value="summary">Video Summaries</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="chat" className="space-y-4">
+              <div className="text-sm text-muted-foreground mb-4">
+                Configure AI prompts for chat responses and video Q&A interactions.
+              </div>
+              {renderConfigurationContent()}
+            </TabsContent>
+
+            <TabsContent value="summary" className="space-y-4">
+              <div className="text-sm text-muted-foreground mb-4">
+                Configure AI prompts for automatic video summarization.
+              </div>
+              {renderConfigurationContent()}
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="variables" className="space-y-4">
@@ -347,45 +345,68 @@ export default function SettingsPage() {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <code className="bg-muted px-2 py-1 rounded">${"{context}"}</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Previous conversation history with questions and answers
-                  </p>
+                  <h4 className="font-semibold mb-3">For Chat Prompts:</h4>
+                  <div className="grid gap-3">
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{context}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Previous conversation history with questions and answers
+                      </p>
+                    </div>
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{transcript}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Full video transcript with timestamps
+                      </p>
+                    </div>
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{videoDuration}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Total duration of the video (e.g., "10:23")
+                      </p>
+                    </div>
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{question}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Current question from the user
+                      </p>
+                    </div>
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{title}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Title of the video being analyzed
+                      </p>
+                    </div>
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{webSearchInfo}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Additional web search information when applicable
+                      </p>
+                    </div>
+                  </div>
                 </div>
+
                 <div>
-                  <code className="bg-muted px-2 py-1 rounded">${"{transcript}"}</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Full video transcript with timestamps
-                  </p>
-                </div>
-                <div>
-                  <code className="bg-muted px-2 py-1 rounded">${"{videoDuration}"}</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Total duration of the video (e.g., "10:23")
-                  </p>
-                </div>
-                <div>
-                  <code className="bg-muted px-2 py-1 rounded">${"{question}"}</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Current question from the user
-                  </p>
-                </div>
-                <div>
-                  <code className="bg-muted px-2 py-1 rounded">${"{title}"}</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Title of the video being analyzed
-                  </p>
-                </div>
-                <div>
-                  <code className="bg-muted px-2 py-1 rounded">${"{webSearchInfo}"}</code>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Additional web search information when applicable
-                  </p>
+                  <h4 className="font-semibold mb-3">For Summary Prompts:</h4>
+                  <div className="grid gap-3">
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{title}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Title of the video being summarized
+                      </p>
+                    </div>
+                    <div>
+                      <code className="bg-muted px-2 py-1 rounded">${"{transcript}"}</code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Full video transcript with timestamps
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <div className="mt-6">
-                <h4 className="font-semibold mb-2">Example User Prompt Template:</h4>
+                <h4 className="font-semibold mb-2">Example Chat User Prompt Template:</h4>
                 <pre className="bg-muted p-3 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
 {`Previous conversation:
 \${context}
@@ -398,6 +419,15 @@ Full Video Transcript with Timestamps:
 User Question: \${question}
 
 IMPORTANT: Only provide timestamps that exist in the transcript above.`}
+                </pre>
+              </div>
+
+              <div className="mt-6">
+                <h4 className="font-semibold mb-2">Example Summary User Prompt Template:</h4>
+                <pre className="bg-muted p-3 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
+{`Analyze this video transcript for "\${title}":
+
+\${transcript}`}
                 </pre>
               </div>
             </CardContent>
@@ -417,6 +447,31 @@ IMPORTANT: Only provide timestamps that exist in the transcript above.`}
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Configuration Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-config-type">
+                          <SelectValue placeholder="Select configuration type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="chat">Chat Responses</SelectItem>
+                        <SelectItem value="summary">Video Summaries</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose whether this configuration is for chat responses or video summaries
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="name"
@@ -452,12 +507,12 @@ IMPORTANT: Only provide timestamps that exist in the transcript above.`}
                   <FormItem>
                     <FormLabel>System Prompt</FormLabel>
                     <FormDescription>
-                      Define the AI's role and behavior
+                      Instructions that define the AI's role, behavior, and response format
                     </FormDescription>
                     <FormControl>
                       <Textarea 
                         {...field} 
-                        rows={8}
+                        rows={10}
                         placeholder="You are an AI assistant helping users understand videos..."
                         className="font-mono text-sm"
                         data-testid="textarea-system-prompt"
@@ -534,3 +589,44 @@ Full Video Transcript with Timestamps:
 User Question: \${question}
 
 IMPORTANT: Only provide timestamps that exist in the transcript above. Do not generate or guess timestamps.`;
+
+// Default prompts for summary configurations
+const defaultSummarySystemPrompt = `You are an expert video analyst. Create a comprehensive, well-structured summary following this exact format. Use simple, everyday language that's easy to understand. When mentioning tools, websites, or resources, format them as clickable links using markdown format [text](url).
+
+Respond with JSON in this exact format:
+{
+  "shortSummary": "A brief 2-3 sentence overview of what this video is about and its main purpose",
+  "outline": [
+    {
+      "title": "Section name (e.g., Introduction, Main Concept, etc.)",
+      "items": ["Key point 1", "Key point 2", "Key point 3"]
+    }
+  ],
+  "keyTakeaways": [
+    {
+      "title": "Simple takeaway title",
+      "description": "Clear explanation of why this matters",
+      "timestamp": "MM:SS (if specific moment mentioned)"
+    }
+  ],
+  "actionableSteps": [
+    {
+      "step": "Clear action item",
+      "description": "Simple explanation of how to do it",
+      "priority": "high" or "medium" or "low"
+    }
+  ],
+  "readingTime": "X min",
+  "insights": number_of_insights
+}
+
+GUIDELINES:
+- Use simple words everyone can understand
+- Make takeaways practical and useful
+- Include timestamps when referencing specific video moments
+- Prioritize action steps: high (do first), medium (do soon), low (do later)
+- Keep everything clear and actionable`;
+
+const defaultSummaryUserPrompt = `Analyze this video transcript for "\${title}":
+
+\${transcript}`;
