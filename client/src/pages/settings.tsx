@@ -25,13 +25,16 @@ const formSchema = insertPromptConfigSchema.extend({
 });
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, isLoading: userLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedConfig, setSelectedConfig] = useState<PromptConfig | null>(null);
   const [currentConfigType, setCurrentConfigType] = useState<"chat" | "summary" | "quick_action">("chat");
+
+  // Check if user is admin
+  const isAdmin = user?.id === "40339057";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,14 +48,21 @@ export default function Settings() {
     },
   });
 
-  const { data: configs = [], isLoading } = useQuery({
+  const { data: configs = [], isLoading, error } = useQuery({
     queryKey: ["/api/admin/prompt-configs", currentConfigType],
     queryFn: async () => {
       const response = await fetch(`/api/admin/prompt-configs?type=${currentConfigType}`, {
         credentials: 'include'
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch');
+      }
+      
       return response.json();
     },
+    enabled: isAdmin && !userLoading,
   });
 
   const createMutation = useMutation({
@@ -159,7 +169,7 @@ export default function Settings() {
       systemPrompt: config.systemPrompt,
       userPrompt: config.userPrompt,
       type: config.type as "chat" | "summary" | "quick_action" || "chat",
-      quickActionType: config.quickActionType || undefined,
+      quickActionType: config.quickActionType as "Shorter Summary" | "Detailed Analysis" | "Action Items" | "Key Quotes" | undefined,
     });
     setIsDialogOpen(true);
   };
@@ -296,6 +306,21 @@ export default function Settings() {
             <CardTitle>Authentication Required</CardTitle>
             <CardDescription>
               Please sign in to access the settings page
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Access Restricted</CardTitle>
+            <CardDescription>
+              This settings page is only accessible to administrators.
             </CardDescription>
           </CardHeader>
         </Card>

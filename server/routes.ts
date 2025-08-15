@@ -7,6 +7,17 @@ import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./servic
 import { generateQuickAction } from "./services/quickActions";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
+// Admin middleware - restrict to specific user ID
+const isAdmin = async (req: any, res: any, next: any) => {
+  const adminUserId = "40339057"; // Your user ID
+  
+  if (!req.user || !req.user.claims || req.user.claims.sub !== adminUserId) {
+    return res.status(403).json({ message: "Admin access required" });
+  }
+  
+  next();
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
@@ -354,7 +365,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Prompt configuration endpoints (requires authentication)
   
   // Get all prompt configurations
-  app.get("/api/admin/prompt-configs", isAuthenticated, async (req, res) => {
+  app.get("/api/admin/prompt-configs", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { type } = req.query;
       let configs;
@@ -392,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new prompt configuration
-  app.post("/api/admin/prompt-configs", isAuthenticated, async (req, res) => {
+  app.post("/api/admin/prompt-configs", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { insertPromptConfigSchema } = await import("@shared/schema");
       const validatedData = insertPromptConfigSchema.parse(req.body);
@@ -405,7 +416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update prompt configuration
-  app.put("/api/admin/prompt-configs/:id", isAuthenticated, async (req, res) => {
+  app.put("/api/admin/prompt-configs/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const { updatePromptConfigSchema } = await import("@shared/schema");
@@ -424,7 +435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete prompt configuration
-  app.delete("/api/admin/prompt-configs/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/admin/prompt-configs/:id", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const deleted = await storage.deletePromptConfig(id);
@@ -441,7 +452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Activate prompt configuration
-  app.post("/api/admin/prompt-configs/:id/activate", isAuthenticated, async (req, res) => {
+  app.post("/api/admin/prompt-configs/:id/activate", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { id } = req.params;
       const activated = await storage.activatePromptConfig(id);
