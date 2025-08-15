@@ -38,7 +38,7 @@ The project employs a monorepo structure separating client, server, and shared c
 
 ## Recent Updates & Changelog
 
-### August 2025 - Configurable Quick Actions System
+### August 2025 - Configurable Quick Actions System (v0.5.0)
 
 **✓ Database Schema Extension for Quick Actions**
 *   Extended `prompt_configs` table with `quickActionType` field for "Shorter Summary", "Detailed Analysis", "Action Items", "Key Quotes"

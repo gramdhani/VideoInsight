@@ -54,16 +54,76 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.4.0 */}
+          {/* Version 0.5.0 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.4.0</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.5.0</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 15, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Enhanced Quick Actions System
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Quick Actions now provide more relevant, context-aware responses</li>
+                    <li>• Improved "Shorter Summary", "Detailed Analysis", "Action Items", and "Key Quotes" features</li>
+                    <li>• Enhanced AI processing for better accuracy and faster response times</li>
+                    <li>• Optimized template system for more consistent output formatting</li>
+                    <li>• Better integration with video content analysis for personalized results</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    AI Response Optimization
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Enhanced AI prompt processing for more accurate video analysis</li>
+                    <li>• Improved response generation with better context understanding</li>
+                    <li>• Optimized template variable handling for consistent formatting</li>
+                    <li>• Better fallback systems ensure reliable functionality across all features</li>
+                    <li>• Enhanced error handling for smoother user experience</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Performance & Reliability Improvements
+                  </h3>
+                  <ul className="text-green-800 text-sm space-y-1">
+                    <li>• Enhanced system stability with improved database operations</li>
+                    <li>• Optimized API endpoints for faster response times</li>
+                    <li>• Better memory management and resource utilization</li>
+                    <li>• Improved caching mechanisms for enhanced performance</li>
+                    <li>• Refined user interface components for smoother interactions</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.4.0 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.4.0</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
