@@ -17,6 +17,9 @@ export default function Sidebar({ className }: SidebarProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { currentVideo, resetVideo } = useVideo();
 
+  // Check if user is admin
+  const isAdmin = user?.id === "40339057";
+
   const navigationItems = [
     {
       href: "/",
@@ -45,12 +48,13 @@ export default function Sidebar({ className }: SidebarProps) {
   ];
 
   const supportItems = [
-    {
+    // Only include Settings for admin users
+    ...(isAdmin ? [{
       href: "/settings",
       label: "Settings",
       icon: Settings,
       isActive: location === "/settings"
-    },
+    }] : []),
     {
       href: "/feedback",
       label: "Share Feedback",

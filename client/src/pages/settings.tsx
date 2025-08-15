@@ -313,6 +313,8 @@ export default function Settings() {
     );
   }
 
+  // Note: Settings page access is now controlled at the sidebar level
+  // Non-admin users won't see the Settings link in the sidebar
   if (!isAdmin) {
     return (
       <div className="container mx-auto p-6">
