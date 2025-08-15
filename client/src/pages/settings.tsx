@@ -45,17 +45,19 @@ export default function Settings() {
   });
 
   const { data: configs = [], isLoading } = useQuery({
-    queryKey: ["/api/prompt-configs", currentConfigType],
+    queryKey: ["/api/admin/prompt-configs", currentConfigType],
     queryFn: async () => {
-      const response = await fetch(`/api/prompt-configs?type=${currentConfigType}`);
+      const response = await fetch(`/api/admin/prompt-configs?type=${currentConfigType}`, {
+        credentials: 'include'
+      });
       return response.json();
     },
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: z.infer<typeof formSchema>) => apiRequest("/api/prompt-configs", "POST", data),
+    mutationFn: (data: z.infer<typeof formSchema>) => apiRequest("/api/admin/prompt-configs", "POST", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       setIsDialogOpen(false);
       form.reset();
       toast({ title: "Success", description: "Configuration created successfully" });
@@ -67,9 +69,9 @@ export default function Settings() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: z.infer<typeof formSchema> }) => 
-      apiRequest(`/api/prompt-configs/${id}`, "PATCH", data),
+      apiRequest(`/api/admin/prompt-configs/${id}`, "PUT", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       setIsDialogOpen(false);
       form.reset();
       setSelectedConfig(null);
@@ -81,9 +83,9 @@ export default function Settings() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/prompt-configs/${id}`, "DELETE"),
+    mutationFn: (id: string) => apiRequest(`/api/admin/prompt-configs/${id}`, "DELETE"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       toast({ title: "Success", description: "Configuration deleted successfully" });
     },
     onError: (error: any) => {
@@ -92,9 +94,9 @@ export default function Settings() {
   });
 
   const activateMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/prompt-configs/${id}/activate`, "POST"),
+    mutationFn: (id: string) => apiRequest(`/api/admin/prompt-configs/${id}/activate`, "POST"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/prompt-configs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       toast({ title: "Success", description: "Configuration activated successfully" });
     },
     onError: (error: any) => {
