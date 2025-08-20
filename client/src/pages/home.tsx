@@ -114,11 +114,11 @@ export default function Home() {
                 >
                   <CardContent className="p-0">
                     {/* Thumbnail */}
-                    <div className="relative overflow-hidden rounded-t-lg">
+                    <div className="relative overflow-hidden rounded-t-lg aspect-video">
                       <img
                         src={video.thumbnail}
                         alt={video.title}
-                        className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-200"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
                         <Play className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
