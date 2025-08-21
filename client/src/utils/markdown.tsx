@@ -67,7 +67,7 @@ export function parseMarkdownText(
 
     // Combined regex for bold, italic, links, and timestamps (including ranges and inline format)
     const formatRegex =
-      /(\*\*(.*?)\*\*|\*(.*?)\*|\[([^\]]+)\]\(([^)]+)\)|<strong>(.*?)<\/strong>|<em>(.*?)<\/em>|\[([\d:,-\s]+)\]|\(Timestamp:\s*([\d:]+)\))/g;
+      /(\*\*(.*?)\*\*|\*(.*?)\*|\[([^\]]+)\]\(([^)]+)\)|<strong>(.*?)<\/strong>|<em>(.*?)<\/em>|\[([\d:,-\s]+)\]|\(Timestamp:\s*([\d:]+)\)|\(([\d:]+)\))/g;
     let match;
 
     while ((match = formatRegex.exec(content)) !== null) {
@@ -147,7 +147,28 @@ export function parseMarkdownText(
               }
             }}
           >
-            (Timestamp: {timestamp})
+            ({timestamp})
+          </button>,
+        );
+      } else if (
+        fullMatch.startsWith("(") &&
+        fullMatch.endsWith(")") &&
+        /^\([\d:]+\)$/.test(fullMatch)
+      ) {
+        // Simple inline timestamp (XX:XX)
+        const timestamp = match[10];
+        parts.push(
+          <button
+            key={match.index}
+            className="text-primary hover:text-primary/80 underline hover:no-underline transition-colors cursor-pointer inline"
+            onClick={() => {
+              console.log(`Jump to ${timestamp}`);
+              if (onTimestampClick) {
+                onTimestampClick(timestamp);
+              }
+            }}
+          >
+            ({timestamp})
           </button>,
         );
       }
