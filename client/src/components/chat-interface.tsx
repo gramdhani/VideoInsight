@@ -255,7 +255,7 @@ export default function ChatInterface({
                 <div
                   className={`bg-primary text-white rounded-lg rounded-tr-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-xs"}`}
                 >
-                  <p className="text-xs sm:text-sm">{msg.message}</p>
+                  <p className="text-sm">{msg.message}</p>
                   <span className="text-xs text-indigo-200 mt-1 block">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
@@ -290,7 +290,7 @@ export default function ChatInterface({
               <div
                 className={`bg-primary text-white rounded-lg rounded-tr-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-[70%]"}`}
               >
-                <div className="text-xs sm:text-sm">{pendingMessage}</div>
+                <div className="text-sm">{pendingMessage}</div>
                 <span className="text-xs text-indigo-200 mt-2 block">
                   Sending...
                 </span>
