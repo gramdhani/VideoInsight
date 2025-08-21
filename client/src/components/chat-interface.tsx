@@ -276,29 +276,6 @@ export default function ChatInterface({
                   <div className="text-sm leading-relaxed">
                     {parseMarkdownText(msg.response, onTimestampClick)}
                   </div>
-                  {msg.timestamps &&
-                    msg.timestamps.length > 0 &&
-                    !msg.response.match(/\[\d+:\d+\]/) && (
-                      <div className="flex flex-wrap gap-1 mt-2 mb-2">
-                        {!isMobile && (
-                          <span className="text-xs text-muted-foreground mr-2">
-                            Referenced timestamps:
-                          </span>
-                        )}
-                        {msg.timestamps.map((timestamp: string, i: number) => (
-                          <button
-                            key={i}
-                            onClick={() => {
-                              console.log("Chat timestamp clicked:", timestamp);
-                              onTimestampClick?.(timestamp);
-                            }}
-                            className="text-sm font-medium bg-purple-200 text-purple-800 px-4 py-2 rounded-full hover:bg-purple-300 transition-colors cursor-pointer border-0 outline-none"
-                          >
-                            {timestamp}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   <span className="text-xs text-muted-foreground mt-2 block">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
