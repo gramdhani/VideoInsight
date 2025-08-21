@@ -40,15 +40,15 @@ export function parseMarkdownLinks(text: string): JSX.Element {
 
 // Utility to clean and sanitize text before parsing
 function cleanText(text: string): string {
-  if (!text || typeof text !== 'string') return '';
-  
+  if (!text || typeof text !== "string") return "";
+
   // Remove any malformed JSON artifacts
-  let cleaned = text.replace(/^\{|\}$/g, ''); // Remove leading/trailing braces
-  cleaned = cleaned.replace(/^"answer":\s*"|"$|\\"/g, ''); // Remove JSON property syntax and escaped quotes
-  cleaned = cleaned.replace(/\\n/g, '\n'); // Convert escaped newlines to actual newlines
-  cleaned = cleaned.replace(/\\t/g, '\t'); // Convert escaped tabs to actual tabs
-  cleaned = cleaned.replace(/\\\\/g, '\\'); // Fix double-escaped backslashes
-  
+  let cleaned = text.replace(/^\{|\}$/g, ""); // Remove leading/trailing braces
+  cleaned = cleaned.replace(/^"answer":\s*"|"$|\\"/g, ""); // Remove JSON property syntax and escaped quotes
+  cleaned = cleaned.replace(/\\n/g, "\n"); // Convert escaped newlines to actual newlines
+  cleaned = cleaned.replace(/\\t/g, "\t"); // Convert escaped tabs to actual tabs
+  cleaned = cleaned.replace(/\\\\/g, "\\"); // Fix double-escaped backslashes
+
   return cleaned.trim();
 }
 
@@ -59,15 +59,15 @@ export function parseMarkdownText(
 ): JSX.Element {
   // Clean the input text first
   const cleanedText = cleanText(text);
-  
+
   // Function to recursively parse text with formatting
   const parseFormattedText = (content: string): (string | JSX.Element)[] => {
     const parts: (string | JSX.Element)[] = [];
     let lastIndex = 0;
 
-    // Combined regex for bold, italic, links, and timestamps (including ranges)
+    // Combined regex for bold, italic, links, and timestamps (including ranges and inline format)
     const formatRegex =
-      /(\*\*(.*?)\*\*|\*(.*?)\*|\[([^\]]+)\]\(([^)]+)\)|<strong>(.*?)<\/strong>|<em>(.*?)<\/em>|\[([\d:,-\s]+)\])/g;
+      /(\*\*(.*?)\*\*|\*(.*?)\*|\[([^\]]+)\]\(([^)]+)\)|<strong>(.*?)<\/strong>|<em>(.*?)<\/em>|\[([\d:,-\s]+)\]|\(Timestamp:\s*([\d:]+)\))/g;
     let match;
 
     while ((match = formatRegex.exec(content)) !== null) {
@@ -130,29 +130,24 @@ export function parseMarkdownText(
         fullMatch.endsWith("]") &&
         /^\[[\d:,-\s]+\]$/.test(fullMatch)
       ) {
-        // Timestamp [MM:SS] or range [MM:SS - MM:SS]
-        const timestamp = match[8];
-        // For ranges like "5:01 - 6:35", extract the first timestamp
-        const firstTimestamp = timestamp.includes(" - ")
-          ? timestamp.split(" - ")[0].trim()
-          : timestamp;
+        // Timestamp [MM:SS] or range [MM:SS - MM:SS] - REMOVED
+        // Skip rendering these - they will be removed from the UI
+        parts.push("");
+      } else if (fullMatch.startsWith("(Timestamp:")) {
+        // Inline timestamp (Timestamp: XX:XX)
+        const timestamp = match[9];
         parts.push(
           <button
             key={match.index}
-            className="inline-flex items-center text-xs font-medium bg-purple-200 text-purple-700 px-3 py-1 rounded-full hover:bg-purple-300 transition-colors ml-1 mr-1"
-            style={{
-              minHeight: "auto",
-              paddingLeft: "8px",
-              paddingRight: "8px",
-            }}
+            className="text-primary hover:text-primary/80 underline hover:no-underline transition-colors cursor-pointer inline"
             onClick={() => {
               console.log(`Jump to ${timestamp}`);
               if (onTimestampClick) {
-                onTimestampClick(firstTimestamp);
+                onTimestampClick(timestamp);
               }
             }}
           >
-            {timestamp}
+            (Timestamp: {timestamp})
           </button>,
         );
       }
@@ -169,23 +164,29 @@ export function parseMarkdownText(
   };
 
   // Split content into lines and group them properly
-  const lines = cleanedText.split('\n').filter(line => line.trim());
+  const lines = cleanedText.split("\n").filter((line) => line.trim());
   const elements: JSX.Element[] = [];
   let currentBulletGroup: string[] = [];
-  
+
   const flushBulletGroup = () => {
     if (currentBulletGroup.length > 0) {
       elements.push(
-        <ul key={elements.length} className="list-none space-y-2 text-foreground mb-3">
+        <ul
+          key={elements.length}
+          className="list-none space-y-2 text-foreground mb-3"
+        >
           {currentBulletGroup.map((item, itemIndex) => (
-            <li key={itemIndex} className="text-sm leading-relaxed flex items-start">
+            <li
+              key={itemIndex}
+              className="text-[15px] leading-relaxed flex items-start"
+            >
               <span className="text-primary mr-2 mt-0.5 font-bold">•</span>
               <div className="flex-1">
                 {parseFormattedText(item.replace(/^[•\-]\s*/, ""))}
               </div>
             </li>
           ))}
-        </ul>
+        </ul>,
       );
       currentBulletGroup = [];
     }
@@ -193,7 +194,7 @@ export function parseMarkdownText(
 
   lines.forEach((line, index) => {
     const trimmedLine = line.trim();
-    
+
     if (trimmedLine.startsWith("•") || trimmedLine.startsWith("- ")) {
       // This is a bullet point - add to current group
       currentBulletGroup.push(trimmedLine);
@@ -201,26 +202,35 @@ export function parseMarkdownText(
       // This is a section header - flush bullets first, then add header
       flushBulletGroup();
       elements.push(
-        <div key={elements.length} className="text-sm leading-relaxed text-foreground mb-2">
+        <div
+          key={elements.length}
+          className="text-[15px] leading-relaxed text-foreground mb-2"
+        >
           {parseFormattedText(trimmedLine)}
-        </div>
+        </div>,
       );
     } else if (trimmedLine) {
       // This is regular text - flush bullets first, then add paragraph
       flushBulletGroup();
-      
+
       // Check if this is a continuation of previous content or standalone
       const isShortLine = trimmedLine.length < 100;
-      const hasFormattingMarks = trimmedLine.includes('**') || trimmedLine.includes('[') || trimmedLine.includes('](');
-      
+      const hasFormattingMarks =
+        trimmedLine.includes("**") ||
+        trimmedLine.includes("[") ||
+        trimmedLine.includes("](");
+
       elements.push(
-        <p key={elements.length} className="text-foreground text-[15px] mt-[16px] mb-[16px]">
+        <p
+          key={elements.length}
+          className="text-foreground text-[15px] mt-[16px] mb-[16px]"
+        >
           {parseFormattedText(trimmedLine)}
-        </p>
+        </p>,
       );
     }
   });
-  
+
   // Flush any remaining bullets
   flushBulletGroup();
 
