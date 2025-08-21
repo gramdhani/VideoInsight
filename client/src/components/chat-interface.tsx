@@ -215,8 +215,8 @@ export default function ChatInterface({
                     disabled={chatMutation.isPending}
                     className={`w-full text-left rounded-lg bg-gray-50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 hover:border-primary/30 transition-all leading-relaxed shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
                       isMobile 
-                        ? 'p-4 text-sm touch-target' 
-                        : 'p-3 text-sm'
+                        ? 'p-4 text-[15px] touch-target' 
+                        : 'p-3 text-[15px]'
                     }`}
                     data-testid={`quick-question-${index}`}
                   >
@@ -255,7 +255,7 @@ export default function ChatInterface({
                 <div
                   className={`bg-primary text-white rounded-lg rounded-tr-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-xs"}`}
                 >
-                  <p className="text-sm">{msg.message}</p>
+                  <p className="text-[15px]">{msg.message}</p>
                   <span className="text-xs text-indigo-200 mt-1 block">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </span>
@@ -273,7 +273,7 @@ export default function ChatInterface({
                 <div
                   className={`bg-muted rounded-lg rounded-tl-none p-3 sm:p-4 ${isMobile ? "max-w-[85%]" : "max-w-lg"}`}
                 >
-                  <div className="text-sm leading-relaxed">
+                  <div className="text-[15px] leading-relaxed">
                     {parseMarkdownText(msg.response, onTimestampClick)}
                   </div>
                   <span className="text-xs text-muted-foreground mt-2 block">
@@ -290,7 +290,7 @@ export default function ChatInterface({
               <div
                 className={`bg-primary text-white rounded-lg rounded-tr-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-[70%]"}`}
               >
-                <div className="text-sm">{pendingMessage}</div>
+                <div className="text-[15px]">{pendingMessage}</div>
                 <span className="text-xs text-indigo-200 mt-2 block">
                   Sending...
                 </span>
