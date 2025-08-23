@@ -413,7 +413,7 @@ export default function TabbedContent({
                 <span>Outline</span>
               </h3>
               <div className="space-y-3">
-                {summary.outline.map((section, index) => (
+                {summary.outline?.map((section, index) => (
                   <div key={index} className="border-l-3 border-blue-300 pl-3 sm:pl-4">
                     <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
                       {index + 1}. {section.title}
@@ -440,7 +440,7 @@ export default function TabbedContent({
                 <span>Key Takeaways</span>
               </h3>
               <div className="space-y-3">
-                {summary.keyTakeaways.map((takeaway, index) => (
+                {summary.keyTakeaways?.map((takeaway, index) => (
                   <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="text-blue-900 text-base font-semibold">
@@ -471,7 +471,7 @@ export default function TabbedContent({
                 <span>Next Steps</span>
               </h3>
               <div className="space-y-3">
-                {summary.actionableSteps.map((step, index) => (
+                {summary.actionableSteps?.map((step, index) => (
                   <div key={index} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-2">
@@ -505,7 +505,7 @@ export default function TabbedContent({
                 </div>
                 <div>
                   <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}>
-                    {summary.keyTakeaways.length}
+                    {summary.keyTakeaways?.length || 0}
                   </div>
                   <div className="text-xs text-gray-600">Takeaways</div>
                 </div>

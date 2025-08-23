@@ -153,9 +153,12 @@ export default function Settings() {
   };
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
+    console.log("Form submission triggered", { isEditMode, selectedConfig, data });
     if (isEditMode && selectedConfig) {
+      console.log("Calling updateMutation with:", { id: selectedConfig.id, data });
       updateMutation.mutate({ id: selectedConfig.id, data });
     } else {
+      console.log("Calling createMutation with:", data);
       createMutation.mutate(data);
     }
   };
@@ -500,7 +503,9 @@ IMPORTANT: Only provide timestamps that exist in the transcript above.`}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+              console.log("Form validation errors:", errors);
+            })} className="space-y-4">
               <FormField
                 control={form.control}
                 name="type"
