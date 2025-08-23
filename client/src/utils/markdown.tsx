@@ -1,5 +1,10 @@
 // Utility to convert markdown-style links to clickable JSX elements
 export function parseMarkdownLinks(text: string): JSX.Element {
+  // Handle null or undefined text
+  if (!text || typeof text !== "string") {
+    return <>{""}</>;
+  }
+  
   // Regex to find markdown links [text](url)
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   const parts: (string | JSX.Element)[] = [];
