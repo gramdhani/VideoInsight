@@ -67,7 +67,7 @@ export default function Settings() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: z.infer<typeof formSchema>) => apiRequest("/api/admin/prompt-configs", "POST", data),
+    mutationFn: (data: z.infer<typeof formSchema>) => apiRequest("POST", "/api/admin/prompt-configs", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       setIsDialogOpen(false);
@@ -81,7 +81,7 @@ export default function Settings() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: z.infer<typeof formSchema> }) => 
-      apiRequest(`/api/admin/prompt-configs/${id}`, "PUT", data),
+      apiRequest("PUT", `/api/admin/prompt-configs/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       setIsDialogOpen(false);
@@ -95,7 +95,7 @@ export default function Settings() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/admin/prompt-configs/${id}`, "DELETE"),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/admin/prompt-configs/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       toast({ title: "Success", description: "Configuration deleted successfully" });
@@ -106,7 +106,7 @@ export default function Settings() {
   });
 
   const activateMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/admin/prompt-configs/${id}/activate`, "POST"),
+    mutationFn: (id: string) => apiRequest("POST", `/api/admin/prompt-configs/${id}/activate`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/prompt-configs"] });
       toast({ title: "Success", description: "Configuration activated successfully" });
@@ -154,10 +154,16 @@ export default function Settings() {
   };
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
+    // Transform null quickActionType to undefined for proper handling
+    const cleanedData = {
+      ...data,
+      quickActionType: data.quickActionType === null ? undefined : data.quickActionType,
+    };
+    
     if (isEditMode && selectedConfig) {
-      updateMutation.mutate({ id: selectedConfig.id, data });
+      updateMutation.mutate({ id: selectedConfig.id, data: cleanedData });
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(cleanedData);
     }
   };
 
@@ -563,7 +569,7 @@ IMPORTANT: Only provide timestamps that exist in the transcript above.`}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Quick Action Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                         <FormControl>
                           <SelectTrigger data-testid="select-quick-action-type">
                             <SelectValue placeholder="Select quick action type" />
