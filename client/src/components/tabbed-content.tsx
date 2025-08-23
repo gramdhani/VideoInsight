@@ -674,31 +674,31 @@ export default function TabbedContent({
                                 </div>
                               </div>
 
-                              <p className="text-muted-foreground text-sm">{item.whyItMatters}</p>
+                              <p className="text-foreground text-base text-pretty leading-relaxed">{item.whyItMatters}</p>
 
                               <div className="space-y-2">
-                                <div className="text-sm font-medium">Steps:</div>
-                                <ol className="list-decimal list-inside space-y-1">
+                                <div className="text-base font-medium">Steps:</div>
+                                <ol className="list-decimal list-inside space-y-2">
                                   {item.steps?.map((step, stepIndex) => (
-                                    <li key={stepIndex} className="text-sm text-muted-foreground">
+                                    <li key={stepIndex} className="text-base text-foreground text-pretty leading-relaxed">
                                       {step}
                                     </li>
                                   ))}
                                 </ol>
                               </div>
 
-                              <div className="flex items-center justify-between text-sm">
+                              <div className="flex items-center justify-between text-base">
                                 <div className="flex items-center space-x-4">
-                                  <div className="flex items-center space-x-1">
-                                    <BarChart className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-muted-foreground">
+                                  <div className="flex items-center space-x-2">
+                                    <BarChart className="w-5 h-5 text-foreground" />
+                                    <span className="text-foreground text-pretty">
                                       {item.metric?.name}: {item.metric?.target} in {item.metric?.timeframeDays} days
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex items-center space-x-1">
-                                  <Clock className="w-4 h-4 text-muted-foreground" />
-                                  <span className="text-muted-foreground">
+                                <div className="flex items-center space-x-2">
+                                  <Clock className="w-5 h-5 text-foreground" />
+                                  <span className="text-foreground text-pretty">
                                     Complete in {item.suggestedDeadlineDays} days
                                   </span>
                                 </div>
