@@ -53,7 +53,7 @@ interface TabbedContentProps {
     }>;
     summary: {
       shortSummary: string;
-      outline: Array<{ title: string; items: string[] }>;
+      outline: Array<{ title: string; items: Array<{ point: string; context: string }> }>;
       keyTakeaways: Array<{ title: string; description: string; timestamp?: string }>;
       actionableSteps: Array<{ step: string; description: string; priority: 'high' | 'medium' | 'low' }>;
       readingTime: string;
@@ -418,13 +418,20 @@ export default function TabbedContent({
                     <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
                       {index + 1}. {section.title}
                     </h4>
-                    <ul className="space-y-1">
-                      {section.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-start space-x-2">
+                    <ul className="space-y-3">
+                      {section.items?.map((item, itemIndex) => (
+                        <li key={itemIndex} className="flex items-start space-x-3">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
-                          <span className="text-gray-600 mt-[2px] mb-[2px] text-[15px]">
-                            {parseMarkdownLinks(item)}
-                          </span>
+                          <div className="flex-1">
+                            <div className="text-gray-800 font-medium text-[15px] mb-1">
+                              {typeof item === 'string' ? parseMarkdownLinks(item) : parseMarkdownLinks(item.point)}
+                            </div>
+                            {typeof item === 'object' && item.context && (
+                              <div className="text-gray-600 text-[14px] leading-relaxed">
+                                {parseMarkdownLinks(item.context)}
+                              </div>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>

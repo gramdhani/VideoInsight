@@ -45,7 +45,7 @@ export const videos = pgTable("videos", {
   }>>(),
   summary: jsonb("summary").$type<{
     shortSummary: string;
-    outline: Array<{ title: string; items: string[] }>;
+    outline: Array<{ title: string; items: Array<{ point: string; context: string }> }>;
     keyTakeaways: Array<{ title: string; description: string; timestamp?: string }>;
     actionableSteps: Array<{ step: string; description: string; priority: 'high' | 'medium' | 'low' }>;
     readingTime: string;
