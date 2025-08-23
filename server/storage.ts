@@ -139,10 +139,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteVideo(videoId: string, userId: string): Promise<boolean> {
-    // First delete all chat messages for this video
+    // First delete all personalized plans for this video
+    await db.delete(personalizedPlans).where(eq(personalizedPlans.videoId, videoId));
+    
+    // Then delete all chat messages for this video
     await db.delete(chatMessages).where(eq(chatMessages.videoId, videoId));
     
-    // Then delete the video (only if it belongs to the user)
+    // Finally delete the video (only if it belongs to the user)
     const result = await db.delete(videos).where(
       sql`${videos.id} = ${videoId} AND ${videos.userId} = ${userId}`
     );
