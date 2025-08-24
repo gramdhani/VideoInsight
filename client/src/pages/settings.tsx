@@ -35,7 +35,7 @@ export default function Settings() {
   const [currentConfigType, setCurrentConfigType] = useState<"chat" | "summary" | "quick_action">("chat");
 
   // Check if user is admin
-  const isAdmin = user?.id === "40339057";
+  const isAdmin = !!user?.isAdmin;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

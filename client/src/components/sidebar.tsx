@@ -18,7 +18,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const { currentVideo, resetVideo } = useVideo();
 
   // Check if user is admin
-  const isAdmin = user?.id === "40339057";
+  const isAdmin = !!user?.isAdmin;
 
   const navigationItems = [
     {
