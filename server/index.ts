@@ -1,6 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import fs from "fs";
+import path from "path";
+import { execSync } from "child_process";
 
 // Validate required environment variables
 function validateEnvironment() {
@@ -36,9 +39,6 @@ function validateEnvironment() {
 
 // Validate production build exists
 function validateProductionBuild() {
-  const fs = require('fs');
-  const path = require('path');
-  
   // Check for built client files - they should be in server/public based on serveStatic function
   const publicPath = path.resolve(import.meta.dirname, "public");
   const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
@@ -58,7 +58,6 @@ function validateProductionBuild() {
   if (fs.existsSync(distPath) && !fs.existsSync(publicPath)) {
     log('Copying build files from dist/public to server/public...');
     try {
-      const { execSync } = require('child_process');
       execSync(`cp -r "${distPath}" "${publicPath}"`, { stdio: 'inherit' });
       log('Successfully copied build files');
     } catch (error) {
