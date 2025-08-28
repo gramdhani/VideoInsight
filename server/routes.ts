@@ -581,6 +581,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/videos/:videoId/plans/:profileId", isAuthenticated, async (req: any, res) => {
     try {
       const { videoId, profileId } = req.params;
+      const userId = req.user.claims.sub;
+      
+      // Verify ownership of both video and profile before accessing plan
+      const [video, profile] = await Promise.all([
+        storage.getVideoById(videoId),
+        storage.getProfile(profileId),
+      ]);
+      
+      if (!video) {
+        return res.status(404).json({ message: "Video not found" });
+      }
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      // Check ownership
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied: You don't own this video" });
+      }
+      
+      if (profile.userId !== userId) {
+        return res.status(403).json({ message: "Access denied: You don't own this profile" });
+      }
+      
       const plan = await storage.getPersonalizedPlan(videoId, profileId);
       
       if (!plan) {
@@ -599,18 +624,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { videoId } = req.params;
       const { profileId } = req.body;
+      const userId = req.user.claims.sub;
       
       if (!profileId) {
         return res.status(400).json({ message: "Profile ID is required" });
       }
       
-      // Check if plan already exists
-      const existingPlan = await storage.getPersonalizedPlan(videoId, profileId);
-      if (existingPlan) {
-        return res.json(existingPlan);
-      }
-      
-      // Get video and profile
+      // Get video and profile with ownership verification
       const [video, profile] = await Promise.all([
         storage.getVideoById(videoId),
         storage.getProfile(profileId),
@@ -622,6 +642,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      // Check ownership before proceeding
+      if (video.userId !== userId) {
+        return res.status(403).json({ message: "Access denied: You don't own this video" });
+      }
+      
+      if (profile.userId !== userId) {
+        return res.status(403).json({ message: "Access denied: You don't own this profile" });
+      }
+      
+      // Check if plan already exists (after ownership verification)
+      const existingPlan = await storage.getPersonalizedPlan(videoId, profileId);
+      if (existingPlan) {
+        return res.json(existingPlan);
       }
       
       // Generate personalized plan using AI
