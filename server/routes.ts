@@ -7,11 +7,16 @@ import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./servic
 import { generateQuickAction } from "./services/quickActions";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
-// Admin middleware - restrict to specific user ID
+// Admin middleware - check if user has admin privileges
 const isAdmin = async (req: any, res: any, next: any) => {
-  const adminUserId = "40339057"; // Your user ID
+  if (!req.user || !req.user.claims) {
+    return res.status(403).json({ message: "Authentication required" });
+  }
   
-  if (!req.user || !req.user.claims || req.user.claims.sub !== adminUserId) {
+  const userId = req.user.claims.sub;
+  const userIsAdmin = await storage.isUserAdmin(userId);
+  
+  if (!userIsAdmin) {
     return res.status(403).json({ message: "Admin access required" });
   }
   

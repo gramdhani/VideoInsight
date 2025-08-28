@@ -32,6 +32,7 @@ export interface IStorage {
   // User operations (IMPORTANT) these user operations are mandatory for Replit Auth.
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  isUserAdmin(id: string): Promise<boolean>;
   
   // Video operations
   getVideo(youtubeId: string): Promise<Video | undefined>;
@@ -89,6 +90,27 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
+  }
+
+  async isUserAdmin(id: string): Promise<boolean> {
+    const user = await this.getUser(id);
+    if (user?.isAdmin === true) {
+      return true;
+    }
+    
+    // Fallback: check environment variable for initial admin setup
+    const adminUserId = process.env.ADMIN_USER_ID;
+    if (adminUserId && adminUserId === id) {
+      // Auto-promote user to admin in database if they match environment variable
+      await this.upsertUser({ 
+        id, 
+        email: user?.email || '', 
+        isAdmin: true 
+      });
+      return true;
+    }
+    
+    return false;
   }
 
   // Video operations
@@ -349,6 +371,11 @@ export class MemStorage implements IStorage {
   async upsertUser(userData: UpsertUser): Promise<User> {
     // In-memory storage doesn't support users for auth
     throw new Error("In-memory storage doesn't support user operations");
+  }
+
+  async isUserAdmin(id: string): Promise<boolean> {
+    // In-memory storage doesn't support users for auth
+    return false;
   }
 
   async getVideo(youtubeId: string): Promise<Video | undefined> {
