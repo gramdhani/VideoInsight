@@ -389,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active prompt configuration
-  app.get("/api/admin/prompt-configs/active", async (req, res) => {
+  app.get("/api/admin/prompt-configs/active", isAuthenticated, isAdmin, async (req, res) => {
     try {
       const { type } = req.query;
       let config;
