@@ -1,11 +1,33 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema, insertProfileSchema, insertPersonalizedPlanSchema } from "@shared/schema";
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./services/openai";
 import { generateQuickAction } from "./services/quickActions";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+
+// Rate limiter for expensive operations like video analysis
+const videoAnalysisRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Allow 5 video analysis requests per 15 minutes per user
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable legacy `X-RateLimit-*` headers
+  keyGenerator: (req: any) => {
+    // Rate limit per authenticated user, fallback to IP if not authenticated
+    if (req.user?.claims?.sub) {
+      return `user:${req.user.claims.sub}`;
+    }
+    // For unauthenticated users, use IP (express-rate-limit handles IPv6 properly by default)
+    return `ip:${req.ip}`;
+  },
+  message: {
+    message: "Too many video analysis requests. Please wait 15 minutes before trying again.",
+    retryAfter: "15 minutes"
+  },
+  skipSuccessfulRequests: false, // Count all requests, even successful ones
+});
 
 // Admin middleware - check if user has admin privileges
 const isAdmin = async (req: any, res: any, next: any) => {
@@ -39,16 +61,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Analyze YouTube video (accessible to all users)
-  app.post("/api/videos/analyze", async (req: any, res) => {
+  // Analyze YouTube video (requires authentication and rate limiting)
+  app.post("/api/videos/analyze", isAuthenticated, videoAnalysisRateLimit, async (req: any, res) => {
     try {
       const { url } = req.body;
       
-      // Get userId if user is authenticated, otherwise null
-      let userId = null;
-      if (req.user && req.user.claims && req.user.claims.sub) {
-        userId = req.user.claims.sub;
-      }
+      // User is guaranteed to be authenticated due to middleware
+      const userId = req.user.claims.sub;
       
       if (!url) {
         return res.status(400).json({ message: "YouTube URL is required" });
@@ -59,14 +78,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid YouTube URL" });
       }
       
-      // Check if this video already exists (for authenticated users, check their personal copy)
-      let existingVideo;
-      if (userId) {
-        existingVideo = await storage.getUserVideo(userId, youtubeId);
-      } else {
-        // For unauthenticated users, check if video exists in general
-        existingVideo = await storage.getVideo(youtubeId);
-      }
+      // Check if this video already exists for the authenticated user
+      const existingVideo = await storage.getUserVideo(userId, youtubeId);
       
       if (existingVideo) {
         return res.json(existingVideo);
@@ -89,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         transcript: videoInfo.transcript,
         transcriptData: videoInfo.transcriptData,
         summary,
-        userId, // Associate with user if authenticated, otherwise null
+        userId, // Associate with authenticated user
       });
       
       res.json(video);
@@ -100,27 +113,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Re-analyze YouTube video (refresh the AI summary)
-  app.post("/api/videos/re-analyze", async (req: any, res) => {
+  app.post("/api/videos/re-analyze", isAuthenticated, videoAnalysisRateLimit, async (req: any, res) => {
     try {
       const { youtubeId } = req.body;
       
-      // Get userId if user is authenticated, otherwise null
-      let userId = null;
-      if (req.user && req.user.claims && req.user.claims.sub) {
-        userId = req.user.claims.sub;
-      }
+      // User is guaranteed to be authenticated due to middleware
+      const userId = req.user.claims.sub;
       
       if (!youtubeId) {
         return res.status(400).json({ message: "YouTube ID is required" });
       }
       
-      // Get existing video to retrieve transcript
-      let existingVideo;
-      if (userId) {
-        existingVideo = await storage.getUserVideo(userId, youtubeId);
-      } else {
-        existingVideo = await storage.getVideo(youtubeId);
-      }
+      // Get existing video to retrieve transcript for the authenticated user
+      const existingVideo = await storage.getUserVideo(userId, youtubeId);
       
       if (!existingVideo) {
         return res.status(404).json({ message: "Video not found" });
