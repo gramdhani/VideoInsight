@@ -5,18 +5,7 @@ import { insertVideoSchema, insertChatMessageSchema, insertFeedbackSchema, inser
 import { extractYouTubeId, getVideoInfo } from "./services/youtube";
 import { summarizeVideo, chatAboutVideo, generateQuickQuestions } from "./services/openai";
 import { generateQuickAction } from "./services/quickActions";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-
-// Admin middleware - restrict to specific user ID
-const isAdmin = async (req: any, res: any, next: any) => {
-  const adminUserId = "40339057"; // Your user ID
-  
-  if (!req.user || !req.user.claims || req.user.claims.sub !== adminUserId) {
-    return res.status(403).json({ message: "Admin access required" });
-  }
-  
-  next();
-};
+import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
