@@ -54,16 +54,74 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.5.2 */}
+          {/* Version 0.5.6 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.5.2</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.5.6</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>August 28, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-red-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Security & Protection Update
+                  </h3>
+                  <ul className="text-red-800 text-sm space-y-1">
+                    <li>• <strong>Authentication Protection:</strong> Video analysis endpoints now require user authentication</li>
+                    <li>• <strong>Rate Limiting:</strong> Added comprehensive rate limiting (5 requests per 15 minutes) for expensive operations</li>
+                    <li>• <strong>Session Security:</strong> Enhanced cookie protection with sameSite attribute to prevent CSRF attacks</li>
+                    <li>• <strong>Admin Authorization:</strong> Fixed unprotected admin configuration endpoint with proper access controls</li>
+                    <li>• <strong>Ownership Verification:</strong> Added proper user ownership checks for personalized plans and video access</li>
+                  </ul>
+                </div>
+
+                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-orange-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    XSS & Input Protection
+                  </h3>
+                  <ul className="text-orange-800 text-sm space-y-1">
+                    <li>• <strong>XSS Prevention:</strong> Implemented input sanitization for chart styling to prevent code injection</li>
+                    <li>• <strong>Privacy Protection:</strong> Removed verbose API response logging that exposed sensitive user data</li>
+                    <li>• <strong>Input Validation:</strong> Added CSS color and property sanitization for chart components</li>
+                    <li>• <strong>Error Handling:</strong> Improved security error messages with appropriate status codes</li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Endpoint Security Hardening
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• <strong>Video Analysis:</strong> /api/videos/analyze now requires authentication and rate limiting</li>
+                    <li>• <strong>Video Re-analysis:</strong> /api/videos/re-analyze secured with same protections</li>
+                    <li>• <strong>Admin Configs:</strong> /api/admin/prompt-configs/active now requires admin privileges</li>
+                    <li>• <strong>Resource Protection:</strong> Prevents abuse of expensive AI and API operations</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.5.2 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.5.2</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
