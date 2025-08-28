@@ -72,43 +72,43 @@ function ChangelogContent() {
               </div>
 
               <div className="space-y-4">
-                <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
-                  <h3 className="font-medium text-red-900 mb-2 flex items-center">
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2 flex items-center">
                     <Settings className="w-4 h-4 mr-2" />
-                    Security & Protection Update
+                    Security Enhancements
                   </h3>
-                  <ul className="text-red-800 text-sm space-y-1">
-                    <li>• <strong>Authentication Protection:</strong> Video analysis endpoints now require user authentication</li>
-                    <li>• <strong>Rate Limiting:</strong> Added comprehensive rate limiting (5 requests per 15 minutes) for expensive operations</li>
-                    <li>• <strong>Session Security:</strong> Enhanced cookie protection with sameSite attribute to prevent CSRF attacks</li>
-                    <li>• <strong>Admin Authorization:</strong> Fixed unprotected admin configuration endpoint with proper access controls</li>
-                    <li>• <strong>Ownership Verification:</strong> Added proper user ownership checks for personalized plans and video access</li>
-                  </ul>
-                </div>
-
-                <div className="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
-                  <h3 className="font-medium text-orange-900 mb-2 flex items-center">
-                    <Zap className="w-4 h-4 mr-2" />
-                    XSS & Input Protection
-                  </h3>
-                  <ul className="text-orange-800 text-sm space-y-1">
-                    <li>• <strong>XSS Prevention:</strong> Implemented input sanitization for chart styling to prevent code injection</li>
-                    <li>• <strong>Privacy Protection:</strong> Removed verbose API response logging that exposed sensitive user data</li>
-                    <li>• <strong>Input Validation:</strong> Added CSS color and property sanitization for chart components</li>
-                    <li>• <strong>Error Handling:</strong> Improved security error messages with appropriate status codes</li>
+                  <ul className="text-green-800 text-sm space-y-1">
+                    <li>• Enhanced authentication and authorization across all platform endpoints</li>
+                    <li>• Implemented comprehensive rate limiting to ensure fair usage and prevent abuse</li>
+                    <li>• Strengthened session security with improved cookie protection mechanisms</li>
+                    <li>• Added proper access controls and ownership verification for user data</li>
+                    <li>• Improved input validation and sanitization throughout the application</li>
                   </ul>
                 </div>
 
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
                   <h3 className="font-medium text-blue-900 mb-2 flex items-center">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Endpoint Security Hardening
+                    <Zap className="w-4 h-4 mr-2" />
+                    Performance & Reliability
                   </h3>
                   <ul className="text-blue-800 text-sm space-y-1">
-                    <li>• <strong>Video Analysis:</strong> /api/videos/analyze now requires authentication and rate limiting</li>
-                    <li>• <strong>Video Re-analysis:</strong> /api/videos/re-analyze secured with same protections</li>
-                    <li>• <strong>Admin Configs:</strong> /api/admin/prompt-configs/active now requires admin privileges</li>
-                    <li>• <strong>Resource Protection:</strong> Prevents abuse of expensive AI and API operations</li>
+                    <li>• Enhanced resource protection to maintain service availability for all users</li>
+                    <li>• Improved error handling with better user feedback and system stability</li>
+                    <li>• Streamlined API responses to reduce unnecessary data exposure</li>
+                    <li>• Optimized security validations for faster response times</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Privacy & Data Protection
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Enhanced privacy protections for user data and interactions</li>
+                    <li>• Improved data access controls to ensure users only see their own content</li>
+                    <li>• Strengthened admin interface security with proper privilege verification</li>
+                    <li>• Better protection against common web application vulnerabilities</li>
                   </ul>
                 </div>
               </div>
