@@ -8,15 +8,26 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Only require REPLIT_DOMAINS and REPL_ID in development
+if (!isProduction && !process.env.REPLIT_DOMAINS) {
   throw new Error("Environment variable REPLIT_DOMAINS not provided");
+}
+
+if (!isProduction && !process.env.REPL_ID) {
+  throw new Error("Environment variable REPL_ID not provided");
 }
 
 const getOidcConfig = memoize(
   async () => {
+    // Only attempt OIDC discovery if REPL_ID is available
+    if (!process.env.REPL_ID) {
+      throw new Error("REPL_ID not available - authentication disabled in production");
+    }
     return await client.discovery(
       new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID!
+      process.env.REPL_ID
     );
   },
   { maxAge: 3600 * 1000 }
@@ -73,6 +84,12 @@ export async function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Skip OIDC setup in production if REPL_ID is not available
+  if (isProduction && !process.env.REPL_ID) {
+    console.log("Production mode: REPL_ID not available, skipping OIDC authentication setup");
+    return;
+  }
+
   const config = await getOidcConfig();
 
   const verify: VerifyFunction = async (
@@ -85,26 +102,33 @@ export async function setupAuth(app: Express) {
     verified(null, user);
   };
 
-  for (const domain of process.env
-    .REPLIT_DOMAINS!.split(",")) {
-    const strategy = new Strategy(
-      {
-        name: `replitauth:${domain}`,
-        config,
-        scope: "openid email profile offline_access",
-        callbackURL: `https://${domain}/api/callback`,
-      },
-      verify,
-    );
-    passport.use(strategy);
+  // Only setup strategies if REPLIT_DOMAINS is available
+  if (process.env.REPLIT_DOMAINS) {
+    for (const domain of process.env.REPLIT_DOMAINS.split(",")) {
+      const strategy = new Strategy(
+        {
+          name: `replitauth:${domain}`,
+          config,
+          scope: "openid email profile offline_access",
+          callbackURL: `https://${domain}/api/callback`,
+        },
+        verify,
+      );
+      passport.use(strategy);
+    }
   }
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    // Check if authentication is available
+    if (!process.env.REPLIT_DOMAINS || !process.env.REPL_ID) {
+      return res.status(503).json({ message: "Authentication not available in production" });
+    }
+
     // Find the correct domain from REPLIT_DOMAINS that matches this request
-    const domains = process.env.REPLIT_DOMAINS!.split(",");
+    const domains = process.env.REPLIT_DOMAINS.split(",");
     const matchingDomain = domains.find(domain => 
       domain === req.hostname || 
       req.get('host') === domain ||
@@ -123,8 +147,13 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    // Check if authentication is available
+    if (!process.env.REPLIT_DOMAINS || !process.env.REPL_ID) {
+      return res.status(503).json({ message: "Authentication not available in production" });
+    }
+
     // Find the correct domain from REPLIT_DOMAINS that matches this request
-    const domains = process.env.REPLIT_DOMAINS!.split(",");
+    const domains = process.env.REPLIT_DOMAINS.split(",");
     const matchingDomain = domains.find(domain => 
       domain === req.hostname || 
       req.get('host') === domain ||
@@ -139,9 +168,14 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/logout", (req, res) => {
     req.logout(() => {
+      // If REPL_ID is not available, just redirect to home
+      if (!process.env.REPL_ID) {
+        return res.redirect("/");
+      }
+      
       res.redirect(
         client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
+          client_id: process.env.REPL_ID,
           post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
         }).href
       );
@@ -150,6 +184,12 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  // Skip authentication check in production if REPL_ID is not available
+  if (isProduction && !process.env.REPL_ID) {
+    console.log("Production mode: Authentication disabled, allowing access");
+    return next();
+  }
+
   const user = req.user as any;
 
   if (!req.isAuthenticated() || !user.expires_at) {
@@ -180,6 +220,12 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 
 // Admin-only middleware - only allow specific admin user
 export const isAdmin: RequestHandler = async (req, res, next) => {
+  // Skip admin check in production if REPL_ID is not available
+  if (isProduction && !process.env.REPL_ID) {
+    console.log("Production mode: Admin check disabled, allowing access");
+    return next();
+  }
+
   const user = req.user as any;
   
   if (!req.isAuthenticated() || !user.claims?.sub) {

@@ -7,11 +7,18 @@ import { execSync } from "child_process";
 
 // Validate required environment variables
 function validateEnvironment() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  // Base required environment variables
   const requiredEnvVars = [
     'DATABASE_URL',
-    'SESSION_SECRET',
-    'REPL_ID'
+    'SESSION_SECRET'
   ];
+  
+  // Add REPL_ID only for development environment
+  if (!isProduction) {
+    requiredEnvVars.push('REPL_ID');
+  }
   
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
   
