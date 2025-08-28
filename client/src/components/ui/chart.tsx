@@ -67,6 +67,44 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// Sanitize CSS color values to prevent XSS injection
+function sanitizeCSSColor(color: string): string | null {
+  if (typeof color !== 'string') return null;
+  
+  // Allow only safe CSS color formats:
+  // - Hex colors: #fff, #ffffff, #123abc
+  // - RGB/RGBA: rgb(255, 255, 255), rgba(255, 255, 255, 0.5)
+  // - HSL/HSLA: hsl(240, 100%, 50%), hsla(240, 100%, 50%, 0.5)
+  // - Named colors: red, blue, etc.
+  // - CSS custom properties: var(--color-name)
+  const safeColorPattern = /^(#[0-9a-fA-F]{3,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\)|var\(--[\w-]+\)|[a-zA-Z]+)$/;
+  
+  // Trim whitespace and check pattern
+  const trimmedColor = color.trim();
+  
+  if (!safeColorPattern.test(trimmedColor)) {
+    console.warn(`Potentially unsafe CSS color value blocked: ${color}`);
+    return null;
+  }
+  
+  return trimmedColor;
+}
+
+// Sanitize CSS property key to prevent injection
+function sanitizeCSSKey(key: string): string | null {
+  if (typeof key !== 'string') return null;
+  
+  // Allow only alphanumeric characters, hyphens, and underscores
+  const safeKeyPattern = /^[a-zA-Z0-9_-]+$/;
+  
+  if (!safeKeyPattern.test(key)) {
+    console.warn(`Potentially unsafe CSS key blocked: ${key}`);
+    return null;
+  }
+  
+  return key;
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -85,11 +123,20 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
+    // Sanitize the key to prevent CSS injection
+    const sanitizedKey = sanitizeCSSKey(key);
+    if (!sanitizedKey) return null;
+    
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+      itemConfig.color;
+    
+    // Sanitize the color value to prevent CSS/JS injection
+    const sanitizedColor = color ? sanitizeCSSColor(color) : null;
+    
+    return sanitizedColor ? `  --color-${sanitizedKey}: ${sanitizedColor};` : null;
   })
+  .filter(Boolean) // Remove null entries
   .join("\n")}
 }
 `
