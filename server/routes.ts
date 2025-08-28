@@ -14,14 +14,8 @@ const videoAnalysisRateLimit = rateLimit({
   max: 5, // Allow 5 video analysis requests per 15 minutes per user
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false, // Disable legacy `X-RateLimit-*` headers
-  keyGenerator: (req: any) => {
-    // Rate limit per authenticated user, fallback to IP if not authenticated
-    if (req.user?.claims?.sub) {
-      return `user:${req.user.claims.sub}`;
-    }
-    // For unauthenticated users, use IP (express-rate-limit handles IPv6 properly by default)
-    return `ip:${req.ip}`;
-  },
+  // Rate limit per authenticated user, fallback to default IP handling
+  skip: (req: any) => false, // Don't skip any requests
   message: {
     message: "Too many video analysis requests. Please wait 15 minutes before trying again.",
     retryAfter: "15 minutes"

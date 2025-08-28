@@ -27,7 +27,7 @@ export function getSession() {
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
+    createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
@@ -103,14 +103,35 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Find the correct domain from REPLIT_DOMAINS that matches this request
+    const domains = process.env.REPLIT_DOMAINS!.split(",");
+    const matchingDomain = domains.find(domain => 
+      domain === req.hostname || 
+      req.get('host') === domain ||
+      req.get('x-forwarded-host') === domain
+    ) || domains[0]; // fallback to first domain
+
+    console.log(`Login attempt - hostname: ${req.hostname}, host: ${req.get('host')}, x-forwarded-host: ${req.get('x-forwarded-host')}`);
+    console.log(`Available domains: ${domains.join(', ')}`);
+    console.log(`Selected domain: ${matchingDomain}`);
+    console.log(`Strategy name: replitauth:${matchingDomain}`);
+
+    passport.authenticate(`replitauth:${matchingDomain}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    // Find the correct domain from REPLIT_DOMAINS that matches this request
+    const domains = process.env.REPLIT_DOMAINS!.split(",");
+    const matchingDomain = domains.find(domain => 
+      domain === req.hostname || 
+      req.get('host') === domain ||
+      req.get('x-forwarded-host') === domain
+    ) || domains[0]; // fallback to first domain
+
+    passport.authenticate(`replitauth:${matchingDomain}`, {
       successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
     })(req, res, next);
