@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Profile, PersonalizedPlan } from "@shared/schema";
+import { useVideo } from "@/contexts/VideoContext";
 
 interface TabbedContentProps {
   video: {
@@ -83,6 +84,7 @@ export default function TabbedContent({
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
+  const { setCurrentVideo } = useVideo();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("summary");
   const [selectedProfileId, setSelectedProfileId] = useState<string>("");
@@ -116,6 +118,9 @@ export default function TabbedContent({
       // Update the video data in the query cache
       queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
       queryClient.setQueryData([`/api/videos/id/${video.id}`], updatedVideo);
+      
+      // Update the current video in VideoContext to refresh the UI
+      setCurrentVideo(updatedVideo);
 
       toast({
         title: "Summary regenerated",
