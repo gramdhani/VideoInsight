@@ -1,4 +1,4 @@
-import { Calendar, GitBranch, Zap, Settings, FileText } from "lucide-react";
+import { Calendar, GitBranch, Zap, Settings, FileText, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "../components/header";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -54,16 +54,73 @@ export default function Changelog() {
 function ChangelogContent() {
   return (
     <div className="space-y-8">
-          {/* Version 0.5.6 */}
+          {/* Version 0.5.7 */}
           <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <h2 className="text-xl font-semibold text-gray-900">v0.5.6</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.5.7</h2>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     Latest
                   </span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  <Calendar className="w-4 h-4" />
+                  <span>September 2, 2025</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Enhanced Video Navigation
+                  </h3>
+                  <ul className="text-blue-800 text-sm space-y-1">
+                    <li>• Added clickable timestamps to video outline sections for instant navigation</li>
+                    <li>• Implemented accurate timestamp generation using real transcript data</li>
+                    <li>• Enhanced timestamp precision to match actual video timeline</li>
+                    <li>• Added automatic scroll-to-video functionality when clicking timestamps</li>
+                  </ul>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-green-900 mb-2 flex items-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Video Analysis Improvements
+                  </h3>
+                  <ul className="text-green-800 text-sm space-y-1">
+                    <li>• Updated AI prompts to generate section timestamps from transcript data</li>
+                    <li>• Enhanced video re-analysis to include timestamp refresh capabilities</li>
+                    <li>• Improved frontend state management for real-time video data updates</li>
+                    <li>• Fixed timestamp display issues with proper cache invalidation</li>
+                  </ul>
+                </div>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h3 className="font-medium text-purple-900 mb-2 flex items-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    User Experience Enhancements
+                  </h3>
+                  <ul className="text-purple-800 text-sm space-y-1">
+                    <li>• Smooth scroll animation when jumping to video sections</li>
+                    <li>• Immediate visual feedback for timestamp interactions</li>
+                    <li>• Enhanced mobile experience for video navigation</li>
+                    <li>• Streamlined workflow for video analysis and timestamp viewing</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Version 0.5.6 */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                  <h2 className="text-xl font-semibold text-gray-900">v0.5.6</h2>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
