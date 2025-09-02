@@ -18,7 +18,7 @@ export async function summarizeVideo(
   storage: any,
 ): Promise<{
   shortSummary: string;
-  outline: Array<{ title: string; items: string[] }>;
+  outline: Array<{ title: string; timestamp?: string; items: Array<{ point: string; context: string }> }>;
   keyTakeaways: Array<{
     title: string;
     description: string;
