@@ -55,6 +55,7 @@ interface TabbedContentProps {
       shortSummary: string;
       outline: Array<{
         title: string;
+        timestamp?: string;
         items: Array<{ point: string; context: string }>;
       }>;
       keyTakeaways: Array<{
@@ -451,9 +452,20 @@ export default function TabbedContent({
                         key={index}
                         className="border-l-3 border-blue-300 pl-3 sm:pl-4"
                       >
-                        <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
-                          {index + 1}. {section.title}
-                        </h4>
+                        <div className="flex items-center justify-between mt-[12px] mb-[12px]">
+                          <h4 className="text-gray-800 text-[16px] font-semibold">
+                            {index + 1}. {section.title}
+                          </h4>
+                          {section.timestamp && (
+                            <button
+                              onClick={() => jumpToTimestamp(section.timestamp!)}
+                              className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded hover:bg-blue-300 transition-colors ml-2 flex-shrink-0"
+                              data-testid={`outline-timestamp-${section.timestamp}`}
+                            >
+                              {section.timestamp}
+                            </button>
+                          )}
+                        </div>
                         <ul className="space-y-3">
                           {section.items?.map((item, itemIndex) => (
                             <li

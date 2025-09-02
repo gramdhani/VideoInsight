@@ -54,6 +54,7 @@ Respond with JSON in this exact format:
   "outline": [
     {
       "title": "Section name (e.g., Introduction, Main Concept, etc.)",
+      "timestamp": "MM:SS (when this section starts in the video)",
       "items": ["Key point 1", "Key point 2", "Key point 3"]
     }
   ],
@@ -78,7 +79,8 @@ Respond with JSON in this exact format:
 GUIDELINES:
 - Use simple words everyone can understand
 - Make takeaways practical and useful
-- Include timestamps when referencing specific video moments
+- Include timestamps for each outline section (when each major section starts)
+- Include timestamps when referencing specific video moments in takeaways
 - Prioritize action steps: high (do first), medium (do soon), low (do later)
 - Keep everything clear and actionable`;
 
