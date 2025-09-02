@@ -53,9 +53,20 @@ interface TabbedContentProps {
     }>;
     summary: {
       shortSummary: string;
-      outline: Array<{ title: string; items: Array<{ point: string; context: string }> }>;
-      keyTakeaways: Array<{ title: string; description: string; timestamp?: string }>;
-      actionableSteps: Array<{ step: string; description: string; priority: 'high' | 'medium' | 'low' }>;
+      outline: Array<{
+        title: string;
+        items: Array<{ point: string; context: string }>;
+      }>;
+      keyTakeaways: Array<{
+        title: string;
+        description: string;
+        timestamp?: string;
+      }>;
+      actionableSteps: Array<{
+        step: string;
+        description: string;
+        priority: "high" | "medium" | "low";
+      }>;
       readingTime: string;
       insights: number;
     };
@@ -93,9 +104,9 @@ export default function TabbedContent({
   const resummaryMutation = useMutation({
     mutationFn: async () => {
       if (!video.youtubeId) throw new Error("Video ID is required");
-      
-      const response = await apiRequest("POST", "/api/videos/re-analyze", { 
-        youtubeId: video.youtubeId 
+
+      const response = await apiRequest("POST", "/api/videos/re-analyze", {
+        youtubeId: video.youtubeId,
       });
       return response.json();
     },
@@ -104,7 +115,7 @@ export default function TabbedContent({
       // Update the video data in the query cache
       queryClient.invalidateQueries({ queryKey: ["/api/videos"] });
       queryClient.setQueryData([`/api/videos/id/${video.id}`], updatedVideo);
-      
+
       toast({
         title: "Summary regenerated",
         description: "The AI has created a fresh analysis of this video.",
@@ -124,7 +135,7 @@ export default function TabbedContent({
   const generatePlan = useMutation({
     mutationFn: async (profileId: string) => {
       if (!video.id) throw new Error("Video ID is required");
-      
+
       const response = await fetch(`/api/videos/${video.id}/plans`, {
         method: "POST",
         headers: {
@@ -132,18 +143,18 @@ export default function TabbedContent({
         },
         body: JSON.stringify({ profileId }),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || "Failed to generate plan");
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
       setCurrentPlan(data);
-      queryClient.invalidateQueries({ 
-        queryKey: [`/api/videos/${video.id}/plans/${selectedProfileId}`] 
+      queryClient.invalidateQueries({
+        queryKey: [`/api/videos/${video.id}/plans/${selectedProfileId}`],
       });
       toast({
         title: "Plan generated",
@@ -175,27 +186,31 @@ export default function TabbedContent({
     }
   };
 
-  const getPriorityColor = (priority: 'high' | 'medium' | 'low') => {
+  const getPriorityColor = (priority: "high" | "medium" | "low") => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
+      case "high":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
     }
   };
 
   // Filter transcript based on search query
-  const filteredTranscript = transcriptData?.filter(segment =>
-    segment.text.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredTranscript =
+    transcriptData?.filter((segment) =>
+      segment.text.toLowerCase().includes(searchQuery.toLowerCase()),
+    ) || [];
 
   // Copy all transcript text to clipboard
   const copyAllTranscript = async () => {
     if (!transcriptData) return;
-    
+
     const fullText = transcriptData
-      .map(segment => `${segment.startTimeText} ${segment.text}`)
-      .join('\n');
-    
+      .map((segment) => `${segment.startTimeText} ${segment.text}`)
+      .join("\n");
+
     try {
       await navigator.clipboard.writeText(fullText);
       toast({
@@ -217,19 +232,25 @@ export default function TabbedContent({
   };
 
   return (
-    <Card className={`modern-card shadow-modern ${isMobile ? 'mobile-card' : ''}`}>
-      <CardContent className={`${isMobile ? 'p-4' : 'p-3 sm:p-6'}`}>
-        <div className={`flex items-center justify-between mb-3 sm:mb-4 ${
-          isMobile ? 'flex-col space-y-3' : ''
-        }`}>
+    <Card
+      className={`modern-card shadow-modern ${isMobile ? "mobile-card" : ""}`}
+    >
+      <CardContent className={`${isMobile ? "p-4" : "p-3 sm:p-6"}`}>
+        <div
+          className={`flex items-center justify-between mb-3 sm:mb-4 ${
+            isMobile ? "flex-col space-y-3" : ""
+          }`}
+        >
           <h2
             className={`${
               isMobile ? "text-lg" : "text-xl"
             } font-semibold flex items-center space-x-2 text-foreground`}
           >
-            <Lightbulb className={`text-primary ${
-              isMobile ? 'w-5 h-5' : 'w-4 h-4 sm:w-5 sm:h-5'
-            }`} />
+            <Lightbulb
+              className={`text-primary ${
+                isMobile ? "w-5 h-5" : "w-4 h-4 sm:w-5 sm:h-5"
+              }`}
+            />
             <span>{isMobile ? "Analysis" : "AI Analysis"}</span>
           </h2>
           <div className="flex space-x-2">
@@ -237,7 +258,7 @@ export default function TabbedContent({
               variant="ghost"
               size={isMobile ? "default" : "sm"}
               title="Regenerate Summary"
-              className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
+              className={`hover:bg-muted ${isMobile ? "touch-target" : ""}`}
               onClick={() => {
                 setIsResummarizing(true);
                 resummaryMutation.mutate();
@@ -245,50 +266,54 @@ export default function TabbedContent({
               disabled={resummaryMutation.isPending || isResummarizing}
             >
               {resummaryMutation.isPending || isResummarizing ? (
-                <Loader2 className={`animate-spin ${
-                  isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
-                }`} />
+                <Loader2
+                  className={`animate-spin ${
+                    isMobile ? "w-4 h-4" : "w-3 h-3 sm:w-4 sm:h-4"
+                  }`}
+                />
               ) : (
-                <RotateCcw className={`${
-                  isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
-                }`} />
+                <RotateCcw
+                  className={`${
+                    isMobile ? "w-4 h-4" : "w-3 h-3 sm:w-4 sm:h-4"
+                  }`}
+                />
               )}
             </Button>
             <Button
               variant="ghost"
               size={isMobile ? "default" : "sm"}
               title="Export Summary"
-              className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
+              className={`hover:bg-muted ${isMobile ? "touch-target" : ""}`}
             >
-              <Download className={`${
-                isMobile ? 'w-4 h-4' : 'w-3 h-3 sm:w-4 sm:h-4'
-              }`} />
+              <Download
+                className={`${isMobile ? "w-4 h-4" : "w-3 h-3 sm:w-4 sm:h-4"}`}
+              />
             </Button>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full grid-cols-3 ${
-            isMobile ? 'h-12' : ''
-          }`}>
-            <TabsTrigger 
-              value="summary" 
+          <TabsList
+            className={`grid w-full grid-cols-3 ${isMobile ? "h-12" : ""}`}
+          >
+            <TabsTrigger
+              value="summary"
               data-testid="tab-summary"
-              className={isMobile ? 'text-sm touch-target' : ''}
+              className={isMobile ? "text-sm touch-target" : ""}
             >
               Summary
             </TabsTrigger>
-            <TabsTrigger 
-              value="plan" 
+            <TabsTrigger
+              value="plan"
               data-testid="tab-plan"
-              className={isMobile ? 'text-sm touch-target' : ''}
+              className={isMobile ? "text-sm touch-target" : ""}
             >
               {isMobile ? "Plan" : "Personalized Plan"}
             </TabsTrigger>
-            <TabsTrigger 
-              value="transcript" 
+            <TabsTrigger
+              value="transcript"
               data-testid="tab-transcript"
-              className={isMobile ? 'text-sm touch-target' : ''}
+              className={isMobile ? "text-sm touch-target" : ""}
             >
               Transcript
             </TabsTrigger>
@@ -345,7 +370,10 @@ export default function TabbedContent({
                   </div>
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div
+                        key={i}
+                        className="bg-blue-50 border border-blue-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start mb-2">
                           <Skeleton className="h-5 w-40" />
                           <Skeleton className="h-6 w-16 rounded" />
@@ -365,7 +393,10 @@ export default function TabbedContent({
                   </div>
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={i}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center space-x-2">
                             <Skeleton className="w-4 h-4" />
@@ -401,129 +432,158 @@ export default function TabbedContent({
                     <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                     <span>Summary</span>
                   </h3>
-                  <p className={`text-foreground leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
+                  <p
+                    className={`text-foreground leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}
+                  >
                     {parseMarkdownLinks(summary.shortSummary)}
                   </p>
                 </div>
 
-            {/* Outline */}
-            <div>
-              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
-                <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-                <span>Outline</span>
-              </h3>
-              <div className="space-y-3">
-                {summary.outline?.map((section, index) => (
-                  <div key={index} className="border-l-3 border-blue-300 pl-3 sm:pl-4">
-                    <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
-                      {index + 1}. {section.title}
-                    </h4>
-                    <ul className="space-y-3">
-                      {section.items?.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-start space-x-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="text-gray-800 font-medium text-[15px] mb-1">
-                              {typeof item === 'string' ? parseMarkdownLinks(item) : parseMarkdownLinks(item.point)}
-                            </div>
-                            {typeof item === 'object' && item.context && (
-                              <div className="text-gray-600 text-[14px] leading-relaxed">
-                                {parseMarkdownLinks(item.context)}
-                              </div>
-                            )}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Key Takeaways */}
-            <div>
-              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
-                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
-                <span>Key Takeaways</span>
-              </h3>
-              <div className="space-y-3">
-                {summary.keyTakeaways?.map((takeaway, index) => (
-                  <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="text-blue-900 text-base font-semibold">
-                        {takeaway.title}
-                      </h4>
-                      {takeaway.timestamp && (
-                        <button
-                          onClick={() => jumpToTimestamp(takeaway.timestamp!)}
-                          className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded hover:bg-blue-300 transition-colors"
-                          data-testid={`timestamp-${takeaway.timestamp}`}
-                        >
-                          {takeaway.timestamp}
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-blue-800 text-[15px]">
-                      {parseMarkdownLinks(takeaway.description)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Actionable Next Steps */}
-            <div>
-              <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
-                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
-                <span>Next Steps</span>
-              </h3>
-              <div className="space-y-3">
-                {summary.actionableSteps?.map((step, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <ArrowRight className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-400`} />
-                        <h4 className="text-foreground text-base font-semibold">
-                          {step.step}
+                {/* Outline */}
+                <div>
+                  <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                    <span>Outline</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {summary.outline?.map((section, index) => (
+                      <div
+                        key={index}
+                        className="border-l-3 border-blue-300 pl-3 sm:pl-4"
+                      >
+                        <h4 className="text-gray-800 text-[16px] font-semibold mt-[12px] mb-[12px]">
+                          {index + 1}. {section.title}
                         </h4>
+                        <ul className="space-y-3">
+                          {section.items?.map((item, itemIndex) => (
+                            <li
+                              key={itemIndex}
+                              className="flex items-start space-x-3"
+                            >
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
+                              <div className="flex-1">
+                                <div className="text-gray-800 font-medium text-[15px] mb-1 font-semibold">
+                                  {typeof item === "string"
+                                    ? parseMarkdownLinks(item)
+                                    : parseMarkdownLinks(item.point)}
+                                </div>
+                                {typeof item === "object" && item.context && (
+                                  <div className="text-gray-600 text-[15px] leading-relaxed">
+                                    {parseMarkdownLinks(item.context)}
+                                  </div>
+                                )}
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                      <Badge variant="outline" className={`${getPriorityColor(step.priority)} text-xs`}>
-                        {step.priority}
-                      </Badge>
-                    </div>
-                    <p className="text-muted-foreground ml-6 text-[15px]">
-                      {parseMarkdownLinks(step.description)}
-                    </p>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Quick Stats */}
-            <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                {/* Key Takeaways */}
                 <div>
-                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-primary`}>
-                    {summary.readingTime}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {isMobile ? "Read Time" : "Reading Time"}
+                  <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
+                    <span>Key Takeaways</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {summary.keyTakeaways?.map((takeaway, index) => (
+                      <div
+                        key={index}
+                        className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="text-blue-900 text-base font-semibold">
+                            {takeaway.title}
+                          </h4>
+                          {takeaway.timestamp && (
+                            <button
+                              onClick={() =>
+                                jumpToTimestamp(takeaway.timestamp!)
+                              }
+                              className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded hover:bg-blue-300 transition-colors"
+                              data-testid={`timestamp-${takeaway.timestamp}`}
+                            >
+                              {takeaway.timestamp}
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-blue-800 text-[15px]">
+                          {parseMarkdownLinks(takeaway.description)}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
+                {/* Actionable Next Steps */}
                 <div>
-                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}>
-                    {summary.keyTakeaways?.length || 0}
+                  <h3 className="text-foreground mb-2 sm:mb-3 flex items-center space-x-2 text-[20px] font-semibold">
+                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                    <span>Next Steps</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {summary.actionableSteps?.map((step, index) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <ArrowRight
+                              className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-400`}
+                            />
+                            <h4 className="text-foreground text-base font-semibold">
+                              {step.step}
+                            </h4>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className={`${getPriorityColor(step.priority)} text-xs`}
+                          >
+                            {step.priority}
+                          </Badge>
+                        </div>
+                        <p className="text-muted-foreground ml-6 text-[15px]">
+                          {parseMarkdownLinks(step.description)}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-xs text-gray-600">Takeaways</div>
                 </div>
-                <div>
-                  <div className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-accent`}>
-                    {summary.insights}
+
+                {/* Quick Stats */}
+                <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                    <div>
+                      <div
+                        className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-primary`}
+                      >
+                        {summary.readingTime}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {isMobile ? "Read Time" : "Reading Time"}
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-secondary`}
+                      >
+                        {summary.keyTakeaways?.length || 0}
+                      </div>
+                      <div className="text-xs text-gray-600">Takeaways</div>
+                    </div>
+                    <div>
+                      <div
+                        className={`${isMobile ? "text-base" : "text-lg"} font-semibold text-accent`}
+                      >
+                        {summary.insights}
+                      </div>
+                      <div className="text-xs text-gray-600">Insights</div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-600">Insights</div>
                 </div>
-              </div>
-            </div>
               </>
             )}
           </TabsContent>
@@ -559,32 +619,48 @@ export default function TabbedContent({
                 {/* Transcript Content */}
                 <ScrollArea className="h-96 w-full rounded-md border p-4">
                   <div className="space-y-3">
-                    {(searchQuery ? filteredTranscript : transcriptData).map((segment, index) => (
-                      <div key={index} className="flex items-start space-x-3 group">
-                        <button
-                          onClick={() => jumpToTimestamp(segment.startTimeText)}
-                          className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
-                          data-testid={`timestamp-${segment.startTimeText}`}
+                    {(searchQuery ? filteredTranscript : transcriptData).map(
+                      (segment, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start space-x-3 group"
                         >
-                          {segment.startTimeText}
-                        </button>
-                        <p className={`text-gray-700 leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}>
-                          {searchQuery && segment.text.toLowerCase().includes(searchQuery.toLowerCase()) ? (
-                            segment.text.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, partIndex) =>
-                              part.toLowerCase() === searchQuery.toLowerCase() ? (
-                                <mark key={partIndex} className="bg-yellow-200 px-1 rounded">
-                                  {part}
-                                </mark>
-                              ) : (
-                                part
-                              )
-                            )
-                          ) : (
+                          <button
+                            onClick={() =>
+                              jumpToTimestamp(segment.startTimeText)
+                            }
+                            className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+                            data-testid={`timestamp-${segment.startTimeText}`}
+                          >
+                            {segment.startTimeText}
+                          </button>
+                          <p
+                            className={`text-gray-700 leading-relaxed ${isMobile ? "text-sm" : "text-base"}`}
+                          >
+                            {searchQuery &&
                             segment.text
-                          )}
-                        </p>
-                      </div>
-                    ))}
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase())
+                              ? segment.text
+                                  .split(new RegExp(`(${searchQuery})`, "gi"))
+                                  .map((part, partIndex) =>
+                                    part.toLowerCase() ===
+                                    searchQuery.toLowerCase() ? (
+                                      <mark
+                                        key={partIndex}
+                                        className="bg-yellow-200 px-1 rounded"
+                                      >
+                                        {part}
+                                      </mark>
+                                    ) : (
+                                      part
+                                    ),
+                                  )
+                              : segment.text}
+                          </p>
+                        </div>
+                      ),
+                    )}
                     {searchQuery && filteredTranscript.length === 0 && (
                       <div className="text-center text-gray-500 py-8">
                         <p>No results found for "{searchQuery}"</p>
@@ -605,22 +681,32 @@ export default function TabbedContent({
             {!isAuthenticated ? (
               <div className="text-center py-8">
                 <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Sign in to create personalized plans</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Sign in to create personalized plans
+                </h3>
                 <p className="text-muted-foreground mb-4">
                   Get tailored action plans based on your profile
                 </p>
-                <Button onClick={() => window.location.href = '/api/login'} data-testid="button-signin-plan">
+                <Button
+                  onClick={() => (window.location.href = "/api/login")}
+                  data-testid="button-signin-plan"
+                >
                   Sign In
                 </Button>
               </div>
             ) : profiles.length === 0 ? (
               <div className="text-center py-8">
                 <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No profiles found</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  No profiles found
+                </h3>
                 <p className="text-muted-foreground mb-4">
                   Create a profile first to get personalized action plans
                 </p>
-                <Button onClick={() => window.location.href = '/profile'} data-testid="button-create-profile-plan">
+                <Button
+                  onClick={() => (window.location.href = "/profile")}
+                  data-testid="button-create-profile-plan"
+                >
                   Create Profile
                 </Button>
               </div>
@@ -628,8 +714,14 @@ export default function TabbedContent({
               <div className="space-y-6">
                 {/* Profile Selector */}
                 <div className="flex items-center space-x-4">
-                  <Select value={selectedProfileId} onValueChange={setSelectedProfileId}>
-                    <SelectTrigger className="flex-1" data-testid="select-profile">
+                  <Select
+                    value={selectedProfileId}
+                    onValueChange={setSelectedProfileId}
+                  >
+                    <SelectTrigger
+                      className="flex-1"
+                      data-testid="select-profile"
+                    >
                       <SelectValue placeholder="Select a profile" />
                     </SelectTrigger>
                     <SelectContent>
@@ -663,24 +755,49 @@ export default function TabbedContent({
                           <Card key={index} className="p-4">
                             <div className="space-y-3">
                               <div className="flex justify-between items-start">
-                                <h4 className="font-semibold text-lg flex-1">{item.title}</h4>
+                                <h4 className="font-semibold text-lg flex-1">
+                                  {item.title}
+                                </h4>
                                 <div className="flex space-x-2">
-                                  <Badge variant={item.effort === 'low' ? 'secondary' : item.effort === 'medium' ? 'default' : 'destructive'}>
+                                  <Badge
+                                    variant={
+                                      item.effort === "low"
+                                        ? "secondary"
+                                        : item.effort === "medium"
+                                          ? "default"
+                                          : "destructive"
+                                    }
+                                  >
                                     {item.effort} effort
                                   </Badge>
-                                  <Badge variant={item.impact === 'high' ? 'default' : item.impact === 'medium' ? 'secondary' : 'outline'}>
+                                  <Badge
+                                    variant={
+                                      item.impact === "high"
+                                        ? "default"
+                                        : item.impact === "medium"
+                                          ? "secondary"
+                                          : "outline"
+                                    }
+                                  >
                                     {item.impact} impact
                                   </Badge>
                                 </div>
                               </div>
 
-                              <p className="text-foreground text-base text-pretty leading-relaxed">{item.whyItMatters}</p>
+                              <p className="text-foreground text-base text-pretty leading-relaxed">
+                                {item.whyItMatters}
+                              </p>
 
                               <div className="space-y-2">
-                                <div className="text-base font-medium">Steps:</div>
+                                <div className="text-base font-medium">
+                                  Steps:
+                                </div>
                                 <ol className="list-decimal list-inside space-y-2">
                                   {item.steps?.map((step, stepIndex) => (
-                                    <li key={stepIndex} className="text-base text-foreground text-pretty leading-relaxed">
+                                    <li
+                                      key={stepIndex}
+                                      className="text-base text-foreground text-pretty leading-relaxed"
+                                    >
                                       {step}
                                     </li>
                                   ))}
@@ -692,14 +809,16 @@ export default function TabbedContent({
                                   <div className="flex items-center space-x-2">
                                     <BarChart className="w-5 h-5 text-foreground" />
                                     <span className="text-foreground text-pretty">
-                                      {item.metric?.name}: {item.metric?.target} in {item.metric?.timeframeDays} days
+                                      {item.metric?.name}: {item.metric?.target}{" "}
+                                      in {item.metric?.timeframeDays} days
                                     </span>
                                   </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Clock className="w-5 h-5 text-foreground" />
                                   <span className="text-foreground text-pretty">
-                                    Complete in {item.suggestedDeadlineDays} days
+                                    Complete in {item.suggestedDeadlineDays}{" "}
+                                    days
                                   </span>
                                 </div>
                               </div>
@@ -710,46 +829,58 @@ export default function TabbedContent({
                     </div>
 
                     {/* Quick Wins */}
-                    {currentPlan.plan.quickWins && currentPlan.plan.quickWins.length > 0 && (
-                      <div>
-                        <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
-                          <Zap className="w-5 h-5 text-accent" />
-                          <span>Quick Wins</span>
-                        </h3>
-                        <div className="space-y-3">
-                          {currentPlan.plan.quickWins.map((quickWin, index) => (
-                            <Card key={index} className="p-4">
-                              <h4 className="font-semibold mb-2">{quickWin.title}</h4>
-                              <ul className="space-y-1">
-                                {quickWin.steps?.map((step, stepIndex) => (
-                                  <li key={stepIndex} className="text-sm text-muted-foreground flex items-start">
-                                    <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                                    {step}
-                                  </li>
-                                ))}
-                              </ul>
-                            </Card>
-                          ))}
+                    {currentPlan.plan.quickWins &&
+                      currentPlan.plan.quickWins.length > 0 && (
+                        <div>
+                          <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
+                            <Zap className="w-5 h-5 text-accent" />
+                            <span>Quick Wins</span>
+                          </h3>
+                          <div className="space-y-3">
+                            {currentPlan.plan.quickWins.map(
+                              (quickWin, index) => (
+                                <Card key={index} className="p-4">
+                                  <h4 className="font-semibold mb-2">
+                                    {quickWin.title}
+                                  </h4>
+                                  <ul className="space-y-1">
+                                    {quickWin.steps?.map((step, stepIndex) => (
+                                      <li
+                                        key={stepIndex}
+                                        className="text-sm text-muted-foreground flex items-start"
+                                      >
+                                        <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                                        {step}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </Card>
+                              ),
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 )}
 
                 {/* Empty State */}
-                {selectedProfileId && !currentPlan && !generatePlan.isPending && (
-                  <div className="text-center py-8">
-                    <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No plan generated yet</h3>
-                    <p className="text-muted-foreground">
-                      Click "Generate Plan" to create your personalized action plan
-                    </p>
-                  </div>
-                )}
+                {selectedProfileId &&
+                  !currentPlan &&
+                  !generatePlan.isPending && (
+                    <div className="text-center py-8">
+                      <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">
+                        No plan generated yet
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Click "Generate Plan" to create your personalized action
+                        plan
+                      </p>
+                    </div>
+                  )}
               </div>
             )}
           </TabsContent>
-
         </Tabs>
       </CardContent>
     </Card>

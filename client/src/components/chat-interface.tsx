@@ -61,7 +61,7 @@ export default function ChatInterface({
           // Return empty array for unauthenticated users
           return [];
         }
-        throw new Error('Failed to fetch messages');
+        throw new Error("Failed to fetch messages");
       }
       return response.json();
     },
@@ -72,7 +72,10 @@ export default function ChatInterface({
   const { data: questionsData, isLoading: questionsLoading } = useQuery({
     queryKey: ["/api/videos", video.youtubeId, "quick-questions"],
     queryFn: async () => {
-      const response = await apiRequest("GET", `/api/videos/${video.youtubeId}/quick-questions`);
+      const response = await apiRequest(
+        "GET",
+        `/api/videos/${video.youtubeId}/quick-questions`,
+      );
       return response.json();
     },
     staleTime: 1000 * 60 * 30, // Cache for 30 minutes
@@ -112,7 +115,9 @@ export default function ChatInterface({
   useEffect(() => {
     const scrollToBottom = () => {
       if (scrollAreaRef.current) {
-        const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        const scrollElement = scrollAreaRef.current.querySelector(
+          "[data-radix-scroll-area-viewport]",
+        );
         if (scrollElement) {
           scrollElement.scrollTop = scrollElement.scrollHeight;
         }
@@ -129,7 +134,9 @@ export default function ChatInterface({
     if (!chatMutation.isPending && !pendingMessage) {
       const scrollToBottom = () => {
         if (scrollAreaRef.current) {
-          const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+          const scrollElement = scrollAreaRef.current.querySelector(
+            "[data-radix-scroll-area-viewport]",
+          );
           if (scrollElement) {
             scrollElement.scrollTop = scrollElement.scrollHeight;
           }
@@ -162,70 +169,74 @@ export default function ChatInterface({
       }`}
     >
       {/* Chat Header */}
-      <div className={`border-b border-border ${isMobile ? 'p-4' : 'p-3 sm:p-4'}`}>
+      <div
+        className={`border-b border-border ${isMobile ? "p-4" : "p-3 sm:p-4"}`}
+      >
         <div className="flex items-center justify-between">
           <h2
             className={`${
               isMobile ? "text-base" : "text-lg"
             } font-semibold flex items-center space-x-2 text-foreground`}
           >
-            <MessageCircle className={`text-primary ${
-              isMobile ? 'w-5 h-5' : 'w-4 h-4 sm:w-5 sm:h-5'
-            }`} />
+            <MessageCircle
+              className={`text-primary ${
+                isMobile ? "w-5 h-5" : "w-4 h-4 sm:w-5 sm:h-5"
+              }`}
+            />
             <span>{isMobile ? "Ask AI" : "Ask About This Video"}</span>
           </h2>
           <Button
             variant="ghost"
             size={isMobile ? "default" : "sm"}
             title="Clear Chat"
-            className={`hover:bg-muted ${isMobile ? 'touch-target' : ''}`}
+            className={`hover:bg-muted ${isMobile ? "touch-target" : ""}`}
           >
-            <Trash2 className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} />
+            <Trash2 className={`${isMobile ? "w-5 h-5" : "w-4 h-4"}`} />
           </Button>
         </div>
-        
       </div>
 
       {/* Chat Messages */}
       <ScrollArea ref={scrollAreaRef} className="flex-1 p-3 sm:p-4">
         <div className="space-y-3 sm:space-y-4">
-
-
           {/* Quick Questions - Only show when there are no messages */}
-          {messages.length === 0 && !questionsLoading && questions.length > 0 && (
-            <div className="space-y-3">
-              <div className="text-sm font-medium text-muted-foreground px-1">
-                Start your video chat with these quick questions!
+          {messages.length === 0 &&
+            !questionsLoading &&
+            questions.length > 0 && (
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-muted-foreground px-1">
+                  Start your video chat with these quick questions!
+                </div>
+                <div className="space-y-2">
+                  {questions.map((question: string, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          toast({
+                            title: "Authentication Required",
+                            description:
+                              "Please log in to chat with the AI about this video.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        chatMutation.mutate(question);
+                      }}
+                      disabled={chatMutation.isPending}
+                      className={`w-full text-left rounded-lg bg-gray-50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 hover:border-primary/30 transition-all leading-relaxed shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isMobile
+                          ? "p-4 text-[15px] touch-target"
+                          : "p-3 text-[15px]"
+                      }`}
+                      data-testid={`quick-question-${index}`}
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-2">
-                {questions.map((question: string, index: number) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      if (!isAuthenticated) {
-                        toast({
-                          title: "Authentication Required",
-                          description: "Please log in to chat with the AI about this video.",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      chatMutation.mutate(question);
-                    }}
-                    disabled={chatMutation.isPending}
-                    className={`w-full text-left rounded-lg bg-gray-50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/30 hover:border-primary/30 transition-all leading-relaxed shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isMobile 
-                        ? 'p-4 text-[15px] touch-target' 
-                        : 'p-3 text-[15px]'
-                    }`}
-                    data-testid={`quick-question-${index}`}
-                  >
-                    {question}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
           {/* Loading state for Quick Questions */}
           {messages.length === 0 && questionsLoading && (
@@ -248,41 +259,42 @@ export default function ChatInterface({
           )}
 
           {/* Chat Messages */}
-          {Array.isArray(messages) && messages.map((msg: any, index: number) => (
-            <div key={msg.id}>
-              {/* User Message */}
-              <div className="flex items-start space-x-2 sm:space-x-3 justify-end mb-3 sm:mb-4">
-                <div
-                  className={`bg-primary text-white rounded-lg rounded-tr-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-xs"}`}
-                >
-                  <p className="text-[15px]">{msg.message}</p>
-                  <span className="text-xs text-indigo-200 mt-1 block">
-                    {new Date(msg.createdAt).toLocaleTimeString()}
-                  </span>
-                </div>
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-                </div>
-              </div>
-
-              {/* AI Response */}
-              <div className="flex items-start space-x-2 sm:space-x-3">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-                </div>
-                <div
-                  className={`bg-muted rounded-lg rounded-tl-none p-3 sm:p-4 ${isMobile ? "max-w-[85%]" : "max-w-lg"}`}
-                >
-                  <div className="text-[15px] leading-relaxed">
-                    {parseMarkdownText(msg.response, onTimestampClick)}
+          {Array.isArray(messages) &&
+            messages.map((msg: any, index: number) => (
+              <div key={msg.id}>
+                {/* User Message */}
+                <div className="flex items-start space-x-2 sm:space-x-3 justify-end mb-3 sm:mb-4">
+                  <div
+                    className={`bg-primary text-white rounded-lg rounded-tr-none p-2 sm:p-3 ${isMobile ? "max-w-[85%]" : "max-w-xs"}`}
+                  >
+                    <p className="text-[15px]">{msg.message}</p>
+                    <span className="text-xs text-indigo-200 mt-1 block">
+                      {new Date(msg.createdAt).toLocaleTimeString()}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground mt-2 block">
-                    {new Date(msg.createdAt).toLocaleTimeString()}
-                  </span>
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+                  </div>
+                </div>
+
+                {/* AI Response */}
+                <div className="flex items-start space-x-2 sm:space-x-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  <div
+                    className={`bg-muted rounded-lg rounded-tl-none p-3 sm:p-4 ${isMobile ? "max-w-[85%]" : "max-w-lg"}`}
+                  >
+                    <div className="text-[15px] leading-relaxed">
+                      {parseMarkdownText(msg.response, onTimestampClick)}
+                    </div>
+                    <span className="text-xs text-muted-foreground mt-2 block">
+                      {new Date(msg.createdAt).toLocaleTimeString()}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
 
           {/* Show pending user message immediately */}
           {pendingMessage && (
@@ -335,7 +347,7 @@ export default function ChatInterface({
                 variant="outline"
                 size={isMobile ? "sm" : "default"}
                 disabled={chatMutation.isPending}
-                className="flex-shrink-0"
+                className="flex-shrink-0 min-h-[44px]"
               >
                 <Zap className="w-4 h-4" />
                 <ChevronDown className="w-3 h-3 ml-1" />
@@ -343,28 +355,38 @@ export default function ChatInterface({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuItem
-                onClick={() => setMessage("Give me a shorter summary of this video")}
+                onClick={() =>
+                  setMessage("Give me a shorter summary of this video")
+                }
                 disabled={chatMutation.isPending}
               >
                 <Lightbulb className="w-4 h-4 mr-2" />
                 Shorter Summary
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setMessage("What are the main action items from this video?")}
+                onClick={() =>
+                  setMessage("What are the main action items from this video?")
+                }
                 disabled={chatMutation.isPending}
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Action Items
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setMessage("What are the most important quotes from this video?")}
+                onClick={() =>
+                  setMessage(
+                    "What are the most important quotes from this video?",
+                  )
+                }
                 disabled={chatMutation.isPending}
               >
                 <Hash className="w-4 h-4 mr-2" />
                 Key Quotes
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setMessage("Give me a detailed analysis of this video")}
+                onClick={() =>
+                  setMessage("Give me a detailed analysis of this video")
+                }
                 disabled={chatMutation.isPending}
               >
                 <Clock className="w-4 h-4 mr-2" />
@@ -388,7 +410,7 @@ export default function ChatInterface({
           <Button
             type="submit"
             disabled={chatMutation.isPending || !message.trim()}
-            className="bg-primary text-white hover:bg-indigo-700 transition-colors"
+            className="bg-primary text-white hover:bg-indigo-700 transition-colors min-h-[44px]"
             size={isMobile ? "sm" : "default"}
           >
             <Send className="w-4 h-4" />
@@ -396,8 +418,7 @@ export default function ChatInterface({
         </form>
         <div
           className={`flex items-center ${isMobile ? "justify-center" : "justify-between"} mt-2`}
-        >
-        </div>
+        ></div>
       </div>
     </Card>
   );
