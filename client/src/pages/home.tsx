@@ -23,6 +23,7 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
+  const videoSectionRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
 
   // Check for video parameter from Library
@@ -68,7 +69,15 @@ export default function Home() {
 
     const seconds = timeToSeconds(timestamp);
     console.log("Jumping to seconds:", seconds);
+    
+    // Jump to the timestamp in the video
     videoPlayerRef.current?.jumpToTime(seconds);
+    
+    // Scroll to the video section
+    videoSectionRef.current?.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
   };
 
   const handleLatestVideoClick = (video: Video) => {
@@ -181,7 +190,7 @@ export default function Home() {
             }`}
           >
             {/* Left Column / Mobile Stack */}
-            <div className={`space-y-4 sm:space-y-6 ${isMobile ? "mobile-padding" : ""}`}>
+            <div ref={videoSectionRef} className={`space-y-4 sm:space-y-6 ${isMobile ? "mobile-padding" : ""}`}>
               <VideoPlayer ref={videoPlayerRef} video={currentVideo} />
               <TabbedContent
                 video={{
