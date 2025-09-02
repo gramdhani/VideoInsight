@@ -82,8 +82,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get video information from YouTube
       const videoInfo = await getVideoInfo(youtubeId);
       
-      // Generate AI summary
-      const summary = await summarizeVideo(videoInfo.transcript || "", videoInfo.title, storage);
+      // Generate AI summary using transcriptData for accurate timestamps
+      const formattedTranscript = videoInfo.transcriptData && videoInfo.transcriptData.length > 0
+        ? videoInfo.transcriptData.map((segment: any) => 
+            `[${segment.startTimeText}] ${segment.text}`
+          ).join('\n')
+        : videoInfo.transcript || "";
+      
+      const summary = await summarizeVideo(formattedTranscript, videoInfo.title, storage);
       
       // Create video record
       const video = await storage.createVideo({
@@ -125,8 +131,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Video not found" });
       }
       
-      // Generate fresh AI summary
-      const summary = await summarizeVideo(existingVideo.transcript || "", existingVideo.title, storage);
+      // Generate fresh AI summary using transcriptData for accurate timestamps
+      const formattedTranscript = existingVideo.transcriptData && existingVideo.transcriptData.length > 0
+        ? existingVideo.transcriptData.map((segment: any) => 
+            `[${segment.startTimeText}] ${segment.text}`
+          ).join('\n')
+        : existingVideo.transcript || "";
+      
+      const summary = await summarizeVideo(formattedTranscript, existingVideo.title, storage);
       
       // Update the video with new summary
       const updatedVideo = await storage.updateVideo(existingVideo.id, { summary });
