@@ -16,7 +16,6 @@ externalPort = 80
 
 [env]
 PORT = "5000"
-DATABASE_URL = "YOUR_DATABASE_CONNECTION_STRING"
 
 [workflows]
 runButton = "Project"
