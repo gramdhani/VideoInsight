@@ -104,18 +104,33 @@ export async function setupAuth(app: Express) {
 
   // Only setup strategies if REPLIT_DOMAINS is available
   if (process.env.REPLIT_DOMAINS) {
-    for (const domain of process.env.REPLIT_DOMAINS.split(",")) {
-      const strategy = new Strategy(
-        {
-          name: `replitauth:${domain}`,
-          config,
-          scope: "openid email profile offline_access",
-          callbackURL: `https://${domain}/api/callback`,
-        },
-        verify,
-      );
-      passport.use(strategy);
+    const domains = process.env.REPLIT_DOMAINS.split(",");
+    console.log(`Setting up authentication strategies for domains: ${domains.join(', ')}`);
+    
+    for (const domain of domains) {
+      const trimmedDomain = domain.trim();
+      const callbackURL = `https://${trimmedDomain}/api/callback`;
+      
+      console.log(`Creating strategy for domain: ${trimmedDomain} with callback: ${callbackURL}`);
+      
+      try {
+        const strategy = new Strategy(
+          {
+            name: `replitauth:${trimmedDomain}`,
+            config,
+            scope: "openid email profile offline_access",
+            callbackURL,
+          },
+          verify,
+        );
+        passport.use(strategy);
+        console.log(`Successfully registered strategy: replitauth:${trimmedDomain}`);
+      } catch (error) {
+        console.error(`Failed to create strategy for domain ${trimmedDomain}:`, error);
+      }
     }
+  } else {
+    console.warn("REPLIT_DOMAINS not available - no authentication strategies will be set up");
   }
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
@@ -129,21 +144,37 @@ export async function setupAuth(app: Express) {
 
     // Find the correct domain from REPLIT_DOMAINS that matches this request
     const domains = process.env.REPLIT_DOMAINS.split(",");
-    const matchingDomain = domains.find(domain => 
-      domain === req.hostname || 
-      req.get('host') === domain ||
-      req.get('x-forwarded-host') === domain
-    ) || domains[0]; // fallback to first domain
+    const requestHost = req.get('x-forwarded-host') || req.get('host') || req.hostname;
+    
+    let matchingDomain = domains.find(domain => {
+      // More flexible domain matching
+      return domain === requestHost || 
+             domain.includes(requestHost) || 
+             requestHost.includes(domain) ||
+             domain === req.hostname;
+    });
+    
+    // If no match found, use the first domain as fallback
+    if (!matchingDomain) {
+      matchingDomain = domains[0];
+      console.log(`No exact domain match found, using fallback: ${matchingDomain}`);
+    }
 
     console.log(`Login attempt - hostname: ${req.hostname}, host: ${req.get('host')}, x-forwarded-host: ${req.get('x-forwarded-host')}`);
+    console.log(`Request host: ${requestHost}`);
     console.log(`Available domains: ${domains.join(', ')}`);
     console.log(`Selected domain: ${matchingDomain}`);
     console.log(`Strategy name: replitauth:${matchingDomain}`);
 
-    passport.authenticate(`replitauth:${matchingDomain}`, {
-      prompt: "login consent",
-      scope: ["openid", "email", "profile", "offline_access"],
-    })(req, res, next);
+    try {
+      passport.authenticate(`replitauth:${matchingDomain}`, {
+        prompt: "login consent",
+        scope: ["openid", "email", "profile", "offline_access"],
+      })(req, res, next);
+    } catch (error) {
+      console.error(`Authentication error for domain ${matchingDomain}:`, error);
+      return res.status(500).json({ message: "Authentication setup error" });
+    }
   });
 
   app.get("/api/callback", (req, res, next) => {
@@ -154,16 +185,60 @@ export async function setupAuth(app: Express) {
 
     // Find the correct domain from REPLIT_DOMAINS that matches this request
     const domains = process.env.REPLIT_DOMAINS.split(",");
-    const matchingDomain = domains.find(domain => 
-      domain === req.hostname || 
-      req.get('host') === domain ||
-      req.get('x-forwarded-host') === domain
-    ) || domains[0]; // fallback to first domain
+    const requestHost = req.get('x-forwarded-host') || req.get('host') || req.hostname;
+    
+    let matchingDomain = domains.find(domain => {
+      // More flexible domain matching
+      return domain === requestHost || 
+             domain.includes(requestHost) || 
+             requestHost.includes(domain) ||
+             domain === req.hostname;
+    });
+    
+    // If no match found, use the first domain as fallback
+    if (!matchingDomain) {
+      matchingDomain = domains[0];
+      console.log(`Callback: No exact domain match found, using fallback: ${matchingDomain}`);
+    }
 
-    passport.authenticate(`replitauth:${matchingDomain}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
-    })(req, res, next);
+    console.log(`Callback attempt - hostname: ${req.hostname}, host: ${req.get('host')}, x-forwarded-host: ${req.get('x-forwarded-host')}`);
+    console.log(`Callback request host: ${requestHost}`);
+    console.log(`Callback available domains: ${domains.join(', ')}`);
+    console.log(`Callback selected domain: ${matchingDomain}`);
+    console.log(`Callback strategy name: replitauth:${matchingDomain}`);
+
+    try {
+      passport.authenticate(`replitauth:${matchingDomain}`, {
+        successReturnToOrRedirect: "/",
+        failureRedirect: "/api/login",
+        failureFlash: false,
+      })(req, res, next);
+    } catch (error) {
+      console.error(`Callback authentication error for domain ${matchingDomain}:`, error);
+      console.log(`Redirecting to login due to error`);
+      return res.redirect("/api/login");
+    }
+  });
+
+  // Add a debug route to check authentication status
+  app.get("/api/auth/debug", (req, res) => {
+    const domains = process.env.REPLIT_DOMAINS?.split(",") || [];
+    const requestHost = req.get('x-forwarded-host') || req.get('host') || req.hostname;
+    
+    res.json({
+      isAuthenticated: req.isAuthenticated(),
+      user: req.user || null,
+      environment: process.env.NODE_ENV,
+      hasReplId: !!process.env.REPL_ID,
+      hasReplitDomains: !!process.env.REPLIT_DOMAINS,
+      domains: domains,
+      requestHost: requestHost,
+      hostname: req.hostname,
+      headers: {
+        host: req.get('host'),
+        'x-forwarded-host': req.get('x-forwarded-host'),
+      }
+    });
   });
 
   app.get("/api/logout", (req, res) => {
