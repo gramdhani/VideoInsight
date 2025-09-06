@@ -96,10 +96,19 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
-    updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
-    verified(null, user);
+    try {
+      console.log("OAuth verify function called - tokens received");
+      const user = {};
+      updateUserSession(user, tokens);
+      console.log("User session updated");
+      await upsertUser(tokens.claims());
+      console.log("User upserted to database");
+      verified(null, user);
+      console.log("OAuth verification completed successfully");
+    } catch (error) {
+      console.error("Error in OAuth verify function:", error);
+      verified(error, null);
+    }
   };
 
   // Only setup strategies if REPLIT_DOMAINS is available
@@ -178,8 +187,13 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/callback", (req, res, next) => {
+    console.log("=== OAuth Callback Started ===");
+    console.log("Query params:", req.query);
+    console.log("Full URL:", req.url);
+    
     // Check if authentication is available
     if (!process.env.REPLIT_DOMAINS || !process.env.REPL_ID) {
+      console.error("OAuth callback failed: Missing environment variables");
       return res.status(503).json({ message: "Authentication not available in production" });
     }
 
@@ -208,6 +222,7 @@ export async function setupAuth(app: Express) {
     console.log(`Callback strategy name: replitauth:${matchingDomain}`);
 
     try {
+      console.log(`Attempting callback authentication with strategy: replitauth:${matchingDomain}`);
       passport.authenticate(`replitauth:${matchingDomain}`, {
         successReturnToOrRedirect: "/",
         failureRedirect: "/api/login",
