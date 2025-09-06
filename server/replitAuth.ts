@@ -89,6 +89,8 @@ export async function setupAuth(app: Express) {
     console.log("Production mode: REPL_ID not available, skipping OIDC authentication setup");
     return;
   }
+  
+  console.log(`Authentication setup - Environment: ${process.env.NODE_ENV}, REPL_ID: ${process.env.REPL_ID ? 'Present' : 'Missing'}, REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS || 'Missing'}`);
 
   const config = await getOidcConfig();
 
@@ -146,8 +148,11 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    console.log(`Login endpoint hit - REPL_ID: ${process.env.REPL_ID ? 'Present' : 'Missing'}, REPLIT_DOMAINS: ${process.env.REPLIT_DOMAINS || 'Missing'}`);
+    
     // Check if authentication is available
     if (!process.env.REPLIT_DOMAINS || !process.env.REPL_ID) {
+      console.error("Login failed: Missing REPLIT_DOMAINS or REPL_ID");
       return res.status(503).json({ message: "Authentication not available in production" });
     }
 
@@ -225,8 +230,26 @@ export async function setupAuth(app: Express) {
       console.log(`Attempting callback authentication with strategy: replitauth:${matchingDomain}`);
       passport.authenticate(`replitauth:${matchingDomain}`, {
         successReturnToOrRedirect: "/",
-        failureRedirect: "/api/login",
+        failureRedirect: "/api/login?error=auth_failed",
         failureFlash: false,
+        failureMessage: true
+      }, (err: any, user: any, info: any) => {
+        if (err) {
+          console.error("Passport authentication error:", err);
+          return res.redirect("/api/login?error=auth_error");
+        }
+        if (!user) {
+          console.error("No user returned from authentication:", info);
+          return res.redirect("/api/login?error=no_user");
+        }
+        req.logIn(user, (err: any) => {
+          if (err) {
+            console.error("Login error:", err);
+            return res.redirect("/api/login?error=login_failed");
+          }
+          console.log("User successfully logged in, redirecting to /");
+          return res.redirect("/");
+        });
       })(req, res, next);
     } catch (error) {
       console.error(`Callback authentication error for domain ${matchingDomain}:`, error);
